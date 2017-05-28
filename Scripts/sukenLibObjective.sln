@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual C++ Express 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sukenLibObjective", "sukenLibObjective.vcxproj", "{441781E7-5FBE-45C8-8663-53BF60439229}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{441781E7-5FBE-45C8-8663-53BF60439229}.Debug|Win32.ActiveCfg = Debug|Win32
+		{441781E7-5FBE-45C8-8663-53BF60439229}.Debug|Win32.Build.0 = Debug|Win32
+		{441781E7-5FBE-45C8-8663-53BF60439229}.Release|Win32.ActiveCfg = Release|Win32
+		{441781E7-5FBE-45C8-8663-53BF60439229}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
