@@ -12,6 +12,7 @@ const std::string nTool[60] = { "pplsflad1","pplsflad2","pplsflad3","pplsflad4",
 const std::string nSorce[200] = { "oaosflad1","oaosflad2","oaosflad3","oaosflad4","oaosflad5","oaosflad6","oaosflad7","oaosflad8","oaosflad9","oaosflad10","oaosflad11","oaosflad12","oaosflad13","oaosflad14","oaosflad15","oaosflad16","oaosflad17","oaosflad18","oaosflad19","oaosflad20","oaosflad21","oaosflad22","oaosflad23","oaosflad24","oaosflad25","oaosflad26","oaosflad27","oaosflad28","oaosflad29","oaosflad30","oaosflad31","oaosflad32","oaosflad33","oaosflad34","oaosflad35","oaosflad36","oaosflad37","oaosflad38","oaosflad39","oaosflad40","oaosflad41","oaosflad42","oaosflad43","oaosflad44","oaosflad45","oaosflad46","oaosflad47","oaosflad48","oaosflad49","oaosflad50","oaosflad51","oaosflad52","oaosflad53","oaosflad54","oaosflad55","oaosflad56","oaosflad57","oaosflad58","oaosflad59","oaosflad60","oaosflad61","oaosflad62","oaosflad63","oaosflad64","oaosflad65","oaosflad66","oaosflad67","oaosflad68","oaosflad69","oaosflad70","oaosflad71","oaosflad72","oaosflad73","oaosflad74","oaosflad75","oaosflad76","oaosflad77","oaosflad78","oaosflad79","oaosflad80","oaosflad81","oaosflad82","oaosflad83","oaosflad84","oaosflad85","oaosflad86","oaosflad87","oaosflad88","oaosflad89","oaosflad90","oaosflad91","oaosflad92","oaosflad93","oaosflad94","oaosflad95","oaosflad96","oaosflad97","oaosflad98","oaosflad99","oaosflad100","oaosflad101","oaosflad102","oaosflad103","oaosflad104","oaosflad105","oaosflad106","oaosflad107","oaosflad108","oaosflad109","oaosflad110","oaosflad111","oaosflad112","oaosflad113","oaosflad114","oaosflad115","oaosflad116","oaosflad117","oaosflad118","oaosflad119","oaosflad120","oaosflad121","oaosflad122","oaosflad123","oaosflad124","oaosflad125","oaosflad126","oaosflad127","oaosflad128","oaosflad129","oaosflad130","oaosflad131","oaosflad132","oaosflad133","oaosflad134","oaosflad135","oaosflad136","oaosflad137","oaosflad138","oaosflad139","oaosflad140","oaosflad141","oaosflad142","oaosflad143","oaosflad144","oaosflad145","oaosflad146","oaosflad147","oaosflad148","oaosflad149","oaosflad150","oaosflad151","oaosflad152","oaosflad153","oaosflad154","oaosflad155","oaosflad156","oaosflad157","oaosflad158","oaosflad159","oaosflad160","oaosflad161","oaosflad162","oaosflad163","oaosflad164","oaosflad165","oaosflad166","oaosflad167","oaosflad168","oaosflad169","oaosflad170","oaosflad171","oaosflad172","oaosflad173","oaosflad174","oaosflad175","oaosflad176","oaosflad177","oaosflad178","oaosflad179","oaosflad180","oaosflad181","oaosflad182","oaosflad183","oaosflad184","oaosflad185","oaosflad186","oaosflad187","oaosflad188","oaosflad189","oaosflad190","oaosflad191","oaosflad192","oaosflad193","oaosflad194","oaosflad195","oaosflad196","oaosflad197","oaosflad198","oaosflad199","oaosflad200" };
 const std::string NwearEquipmentLocate[5][2] = {"rhsrsrgs","sxfbxfg","rhsrsrgs2","sxfbxfg2" ,"rhsrsrgs3","sxfbxfg3","rhsrsrgs4","sxfbxfg4" ,"rhsrsrgs5","sxfbxfg5"};
 const std::string Nmoney = "sida";
+const std::string NitemSet[200] = { "fksffhdppap1","fksffhdppap2","fksffhdppap3","fksffhdppap4","fksffhdppap5","fksffhdppap6","fksffhdppap7","fksffhdppap8","fksffhdppap9","fksffhdppap10","fksffhdppap11","fksffhdppap12","fksffhdppap13","fksffhdppap14","fksffhdppap15","fksffhdppap16","fksffhdppap17","fksffhdppap18","fksffhdppap19","fksffhdppap20","fksffhdppap21","fksffhdppap22","fksffhdppap23","fksffhdppap24","fksffhdppap25","fksffhdppap26","fksffhdppap27","fksffhdppap28","fksffhdppap29","fksffhdppap30","fksffhdppap31","fksffhdppap32","fksffhdppap33","fksffhdppap34","fksffhdppap35","fksffhdppap36","fksffhdppap37","fksffhdppap38","fksffhdppap39","fksffhdppap40","fksffhdppap41","fksffhdppap42","fksffhdppap43","fksffhdppap44","fksffhdppap45","fksffhdppap46","fksffhdppap47","fksffhdppap48","fksffhdppap49","fksffhdppap50","fksffhdppap51","fksffhdppap52","fksffhdppap53","fksffhdppap54","fksffhdppap55","fksffhdppap56","fksffhdppap57","fksffhdppap58","fksffhdppap59","fksffhdppap60","fksffhdppap61","fksffhdppap62","fksffhdppap63","fksffhdppap64","fksffhdppap65","fksffhdppap66","fksffhdppap67","fksffhdppap68","fksffhdppap69","fksffhdppap70","fksffhdppap71","fksffhdppap72","fksffhdppap73","fksffhdppap74","fksffhdppap75","fksffhdppap76","fksffhdppap77","fksffhdppap78","fksffhdppap79","fksffhdppap80","fksffhdppap81","fksffhdppap82","fksffhdppap83","fksffhdppap84","fksffhdppap85","fksffhdppap86","fksffhdppap87","fksffhdppap88","fksffhdppap89","fksffhdppap90","fksffhdppap91","fksffhdppap92","fksffhdppap93","fksffhdppap94","fksffhdppap95","fksffhdppap96","fksffhdppap97","fksffhdppap98","fksffhdppap99","fksffhdppap100","fksffhdppap101","fksffhdppap102","fksffhdppap103","fksffhdppap104","fksffhdppap105","fksffhdppap106","fksffhdppap107","fksffhdppap108","fksffhdppap109","fksffhdppap110","fksffhdppap111","fksffhdppap112","fksffhdppap113","fksffhdppap114","fksffhdppap115","fksffhdppap116","fksffhdppap117","fksffhdppap118","fksffhdppap119","fksffhdppap120","fksffhdppap121","fksffhdppap122","fksffhdppap123","fksffhdppap124","fksffhdppap125","fksffhdppap126","fksffhdppap127","fksffhdppap128","fksffhdppap129","fksffhdppap130","fksffhdppap131","fksffhdppap132","fksffhdppap133","fksffhdppap134","fksffhdppap135","fksffhdppap136","fksffhdppap137","fksffhdppap138","fksffhdppap139","fksffhdppap140","fksffhdppap141","fksffhdppap142","fksffhdppap143","fksffhdppap144","fksffhdppap145","fksffhdppap146","fksffhdppap147","fksffhdppap148","fksffhdppap149","fksffhdppap150","fksffhdppap151","fksffhdppap152","fksffhdppap153","fksffhdppap154","fksffhdppap155","fksffhdppap156","fksffhdppap157","fksffhdppap158","fksffhdppap159","fksffhdppap160","fksffhdppap161","fksffhdppap162","fksffhdppap163","fksffhdppap164","fksffhdppap165","fksffhdppap166","fksffhdppap167","fksffhdppap168","fksffhdppap169","fksffhdppap170","fksffhdppap171","fksffhdppap172","fksffhdppap173","fksffhdppap174","fksffhdppap175","fksffhdppap176","fksffhdppap177","fksffhdppap178","fksffhdppap179","fksffhdppap180","fksffhdppap181","fksffhdppap182","fksffhdppap183","fksffhdppap184","fksffhdppap185","fksffhdppap186","fksffhdppap187","fksffhdppap188","fksffhdppap189","fksffhdppap190","fksffhdppap191","fksffhdppap192","fksffhdppap193","fksffhdppap194","fksffhdppap195","fksffhdppap196","fksffhdppap197","fksffhdppap198","fksffhdppap199","fksffhdppap200" };
 
 
 CMySaveData::CMySaveData(bool kari) {
@@ -51,6 +52,12 @@ CMySaveData::CMySaveData(bool kari) {
 		food[i] = data->GetInt(nFood[i]);
 	}
 
+	for (int i = 0; i < 10; i++) {
+		for (int j = 0; j < 10; j++) {
+			itemSet[i][j].first = data->GetInt(NitemSet[i * 20 + j*2]);
+			itemSet[i][j].second = data->GetInt(NitemSet[i * 20 + j * 2 +1]);
+		}
+	}
 
 	if (EquipmentAmount==0) {
 		EquipmentAmount = 7;
@@ -69,6 +76,10 @@ CMySaveData::CMySaveData(bool kari) {
 
 		}
 
+		for (int i = 0; i < 10; i++) {
+			recipeStep[i] = 0;
+		}
+
 		for (int i = 0; i < 200; i++) {
 			sorce[i] = 0;
 		}
@@ -79,10 +90,20 @@ CMySaveData::CMySaveData(bool kari) {
 			food[i] = 0;
 		}
 		sorce[1] = 100;
+		sorce[3] = 100;
 		tool[0] = 1;
-		food[0] = 1;
+		food[0] = 50;
+		food[2] = 100;
 		money = 1000;
 
+	
+		for (int i = 0; i < 10; i++) {
+			for (int j = 0; j < 10; j++) {
+				itemSet[i][j].first = 0;
+				itemSet[i][j].second = 0;
+			}
+		}
+		itemSet[0][0].second = 1;
 	
 	}
 
@@ -121,7 +142,12 @@ void CMySaveData::WriteSaveData() {
 
 	data->Set(Nmoney, money);
 
-
+	for (int i = 0; i < 10; i++) {
+		for (int j = 0; j < 10; j++) {
+			data->Set(NitemSet[i * 20 + j * 2], itemSet[i][j].first);
+			data->Set(NitemSet[i * 20 + j * 2 + 1], itemSet[i][j].second);
+		}
+	}
 
 	data->WriteAll();
 }
@@ -154,7 +180,12 @@ void CMySaveData::WriteSaveDataToOther() {
 	}
 	otherData->Set(Nmoney, money);
 
-
+	for (int i = 0; i < 10; i++) {
+		for (int j = 0; j < 10; j++) {
+			otherData->Set(NitemSet[i * 20 + j * 2], itemSet[i][j].first);
+			otherData->Set(NitemSet[i * 20 + j * 2 + 1], itemSet[i][j].second);
+		}
+	}
 
 	otherData->WriteAll();
 }
@@ -186,6 +217,17 @@ void CMySaveData::SetItem(int kind, int num, int amount)
 
 }
 
+void CMySaveData::SetMoney(int amount)
+{
+	money = amount;
+}
+
+void CMySaveData::SetItemSet(int setNum, int conNum, int kind, int num)
+{
+	itemSet[setNum][conNum].first = kind;
+	itemSet[setNum][conNum].second = num;
+}
+
 
 int CMySaveData::GetEquipmentAmountSaveData(){
 	return EquipmentAmount;
@@ -213,5 +255,15 @@ int CMySaveData::GetItem(int kind, int num)
 		default:break;
 	}
 
+}
+
+int CMySaveData::GetSetItem(int setNum, int conNum, bool first)
+{
+	if (first) {
+		return itemSet[setNum][conNum].first;
+	}
+	else {
+		return itemSet[setNum][conNum].second;
+	}
 }
 

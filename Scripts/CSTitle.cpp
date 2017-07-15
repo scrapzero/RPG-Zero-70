@@ -12,14 +12,17 @@ bool KeyDown();
 void CSTitle::Start() {
 	SetBackGround("pic/title.png");
 	/*textWindow = new CTextWindow("TITLE‚¾‚æ[/nfhdh‚ ‚©‚©‚©/n‚ ‚¦‚Ó‚Ÿ/n‚“‚¾‚¦‚„‚‘/n‚³‚¾‚¾/n‚ ‚“‚©/n‚ ‚³‚Ó‚Ÿ‚†‚ƒ");
-	mySaveData = new CMySaveData(false);
-	mySaveData->WriteSaveData();
-	mySaveData->WriteSaveDataToOther();
 	Map = MCE("");
 	product = new CProduce(mySaveData, 0);
 	equipmentManager = new CEquipmentManager(mySaveData,0);
 	ItemManager = new CItemManager(1, mySaveData);*/
+
+	mySaveData = new CMySaveData(false);
+	mySaveData->WriteSaveData();
+	mySaveData->WriteSaveDataToOther();
 }
+
+
 
 void CSTitle::Loop() {
 	if (KeyOK()) {
@@ -47,7 +50,7 @@ void CSTitle::Draw() {
 
 void CSTitle::End() {
 
-	//delete mySaveData;
+	delete mySaveData;
 	mySaveData = NULL;
 
 }

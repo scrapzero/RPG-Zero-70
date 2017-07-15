@@ -34,21 +34,27 @@ CProduce::CProduce(CMySaveData * CSD, int proKind) :RecipeInfo("")
 		break;
 	case 3:	RecipeInfo = "zero/ZeroData/ShieldRecipe.txt"; 
 		recipeNameKind = "盾レシピ";
+		kindNum = 100;
 		break;
 	case 4: RecipeInfo = "zero/ZeroData/ProtecterRecipe.txt"; 
-		recipeNameKind = "防具（胴）レシピ";
+		recipeNameKind = "胴レシピ";
+		kindNum = 100;
 		break;
 	case 5: RecipeInfo = "zero/ZeroData/ShoesRecipe.txt"; 
-		recipeNameKind = "防具（靴）レシピ";
+		recipeNameKind = "靴レシピ";
+		kindNum = 100;
 		break;
 	case 6: RecipeInfo = "zero/ZeroData/AccessoryRecipe.txt"; 
 		recipeNameKind = "装飾品レシピ";
+		kindNum = 100;
 		break;
 	case 7: RecipeInfo = "zero/ZeroData/SorceRecipe.txt"; 
 		recipeNameKind = "加工素材レシピ";
+		kindNum = 100;
 		break;
 	case 8: RecipeInfo = "zero/ZeroData/ToolRecipe.txt"; 
 		recipeNameKind = "道具レシピ";
+		kindNum = 100;
 		break;
 	case 9: RecipeInfo = "zero/ZeroData/FoodRecipe.txt"; 
 		kindNum = 100;
@@ -108,10 +114,12 @@ void CProduce::WindowLoop()
 	stepChangeF = false;
 	sozaiAru = true;
 	makeMax = 99;
+	int bu = 0;
 	int buf = 0;
+	int buff, bufff;
 
 	for (int i = 0, looptime = RecipeInfo[lookLocate + lookPage * 20][4]; i < looptime; i++) {
-		int buf, buff, bufff;
+		
 		buf = RecipeInfo[lookLocate + lookPage * 20][5 + i * 3];
 		buff = RecipeInfo[lookLocate + lookPage * 20][6 + i * 3];
 		bufff = RecipeInfo[lookLocate + lookPage * 20][7 + i * 3];
@@ -200,10 +208,10 @@ void CProduce::WindowLoop()
 			step = 1;
 			stepChangeF = true;
 			if (proKind <= 6) {
-				yesNoWindow = new CYesNoWindow(&madeF, "この武器を作るんだな？", true, 200, 200);
+				yesNoWindow = new CYesNoWindow(&madeF, "この武器を作るんだな？", true, 90, 120);
 			}
 			else {
-				amountGetWindow = new CAmountGetWindow("何個作るんだ？", 200, 400, makeMax);
+				amountGetWindow = new CAmountGetWindow("何個作る？", 90, 120, makeMax);
 			}
 		}
 	}
@@ -217,9 +225,9 @@ void CProduce::WindowLoop()
 				delete yesNoWindow;
 				yesNoWindow = NULL;
 				if (madeF == true) {
-					equipManager->PushEquipment(proKind, lookLocate + (lookPage * 20), 0);
+					bu = RecipeInfo[lookLocate + lookPage * 20][2];
+					equipManager->PushEquipment(proKind, bu, 0);
 					for (int i = 0, looptime = RecipeInfo[lookLocate + lookPage * 20][4]; i < looptime; i++) {
-						int buf, buff, bufff;
 						buf = RecipeInfo[lookLocate + lookPage * 20][5 + i * 3];
 						buff = RecipeInfo[lookLocate + lookPage * 20][6 + i * 3];
 						bufff = RecipeInfo[lookLocate + lookPage * 20][7 + i * 3];
@@ -235,20 +243,27 @@ void CProduce::WindowLoop()
 			if (KeyOK() && stepChangeF == false) {
 				stepChangeF = true;
 				step = 0;
-				delete amountGetWindow;
-				amountGetWindow = NULL;
-				if (madeF == true) {
-					itemManager->Add(proKind - 7, lookLocate + lookPage * 20, amountGetWindow->GetAmount());
+					bu=RecipeInfo[lookLocate + lookPage * 20][2];
+					itemManager->Add(proKind - 7, bu, amountGetWindow->GetAmount());
 					for (int i = 0, looptime = RecipeInfo[lookLocate + lookPage * 20][4]; i < looptime; i++) {
-						int buf, buff, bufff;
 						buf = RecipeInfo[lookLocate + lookPage * 20][5 + i * 3];
 						buff = RecipeInfo[lookLocate + lookPage * 20][6 + i * 3];
 						bufff = RecipeInfo[lookLocate + lookPage * 20][7 + i * 3];
 						bufff *= amountGetWindow->GetAmount();
 						itemManager->Remove(buf - 7, buff, bufff);
-					}
 				}
+
+					delete amountGetWindow;
+					amountGetWindow = NULL;
+
 			}
+			else if (KeyCancel()) {
+				stepChangeF = true;
+				step = 0;
+				delete amountGetWindow;
+				amountGetWindow = NULL;
+			}
+
 		}
 
 
@@ -260,11 +275,11 @@ void CProduce::WindowLoop()
 
 void CProduce::WindowDraw()
 {
-
+	int buf, buff, bufff,buffff;
 	std::string name = "";
 
 	
-	if (step == 0) {
+	if (step <= 1) {
 		Window[2](2, 10);
 		Window[1](450, 10);
 		DrawFormatString(40, 20, BLACK, "%s",recipeNameKind.c_str());
@@ -286,15 +301,21 @@ void CProduce::WindowDraw()
 		}
 
 		for (int i = 0, looptime = RecipeInfo[lookLocate + lookPage * 20][4]; i < looptime; i++) {
-			int buf, buff, bufff;
 			buf = RecipeInfo[lookLocate + lookPage * 20][5 + i * 3];
 			buff = RecipeInfo[lookLocate + lookPage * 20][6 + i * 3];
 			bufff = RecipeInfo[lookLocate + lookPage * 20][7 + i * 3];
+			buffff=RecipeInfo[lookLocate + lookPage * 20][2];
 			name = (*SorceInfo[buf - 7])[buff - 1][1];
-			DrawFormatString(460, 80 + i * 40, BLACK, "%s  ×%d /%d個所持", name.c_str(), bufff,itemManager->GetAmount(buf-7,buff));
+			DrawFormatString(460, 80 + i * 56, BLACK, "%s  ×%d /%d個所持", name.c_str(), bufff,itemManager->GetAmount(buf-7,buff));
 		}
 		if (sozaiAru == false) {
 			DrawFormatString(500, 330, RED_DP, "素材が足りません");
+			if (proKind <= 6 && equipManager->GetSize(proKind)>=50) {
+				DrawFormatString(500, 330, RED_DP, "これ以上この装備類はもてません。");
+			}
+			if (proKind > 6 && itemManager->GetAmount(proKind-7,buffff) >= 999) {
+				DrawFormatString(500, 330, RED_DP, "これ以上このアイテムはもてません。");
+			}
 		}
 
 	}
@@ -309,5 +330,10 @@ void CProduce::WindowDraw()
 
 	}
 
+}
+
+bool CProduce::GetStepChangeFlag()
+{
+	return stepChangeF;
 }
 

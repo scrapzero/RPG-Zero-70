@@ -398,11 +398,35 @@ void CSTown::Loop() {
 	if (graphDirect == 3 && KeyOK()) {
 		checkAround[0] = TownMap.Get(TownMap.layer.C, jikiMapX, jikiMapY - 1) - 1;
 		checkAround[1] = TownMap.Get(TownMap.layer.B, jikiMapX, jikiMapY - 1) - 1;
-		if (checkAround[0] == 137 || checkAround[1] == 137) {
-			FlipScene(new CSCook(*this));
+		
+		if (checkAround[0] == 135 || checkAround[1] == 135) {
+			FlipScene(new CSProTool(*this), Flip::SLIDE_UP, 10);
 		}
+
+		if (checkAround[0] == 136 || checkAround[1] == 136) {
+			FlipScene(new CSProEquipment(*this),Flip::SLIDE_UP,10);
+		}
+
+		if (checkAround[0] == 137 || checkAround[1] == 137) {
+			FlipScene(new CSCook(*this), Flip::SLIDE_UP, 10);
+		}
+
+		if (checkAround[0] == 139 || checkAround[1] == 139) {
+			FlipScene(new CSSorceRemake(*this), Flip::SLIDE_UP, 10);
+		}
+
 	
 	
+	}
+
+	if (graphDirect == 2 && KeyOK()) {
+		checkAround[0] = TownMap.Get(TownMap.layer.C, jikiMapX + 1, jikiMapY) - 1;
+		checkAround[1] = TownMap.Get(TownMap.layer.B, jikiMapX + 1, jikiMapY) - 1;
+
+		if (checkAround[0] == 142 || checkAround[1] == 142) {
+			FlipScene(new CSItemSet(*this), Flip::SLIDE_UP, 10);
+		}
+
 	}
 
 	jikiMapX = (jikiX + scrollX) / 32;
@@ -449,6 +473,76 @@ void CSTown::End() {
 }
 
 
+CSTown::CSProTool::CSProTool(CSTown & cstown) :cstown(cstown)
+{
+	textWindow = new CTextWindow("何を作るんだい？");
+	classStart = false;
+	step = 0;
+}
+
+void CSTown::CSProTool::Loop()
+{
+	if (classStart == true) {
+
+		switch (step)
+		{
+		case 2:
+			textWindow->Loop();
+			if (textWindow->GetTextEmpty() == true) {
+				cstown.RemoveScene(Flip::SLIDE_DOWN, 10);
+			}
+			break;
+		case 1:
+			produce->WindowLoop();
+			if (KeyCancel() && produce->GetStepChangeFlag() == false) {
+				step = 2;
+				textWindow->PushText("また道具を作ってほしかったら、来いよな");
+				delete produce;
+				produce = NULL;
+			}
+			break;
+		case 0:
+			textWindow->Loop();
+			if (textWindow->GetTextEmpty() == true) {
+				step = 1;
+				produce = new CProduce(cstown.mySaveData, 8);
+			}
+			break;
+
+
+		default:break;
+		}
+
+
+
+	}
+	classStart = true;
+}
+
+void CSTown::CSProTool::Draw()
+{
+	switch (step)
+	{
+	case 2:
+		textWindow->Draw();
+		break;
+	case 1:
+		produce->WindowDraw();
+		break;
+
+	case 0:
+		textWindow->Draw();
+		break;
+
+	default:break;
+	}
+}
+
+void CSTown::CSProTool::End()
+{
+	delete textWindow;
+	textWindow = NULL;
+}
 
 CSTown::CSCook::CSCook(CSTown & cstown) :cstown(cstown)
 {
@@ -464,11 +558,21 @@ void CSTown::CSCook::Loop()
 
 		switch (step)
 		{
-
+		case 2:
+			textWindow->Loop();
+			if (textWindow->GetTextEmpty() == true) {
+				cstown.RemoveScene(Flip::SLIDE_DOWN, 10);
+			}
+			break;
 		case 1:
 			produce->WindowLoop();
-
-		break;
+			if (KeyCancel() && produce->GetStepChangeFlag()==false) {
+				step = 2;
+				textWindow->PushText("また料理を作ってほしかったら、来てくれカボ");
+				delete produce;
+				produce = NULL;
+			}
+			break;
 		case 0:
 			textWindow->Loop();
 			if (textWindow->GetTextEmpty() == true) {
@@ -493,13 +597,16 @@ void CSTown::CSCook::Draw()
 {
 	switch (step)
 	{
+	case 2:
+		textWindow->Draw();
+		break;
 	case 1:
 		produce->WindowDraw();
-	break;
+		break;
 
 	case 0:
 		textWindow->Draw();
-	break;
+		break;
 
 	default:break;
 	}
@@ -510,6 +617,303 @@ void CSTown::CSCook::End()
 {
 	delete textWindow;
 	textWindow = NULL;
-	delete cstown.mySaveData;
-	cstown.mySaveData = NULL;
+}
+
+
+CSTown::CSProEquipment::CSProEquipment(CSTown & cstown) :cstown(cstown)
+{
+	kindSerectWindow = "zero/EquipmentWindow.png";
+	arrowGraph = "zero/SmallArrow.png";
+	step = 0;
+	arrowPoint = 0;
+	S = "他になんの装備を作るんだ？";
+	textWindow = new CTextWindow("どの装備を作るんだ？");
+}
+
+void CSTown::CSProEquipment::Loop()
+{
+	switch (step)
+	{
+	case 2:
+		textWindow->Loop();
+		if (textWindow->GetTextEmpty()) {
+			cstown.RemoveScene(Flip::SLIDE_DOWN, 10);
+		}
+		break;
+
+	case 1:
+		produce->WindowLoop();
+		if (KeyCancel()) {
+			step = 0;
+			delete produce;
+			produce = NULL;
+			textWindow->PushText("%s",S);
+		}
+
+		break;
+
+	case 0:
+		textWindow->Loop();
+		if (KeyDown() && arrowPoint < 6) {
+			arrowPoint++;
+		}
+		if (KeyUp() && arrowPoint > 0) {
+			arrowPoint--;
+		}
+		if (KeyOK()) {
+			step = 1;
+			produce = new CProduce(cstown.mySaveData, arrowPoint);
+		}
+		if (KeyCancel()) {
+			step = 2;
+			textWindow->TextClear();
+			textWindow->PushText("またいつでも来てくれ。");
+		}
+
+		break;
+
+	default:
+		break;
+	}
+
+}
+
+void CSTown::CSProEquipment::Draw()
+{
+	switch (step)
+	{
+	case 2:
+		textWindow->Draw();
+		kindSerectWindow(520, 20);
+		arrowGraph(550, 40 + 37 * arrowPoint);
+		break;
+
+	case 1:
+			produce->WindowDraw();
+			break;
+
+	case 0:
+		textWindow->Draw();
+		kindSerectWindow(520, 20);
+		arrowGraph(550, 40 + 37* arrowPoint);
+			break;
+
+	default:
+		break;
+	}
+
+}
+
+void CSTown::CSProEquipment::End()
+{
+	delete textWindow;
+	textWindow = NULL;
+}
+
+
+CSTown::CSSorceRemake::CSSorceRemake(CSTown & cstown) :cstown(cstown)
+{
+	textWindow = new CTextWindow("何を加工すればいい？");
+	classStart = false;
+	step = 0;
+}
+
+void CSTown::CSSorceRemake::Loop()
+{
+
+	if (classStart == true) {
+
+		switch (step)
+		{
+		case 2:
+			textWindow->Loop();
+			if (textWindow->GetTextEmpty() == true) {
+				cstown.RemoveScene(Flip::SLIDE_DOWN, 10);
+			}
+			break;
+		case 1:
+			produce->WindowLoop();
+			if (KeyCancel() && produce->GetStepChangeFlag() == false) {
+				step = 2;
+				textWindow->PushText("また加工してほしっかたらここまで来な");
+				delete produce;
+				produce = NULL;
+			}
+			break;
+		case 0:
+			textWindow->Loop();
+			if (textWindow->GetTextEmpty() == true) {
+				step = 1;
+				produce = new CProduce(cstown.mySaveData, 7);
+			}
+			break;
+
+
+		default:break;
+		}
+
+
+
+
+
+	}
+	classStart = true;
+}
+
+void CSTown::CSSorceRemake::Draw()
+{
+	switch (step)
+	{
+	case 2:
+		textWindow->Draw();
+		break;
+	case 1:
+		produce->WindowDraw();
+		break;
+
+	case 0:
+		textWindow->Draw();
+		break;
+
+	default:break;
+	}
+}
+
+void CSTown::CSSorceRemake::End()
+{
+	delete textWindow;
+	textWindow = NULL;
+}
+
+
+CSTown::CSItemSet::CSItemSet(CSTown & cstown) :cstown(cstown)
+{
+	textWindow = new CTextWindow("持っていくアイテムについて何かお困りですか？");
+	classStart = false;
+	step = 0;
+	arrowPoint = 0;
+	arrowPoint2 = 0;
+	ItemInfo[0] = new CSV("zero/ZeroData/Sorce.txt");
+	ItemInfo[1] = new CSV("zero/ZeroData/Tool.txt");
+	ItemInfo[2] = new CSV("zero/ZeroData/Food.txt");
+	Arrow = "zero/SmallArrow.png";
+	Window[0] = "zero/ItemSelectWindow.png";
+	Window[1] = "zero/ItemSelectWindow2.png";
+}
+
+void CSTown::CSItemSet::Loop()
+{
+	if (classStart == true) {
+
+		switch (step)
+		{
+		case 3:
+			if (KeyUp() && 0 < arrowPoint2 ) {
+				arrowPoint2 -= 1;
+			}
+			if (KeyDown() && 2 > arrowPoint2 ) {
+				arrowPoint2 += 1;
+			}
+			break;
+
+		case 2:
+			textWindow->Loop();
+			if (textWindow->GetTextEmpty() == true) {
+				cstown.RemoveScene(Flip::SLIDE_DOWN, 10);
+			}
+			break;
+		case 1:
+			if (KeyUp() && 0 < arrowPoint / 2) {
+				arrowPoint -= 2;
+			}
+			if (KeyDown() && 4 > arrowPoint / 2) {
+				arrowPoint += 2;
+			}
+			if (KeyLeft() || KeyRight()) {
+				if (arrowPoint % 2 == 0) {
+					arrowPoint++;
+				}
+				else {
+					arrowPoint--;
+				}
+			}
+
+			if (KeyOK()) {
+				step = 3;
+			}
+
+			if (KeyCancel()) {
+				step = 2;
+				textWindow->PushText("またいつでも来てくださいね。");
+			}
+			break;
+		case 0:
+			textWindow->Loop();
+			if (textWindow->GetTextEmpty() == true) {
+				step = 1;
+			}
+			break;
+
+
+		default:break;
+		}
+
+
+
+
+
+	}
+	classStart = true;
+
+}
+
+void CSTown::CSItemSet::Draw()
+{
+	string bufS="";
+	int bufInt[2] = {};
+	switch (step)
+	{
+	case 2:
+		textWindow->Draw();
+		break;
+	case 3:
+		Window[1].DrawExtend(380,5,700,160);
+		DrawFormatString(410, 30, BLACK, "このアイテムセットを持っていく");
+
+		DrawFormatString(410, 70, BLACK, "アイテムセットの内容を変更する");
+		DrawFormatString(410, 110, BLACK, "閉じる");
+		Arrow(385,30+arrowPoint2*40);
+
+	case 1:
+		Window[0].DrawExtend(5,5,370,250);
+		Window[1].DrawExtend(5, 260, 370, 570);
+
+		Arrow(12 + (arrowPoint % 2) * 160, 20 + (arrowPoint / 2) * 50);
+		for (int i = 0; i < 10; i++) {
+			DrawFormatString(30 + (i % 2) * 160, 20 + (i / 2) * 50, BLACK, "アイテムセット%d", i+1);
+		}
+		for (int i = 0; i < 10; i++) {
+			bufS = "";
+			bufInt[0] = cstown.mySaveData->GetSetItem(arrowPoint, i, true);
+			bufInt[1] = cstown.mySaveData->GetSetItem(arrowPoint, i, false);
+			if (bufInt[1] > 0) {
+				bufS = (*ItemInfo[bufInt[0]])[bufInt[1] - 1][1];
+			}
+
+			DrawFormatString(30 + (i % 2) * 160, 290 + (i / 2) * 50, BLACK, "%d:%s", i+1,bufS.c_str());
+		}
+		break;
+
+	case 0:
+		textWindow->Draw();
+		break;
+
+	default:break;
+	}
+}
+
+void CSTown::CSItemSet::End()
+{
+	delete textWindow;
+	textWindow = NULL;
 }

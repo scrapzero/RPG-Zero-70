@@ -29,8 +29,13 @@ CEquipmentManager::CEquipmentManager(CMySaveData* CSD, int equipKind) : equipmen
 
 	equipmentKind = equipKind;
 
-	wearWeaponLocate[0] = CSD->GetWearEquipmentLocateSaveData(0,0);
-	wearWeaponLocate[1] = CSD->GetWearEquipmentLocateSaveData(0,1);
+	for (int i = 0; i < 5; i++) {
+		wearWeaponLocate[i][0] = CSD->GetWearEquipmentLocateSaveData(i, 0);
+		wearWeaponLocate[i][1] = CSD->GetWearEquipmentLocateSaveData(i, 1);
+	}
+	
+	bufWearNumLevel[0] = 0;
+	bufWearNumLevel[1] = 0;
 
 	switch (equipmentKind)
 	{
@@ -52,11 +57,19 @@ CEquipmentManager::CEquipmentManager(CMySaveData* CSD, int equipKind) : equipmen
 
 CEquipmentManager::~CEquipmentManager() {
 	int buf=0;
+	equipmentAmount = 0;
+	for (int i = 0; i < 7; i++) {
+		equipmentAmount += haveEquipmentNumLevel[i].size();
+	}
+
 	savedata->SetEquipmentAmount(equipmentAmount);
-	savedata->SetWearEquipmentLocate(equipmentKind, wearWeaponLocate[0], wearWeaponLocate[1]);
+	for (int i = 0; i < 7; i++) {
+		savedata->SetWearEquipmentLocate(equipmentKind, wearWeaponLocate[i][0], wearWeaponLocate[i][1]);
+	}
+	
 	for (int i = 0; i < 7; i++) {
 		
-		for (int j = 0; haveEquipmentNumLevel[i].size(); j++) {
+		for (int j = 0; j<haveEquipmentNumLevel[i].size(); j++) {
 			savedata->SetHaveEquipmentNumLevel(buf, i, haveEquipmentNumLevel[i][j].first, haveEquipmentNumLevel[i][j].second);
 				buf++;
 		}
@@ -121,13 +134,72 @@ void CEquipmentManager::LoopWindow() {
 	}
 
 	if (Input.GetKeyEnter(Input.key.X)) {
-		std::sort(haveEquipmentNumLevel[equipmentKind].begin(), haveEquipmentNumLevel[equipmentKind].end());
-		equipmentWindow->ChangeKind(haveEquipmentNumLevel[equipmentKind][lookLocate + lookPage * 20].first, haveEquipmentNumLevel[equipmentKind][lookLocate + lookPage * 20].second);
+
+		if (equipmentKind <= 2) {
+
+			if (wearWeaponLocate[0][0] == equipmentKind) {
+				bufWearNumLevel[0] = haveEquipmentNumLevel[equipmentKind][wearWeaponLocate[0][1]].first;
+				bufWearNumLevel[1] = haveEquipmentNumLevel[equipmentKind][wearWeaponLocate[0][1]].second;
+				std::sort(haveEquipmentNumLevel[equipmentKind].begin(), haveEquipmentNumLevel[equipmentKind].end());
+				equipmentWindow->ChangeKind(haveEquipmentNumLevel[equipmentKind][lookLocate + lookPage * 20].first, haveEquipmentNumLevel[equipmentKind][lookLocate + lookPage * 20].second);
+				for (int i = 0; i < haveEquipmentNumLevel[equipmentKind].size(); i++) {
+					if (haveEquipmentNumLevel[equipmentKind][i].first == bufWearNumLevel[0] && haveEquipmentNumLevel[equipmentKind][i].second == bufWearNumLevel[1]) {
+						wearWeaponLocate[0][1] = i;
+					}
+				}
+
+			}
+		}
+
+		else {
+			bufWearNumLevel[0] = haveEquipmentNumLevel[equipmentKind][wearWeaponLocate[equipmentKind - 2][1]].first;
+			bufWearNumLevel[1] = haveEquipmentNumLevel[equipmentKind][wearWeaponLocate[equipmentKind - 2][1]].second;
+			std::sort(haveEquipmentNumLevel[equipmentKind].begin(), haveEquipmentNumLevel[equipmentKind].end());
+			equipmentWindow->ChangeKind(haveEquipmentNumLevel[equipmentKind][lookLocate + lookPage * 20].first, haveEquipmentNumLevel[equipmentKind][lookLocate + lookPage * 20].second);
+			for (int i = 0; i < haveEquipmentNumLevel[equipmentKind].size(); i++) {
+				if (haveEquipmentNumLevel[equipmentKind][i].first == bufWearNumLevel[0] && haveEquipmentNumLevel[equipmentKind][i].second == bufWearNumLevel[1]) {
+					wearWeaponLocate[0][1] = i;
+				}
+			}
+
+		}
+
 	}
+
 	if (Input.GetKeyEnter(Input.key.C)) {
-		std::sort(haveEquipmentNumLevel[equipmentKind].begin(), haveEquipmentNumLevel[equipmentKind].end());
-		std::reverse(haveEquipmentNumLevel[equipmentKind].begin(), haveEquipmentNumLevel[equipmentKind].end());
-		equipmentWindow->ChangeKind(haveEquipmentNumLevel[equipmentKind][lookLocate + lookPage * 20].first, haveEquipmentNumLevel[equipmentKind][lookLocate + lookPage * 20].second);
+	
+		if (equipmentKind <= 2) {
+
+			if (wearWeaponLocate[0][0] == equipmentKind) {
+				bufWearNumLevel[0] = haveEquipmentNumLevel[equipmentKind][wearWeaponLocate[0][1]].first;
+				bufWearNumLevel[1] = haveEquipmentNumLevel[equipmentKind][wearWeaponLocate[0][1]].second;
+				std::sort(haveEquipmentNumLevel[equipmentKind].begin(), haveEquipmentNumLevel[equipmentKind].end());
+				std::reverse(haveEquipmentNumLevel[equipmentKind].begin(), haveEquipmentNumLevel[equipmentKind].end());
+				equipmentWindow->ChangeKind(haveEquipmentNumLevel[equipmentKind][lookLocate + lookPage * 20].first, haveEquipmentNumLevel[equipmentKind][lookLocate + lookPage * 20].second);
+				for (int i = 0; i < haveEquipmentNumLevel[equipmentKind].size(); i++) {
+					if (haveEquipmentNumLevel[equipmentKind][i].first == bufWearNumLevel[0] && haveEquipmentNumLevel[equipmentKind][i].second == bufWearNumLevel[1]) {
+						wearWeaponLocate[0][1] = i;
+					}
+				}
+
+			}
+		}
+
+		else {
+			bufWearNumLevel[0] = haveEquipmentNumLevel[equipmentKind][wearWeaponLocate[equipmentKind - 2][1]].first;
+			bufWearNumLevel[1] = haveEquipmentNumLevel[equipmentKind][wearWeaponLocate[equipmentKind - 2][1]].second;
+			std::sort(haveEquipmentNumLevel[equipmentKind].begin(), haveEquipmentNumLevel[equipmentKind].end());
+			std::reverse(haveEquipmentNumLevel[equipmentKind].begin(), haveEquipmentNumLevel[equipmentKind].end());
+			equipmentWindow->ChangeKind(haveEquipmentNumLevel[equipmentKind][lookLocate + lookPage * 20].first, haveEquipmentNumLevel[equipmentKind][lookLocate + lookPage * 20].second);
+			for (int i = 0; i < haveEquipmentNumLevel[equipmentKind].size(); i++) {
+				if (haveEquipmentNumLevel[equipmentKind][i].first == bufWearNumLevel[0] && haveEquipmentNumLevel[equipmentKind][i].second == bufWearNumLevel[1]) {
+					wearWeaponLocate[0][1] = i;
+				}
+			}
+
+		}
+
+	
 	}
 
 }
@@ -157,28 +229,52 @@ void CEquipmentManager::DrawWindow()
 
 void CEquipmentManager::PushEquipment(int equipKind, int equipNum,int equipLevel)
 {
-	intint kariIntInt;
-	kariIntInt.first = equipNum;
-	kariIntInt.second = equipLevel;
-	if (haveEquipmentNumLevel[equipKind].size()<100) {
-		haveEquipmentNumLevel[equipKind].push_back(kariIntInt);
+
+	if (haveEquipmentNumLevel[equipKind].size() < 50) {
+		intint kariIntInt;
+		kariIntInt.first = equipNum;
+		kariIntInt.second = equipLevel;
+		if (haveEquipmentNumLevel[equipKind].size() < maxHaving) {
+			haveEquipmentNumLevel[equipKind].push_back(kariIntInt);
+		}
 	}
 }
 
-void CEquipmentManager::SellEquipment(){
+int CEquipmentManager::SellEquipment(){
 
+	int getMoney;
+	int buf = haveEquipmentNumLevel[equipmentKind][lookLocate + lookPage * 20].first - 1;
+	int buff = haveEquipmentNumLevel[equipmentKind][lookLocate + lookPage * 20].second;
+	int bufff = 0;
 
-	if (wearWeaponLocate[0]!= equipmentKind || wearWeaponLocate[1] != (lookPage * 20 + lookLocate)) {
-		if(haveEquipmentNumLevel[equipmentKind].size()<=1){
+	if (equipmentKind <= 2) {
+		bufff = 0;
+	}
+	else {
+		bufff = equipmentKind - 2;
+	}
 
-			if (equipmentKind == wearWeaponLocate[0]) {
-				if (wearWeaponLocate[1]>(lookPage * 20 + lookLocate)) {
-					wearWeaponLocate[1]--;
+	if (wearWeaponLocate[bufff][0]!= equipmentKind || wearWeaponLocate[bufff][1] != (lookPage * 20 + lookLocate)) {
+		if(haveEquipmentNumLevel[equipmentKind].size()>=2){
+
+			if (equipmentKind == wearWeaponLocate[equipmentKind][0]) {
+				if (wearWeaponLocate[bufff][1]>(lookPage * 20 + lookLocate)) {
+					wearWeaponLocate[bufff][1]--;
 				}
 			}
-		
+
+			if (equipmentKind <= 2) {
+				getMoney = equipmentInfo[buf][31];
+				getMoney *= (1 + buff/10);
+			}
+			else {
+				getMoney = equipmentInfo[buf][24];
+				getMoney *= (1 + buff / 10);
+			}
+
 			haveEquipmentNumLevel[equipmentKind].erase(haveEquipmentNumLevel[equipmentKind].begin() + (lookPage * 20 + lookLocate));
-			if (haveEquipmentNumLevel[equipmentKind].size() == (lookPage * 20 + lookLocate)) {
+			
+			if (haveEquipmentNumLevel[equipmentKind].size() == (lookPage * 20 + lookLocate)-1) {
 				if (lookLocate == 0) {
 					lookPage--;
 					lookLocate = 19;
@@ -189,6 +285,13 @@ void CEquipmentManager::SellEquipment(){
 			}
 
 		}
-	}
 
+		return getMoney;
+	}
+	return 0;
+}
+
+int CEquipmentManager::GetSize(int equipKind)
+{
+	return haveEquipmentNumLevel[equipKind].size();
 }

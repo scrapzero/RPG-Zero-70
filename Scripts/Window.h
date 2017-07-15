@@ -45,6 +45,7 @@ public:
 	void Loop()override;
 	void Draw()override;
 	void ChangeFont(int kind);
+	void TextClear();
 	
 	CTextWindow(string text,...);
 	~CTextWindow();

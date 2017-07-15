@@ -59,12 +59,14 @@ class CEquipmentManager {
 private:
 	CMySaveData *savedata;
 	vector<intint> haveEquipmentNumLevel[7];
-	int wearWeaponLocate[2],lookLocate,lookPage;
+	int wearWeaponLocate[5][2], bufWearNumLevel[2],lookLocate,lookPage;
 	int equipmentKind,equipmentAmount;
 	CEquipmentWindow * equipmentWindow;
 	Graph Window,Arrow;
 	CSV equipmentInfo;
-
+	enum {
+		maxHaving = 50
+	};
 
 public:
 	CEquipmentManager(CMySaveData* CSD,int equipKind);
@@ -73,7 +75,7 @@ public:
 	void LoopWindow();
 	void DrawWindow();
 	void PushEquipment(int equipKind,int equipNum,int equipLevel);
-	void SellEquipment();
-
+	int SellEquipment();
+	int GetSize(int equipKind);
 };
 

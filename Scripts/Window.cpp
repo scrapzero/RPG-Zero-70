@@ -27,6 +27,7 @@ CTextWindow::CTextWindow(string text,...) {
 	string kariBuf = "";
 	string checkD = "%d";
 	string checkN = "/n";
+	string checkS = "%s";
 	stringstream SNum;
 	int num = 0;
 	va_list args;
@@ -60,9 +61,7 @@ CTextWindow::CTextWindow(string text,...) {
 		if (text.size()>=2 ) {
 			 if (text[0] == checkD[0] && text[1] == checkD[1]) {//%dの確認
 				text.erase(0, 2);
-				num = va_arg(args,int);
-				SNum << num;
-				buf += SNum.str();
+				buf += va_arg(args,string);
 				continue;
 			 }
 		 }
@@ -81,8 +80,17 @@ CTextWindow::CTextWindow(string text,...) {
 			}
 		}
 
+		if (text.size() >= 2) {
+			if (text[0] == checkS[0] && text[1] == checkS[1]) {// /nの確認
+				text.erase(0, 2);
+				buf += va_arg(args, string);
 
-		if (true) {
+				continue;
+			}
+		}
+
+
+		if (buf.empty() == true) {
 			buf += text[0];
 			text.erase(0, 1);
 
@@ -125,7 +133,6 @@ void CTextWindow::Start() {
 
 void CTextWindow::PushText(string text,...) {
 
-	window = "zero/TextWindow.png";
 	textArrow = "zero/TextArrow.png";
 	arrowInterval = 0;
 
@@ -133,6 +140,7 @@ void CTextWindow::PushText(string text,...) {
 	string kariBuf = "";
 	string checkD = "%d";
 	string checkN = "/n";
+	string checkS = "%s";
 	stringstream SNum;
 	int num = 0;
 	va_list args;
@@ -187,8 +195,15 @@ void CTextWindow::PushText(string text,...) {
 			}
 		}
 
+		if (text.size() >= 2) {
+			if (text[0] == checkS[0] && text[1] == checkS[1]) {//%dの確認
+				text.erase(0, 2);
+				buf += va_arg(args, string);
+				continue;
+			}
+		}
 
-		if (true) {
+		if (buf.empty()==true) {
 			buf += text[0];
 			text.erase(0, 1);
 
@@ -325,6 +340,11 @@ void CTextWindow::ChangeFont(int kind) {
 	HandleKind = kind;
 
 
+}
+
+void CTextWindow::TextClear()
+{
+		display.clear();
 }
 
 
@@ -633,8 +653,23 @@ void CAmountGetWindow::Loop()
 	if (KeyUp() == true && amount < max) {
 		amount++;
 	}
-	if (KeyDown() == true && amount >0) {
+	if (KeyDown() == true && amount >1) {
 		amount--;
+	}
+
+	if (KeyRight() == true && amount < max) {
+		amount+=10;
+	}
+	if (KeyLeft() == true && amount >1) {
+		amount-=10;
+	}
+
+	if (amount > max){
+		amount = max;
+	}
+
+	if (amount < 1) {
+		amount = 1;
 	}
 
 }

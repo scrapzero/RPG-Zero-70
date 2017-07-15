@@ -30,5 +30,6 @@ public:
 	~CProduce();
 	void WindowLoop();
 	void WindowDraw();
+	bool GetStepChangeFlag();
 
 };
