@@ -37,6 +37,10 @@ SystemSetting suken::Config() {
 
 //初期化用。ほぼ初期シーン設定用
 void suken::Awake() {
+	CMySaveData *mysavedata;
+	mysavedata = new CMySaveData(false);
+	mysavedata->WriteSaveDataToOther();
+
 	Game.DebugRegistFunc("GoTitle", [] {
 		Game.FlipScene(new CSTitle);
 	});

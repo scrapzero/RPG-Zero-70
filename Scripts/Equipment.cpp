@@ -63,8 +63,8 @@ CEquipmentManager::~CEquipmentManager() {
 	}
 
 	savedata->SetEquipmentAmount(equipmentAmount);
-	for (int i = 0; i < 7; i++) {
-		savedata->SetWearEquipmentLocate(equipmentKind, wearWeaponLocate[i][0], wearWeaponLocate[i][1]);
+	for (int i = 0; i < 5; i++) {
+		savedata->SetWearEquipmentLocate(i, wearWeaponLocate[i][0], wearWeaponLocate[i][1]);//
 	}
 	
 	for (int i = 0; i < 7; i++) {
@@ -133,7 +133,7 @@ void CEquipmentManager::LoopWindow() {
 
 	}
 
-	if (Input.GetKeyEnter(Input.key.X)) {
+	if (Input.GetKeyEnter(Input.key.V)) {
 
 		if (equipmentKind <= 2) {
 
@@ -212,16 +212,21 @@ void CEquipmentManager::DrawWindow()
 	Window(0, 7);
 	Arrow(20 +345 * (lookLocate % 2),30+(lookLocate / 2) * 30 );
 
-	for (int i = lookPage*20; i < haveEquipmentNumLevel[equipmentKind].size();i++) {
-		equipName = equipmentInfo[haveEquipmentNumLevel[equipmentKind][i].first-1][1];
-		DrawFormatString(45+ 345 * (i % 2), 32 + ((i%20)/2) * 30,BLACK,"%s",equipName.c_str());
+	for (int i = lookPage * 20; i < haveEquipmentNumLevel[equipmentKind].size(); i++) {
+		equipName = equipmentInfo[haveEquipmentNumLevel[equipmentKind][i].first - 1][1];
+		DrawFormatString(45 + 345 * (i % 2), 32 + ((i % 20) / 2) * 30, BLACK, "%s", equipName.c_str());
+		for (int j = 0; j < 5; j++) {
+			if (equipmentKind == wearWeaponLocate[j][0] && i==wearWeaponLocate[j][1]) {
+				DrawFormatString(45 + 345 * (i % 2), 48 + ((i % 20) / 2) * 30, RED, "(↑装備中)");
+			}
+		}
 		myLoop++;
 		if(myLoop>=20){
 			break;
 		}
 	}
 
-	DrawFormatString(40, 340, BLACK, "ページ　%d/%d  X:番号順に並べる　C:番号逆順に並べる", lookPage+1, (haveEquipmentNumLevel[equipmentKind].size() - 1) / 20 +1);
+	DrawFormatString(40, 340, BLACK, "ページ　%d/%d  V:番号順に並べる　C:番号逆順に並べる", lookPage+1, (haveEquipmentNumLevel[equipmentKind].size() - 1) / 20 +1);
 
 	equipmentWindow->Draw();
 
@@ -247,46 +252,49 @@ int CEquipmentManager::SellEquipment(){
 	int buff = haveEquipmentNumLevel[equipmentKind][lookLocate + lookPage * 20].second;
 	int bufff = 0;
 
-	if (equipmentKind <= 2) {
-		bufff = 0;
-	}
-	else {
-		bufff = equipmentKind - 2;
-	}
+	if (haveEquipmentNumLevel[equipmentKind].size() >= 2) {
 
-	if (wearWeaponLocate[bufff][0]!= equipmentKind || wearWeaponLocate[bufff][1] != (lookPage * 20 + lookLocate)) {
-		if(haveEquipmentNumLevel[equipmentKind].size()>=2){
-
-			if (equipmentKind == wearWeaponLocate[equipmentKind][0]) {
-				if (wearWeaponLocate[bufff][1]>(lookPage * 20 + lookLocate)) {
-					wearWeaponLocate[bufff][1]--;
-				}
-			}
-
-			if (equipmentKind <= 2) {
-				getMoney = equipmentInfo[buf][31];
-				getMoney *= (1 + buff/10);
-			}
-			else {
-				getMoney = equipmentInfo[buf][24];
-				getMoney *= (1 + buff / 10);
-			}
-
-			haveEquipmentNumLevel[equipmentKind].erase(haveEquipmentNumLevel[equipmentKind].begin() + (lookPage * 20 + lookLocate));
-			
-			if (haveEquipmentNumLevel[equipmentKind].size() == (lookPage * 20 + lookLocate)-1) {
-				if (lookLocate == 0) {
-					lookPage--;
-					lookLocate = 19;
-				}
-				else {
-					lookLocate--;
-				}
-			}
-
+		if (equipmentKind <= 2) {
+			bufff = 0;
+		}
+		else {
+			bufff = equipmentKind - 2;
 		}
 
-		return getMoney;
+		if (wearWeaponLocate[bufff][0] != equipmentKind || wearWeaponLocate[bufff][1] != (lookPage * 20 + lookLocate)) {
+			if (haveEquipmentNumLevel[equipmentKind].size() >= 2) {
+
+				if (equipmentKind == wearWeaponLocate[equipmentKind][0]) {
+					if (wearWeaponLocate[bufff][1] > (lookPage * 20 + lookLocate)) {
+						wearWeaponLocate[bufff][1]--;
+					}
+				}
+
+				if (equipmentKind <= 2) {
+					getMoney = equipmentInfo[buf][18];
+					getMoney += getMoney*buff / 10;
+				}
+				else {
+					getMoney = equipmentInfo[buf][17];
+					getMoney += getMoney*buff / 10;
+				}
+				savedata->money += getMoney;
+				haveEquipmentNumLevel[equipmentKind].erase(haveEquipmentNumLevel[equipmentKind].begin() + (lookPage * 20 + lookLocate));
+
+				if (haveEquipmentNumLevel[equipmentKind].size() == lookPage * 20 + lookLocate) {
+					if (lookLocate == 0) {
+						lookPage--;
+						lookLocate = 19;
+					}
+					else {
+						lookLocate--;
+					}
+				}
+
+			}
+
+			return getMoney;
+		}
 	}
 	return 0;
 }

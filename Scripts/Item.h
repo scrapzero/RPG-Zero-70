@@ -33,7 +33,9 @@ public:
 	void WindowDraw();
 	void WindowDrawForRecipe();
 	void Add(int itemKind,int num,int addAmount);
-	void Remove(int itemKind, int num, int addAmount);
+	void Remove(int itemKind, int num, int  removeAmount);
+	void Sell(int amount);
 	int GetAmount(int kind, int num);
+	int GetPointNum();
 	void ChangeDrawKind(int kind);
 };

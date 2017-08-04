@@ -119,11 +119,66 @@ class CSTown :public CScene {
 	public:
 		CSTown& cstown;
 		CTextWindow *textWindow;
+		CItemManager *itemManger;
 		CSV *ItemInfo[3];
 		CSItemSet(CSTown& cstown);
-		bool classStart;
-		int step, arrowPoint, arrowPoint2;
+		bool classStart,closeWindow;
+		int step, arrowPoint, arrowPoint2,arrowPoint3;
 		Graph Arrow,Window[3];
+
+		void Loop();
+		void Draw();
+		void End();
+
+	};
+
+	class CSSetEquipment :public CScene {
+	public:
+		CSTown& cstown;
+		CTextWindow *textWindow;
+		CSV *ItemInfo;
+		CEquipmentManager *equipManger;
+		CSSetEquipment(CSTown& cstown);
+		bool classStart, closeWindow;
+		int step, arrowPoint, arrowPoint2, arrowPoint3;
+		Graph Arrow, Window[3];
+
+		void Loop();
+		void Draw();
+		void End();
+
+	};
+
+	class CSSellItem :public CScene {
+	public:
+		CSTown& cstown;
+		CTextWindow *textWindow;
+		CSSellItem(CSTown& cstown);
+		CEquipmentManager *equipManager;
+		CItemManager *itemManager;
+		CYesNoWindow *ynWindow;
+		CAmountGetWindow *amountGetWindow;
+		bool classStart,yn;
+		int step, arrowPoint, arrowPoint2, arrowPoint3;
+		Graph Arrow, Window[3];
+
+		void Loop();
+		void Draw();
+		void End();
+
+	};
+
+	class CSMenueWindow :public CScene {
+	public:
+		CSTown& cstown;
+		CTextWindow *textWindow;
+		CSMenueWindow(CSTown& cstown);
+		CEquipmentManager *equipManager;
+		CItemManager *itemManager;
+		CYesNoWindow *ynWindow;
+		bool classStart, yn;
+		int step, arrowPoint, arrowPoint2, arrowPoint3;
+		Graph Arrow, Window[3];
 
 		void Loop();
 		void Draw();

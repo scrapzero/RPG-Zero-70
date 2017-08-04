@@ -13,6 +13,7 @@ const std::string nSorce[200] = { "oaosflad1","oaosflad2","oaosflad3","oaosflad4
 const std::string NwearEquipmentLocate[5][2] = {"rhsrsrgs","sxfbxfg","rhsrsrgs2","sxfbxfg2" ,"rhsrsrgs3","sxfbxfg3","rhsrsrgs4","sxfbxfg4" ,"rhsrsrgs5","sxfbxfg5"};
 const std::string Nmoney = "sida";
 const std::string NitemSet[200] = { "fksffhdppap1","fksffhdppap2","fksffhdppap3","fksffhdppap4","fksffhdppap5","fksffhdppap6","fksffhdppap7","fksffhdppap8","fksffhdppap9","fksffhdppap10","fksffhdppap11","fksffhdppap12","fksffhdppap13","fksffhdppap14","fksffhdppap15","fksffhdppap16","fksffhdppap17","fksffhdppap18","fksffhdppap19","fksffhdppap20","fksffhdppap21","fksffhdppap22","fksffhdppap23","fksffhdppap24","fksffhdppap25","fksffhdppap26","fksffhdppap27","fksffhdppap28","fksffhdppap29","fksffhdppap30","fksffhdppap31","fksffhdppap32","fksffhdppap33","fksffhdppap34","fksffhdppap35","fksffhdppap36","fksffhdppap37","fksffhdppap38","fksffhdppap39","fksffhdppap40","fksffhdppap41","fksffhdppap42","fksffhdppap43","fksffhdppap44","fksffhdppap45","fksffhdppap46","fksffhdppap47","fksffhdppap48","fksffhdppap49","fksffhdppap50","fksffhdppap51","fksffhdppap52","fksffhdppap53","fksffhdppap54","fksffhdppap55","fksffhdppap56","fksffhdppap57","fksffhdppap58","fksffhdppap59","fksffhdppap60","fksffhdppap61","fksffhdppap62","fksffhdppap63","fksffhdppap64","fksffhdppap65","fksffhdppap66","fksffhdppap67","fksffhdppap68","fksffhdppap69","fksffhdppap70","fksffhdppap71","fksffhdppap72","fksffhdppap73","fksffhdppap74","fksffhdppap75","fksffhdppap76","fksffhdppap77","fksffhdppap78","fksffhdppap79","fksffhdppap80","fksffhdppap81","fksffhdppap82","fksffhdppap83","fksffhdppap84","fksffhdppap85","fksffhdppap86","fksffhdppap87","fksffhdppap88","fksffhdppap89","fksffhdppap90","fksffhdppap91","fksffhdppap92","fksffhdppap93","fksffhdppap94","fksffhdppap95","fksffhdppap96","fksffhdppap97","fksffhdppap98","fksffhdppap99","fksffhdppap100","fksffhdppap101","fksffhdppap102","fksffhdppap103","fksffhdppap104","fksffhdppap105","fksffhdppap106","fksffhdppap107","fksffhdppap108","fksffhdppap109","fksffhdppap110","fksffhdppap111","fksffhdppap112","fksffhdppap113","fksffhdppap114","fksffhdppap115","fksffhdppap116","fksffhdppap117","fksffhdppap118","fksffhdppap119","fksffhdppap120","fksffhdppap121","fksffhdppap122","fksffhdppap123","fksffhdppap124","fksffhdppap125","fksffhdppap126","fksffhdppap127","fksffhdppap128","fksffhdppap129","fksffhdppap130","fksffhdppap131","fksffhdppap132","fksffhdppap133","fksffhdppap134","fksffhdppap135","fksffhdppap136","fksffhdppap137","fksffhdppap138","fksffhdppap139","fksffhdppap140","fksffhdppap141","fksffhdppap142","fksffhdppap143","fksffhdppap144","fksffhdppap145","fksffhdppap146","fksffhdppap147","fksffhdppap148","fksffhdppap149","fksffhdppap150","fksffhdppap151","fksffhdppap152","fksffhdppap153","fksffhdppap154","fksffhdppap155","fksffhdppap156","fksffhdppap157","fksffhdppap158","fksffhdppap159","fksffhdppap160","fksffhdppap161","fksffhdppap162","fksffhdppap163","fksffhdppap164","fksffhdppap165","fksffhdppap166","fksffhdppap167","fksffhdppap168","fksffhdppap169","fksffhdppap170","fksffhdppap171","fksffhdppap172","fksffhdppap173","fksffhdppap174","fksffhdppap175","fksffhdppap176","fksffhdppap177","fksffhdppap178","fksffhdppap179","fksffhdppap180","fksffhdppap181","fksffhdppap182","fksffhdppap183","fksffhdppap184","fksffhdppap185","fksffhdppap186","fksffhdppap187","fksffhdppap188","fksffhdppap189","fksffhdppap190","fksffhdppap191","fksffhdppap192","fksffhdppap193","fksffhdppap194","fksffhdppap195","fksffhdppap196","fksffhdppap197","fksffhdppap198","fksffhdppap199","fksffhdppap200" };
+const std::string NbringItemSet = "dfvwsdiw3d3";
 
 
 CMySaveData::CMySaveData(bool kari) {
@@ -59,6 +60,8 @@ CMySaveData::CMySaveData(bool kari) {
 		}
 	}
 
+	bringItemSet = data->GetInt(NbringItemSet);
+
 	if (EquipmentAmount==0) {
 		EquipmentAmount = 7;
 		for (int i = 0; i < 7; i++) {
@@ -104,7 +107,8 @@ CMySaveData::CMySaveData(bool kari) {
 			}
 		}
 		itemSet[0][0].second = 1;
-	
+		bringItemSet = 0;
+
 	}
 
 
@@ -149,6 +153,8 @@ void CMySaveData::WriteSaveData() {
 		}
 	}
 
+	data->Set(NbringItemSet,bringItemSet);
+
 	data->WriteAll();
 }
 
@@ -186,6 +192,8 @@ void CMySaveData::WriteSaveDataToOther() {
 			otherData->Set(NitemSet[i * 20 + j * 2 + 1], itemSet[i][j].second);
 		}
 	}
+
+	otherData->Set(NbringItemSet, bringItemSet);
 
 	otherData->WriteAll();
 }

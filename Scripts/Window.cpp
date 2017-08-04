@@ -154,7 +154,7 @@ void CTextWindow::PushText(string text,...) {
 			buf += text[1];
 			text.erase(0, 2);
 
-			if (DxLib::GetDrawStringWidthToHandle(buf.c_str(), buf.size(),TextHandle[HandleKind]) > SWidth) {
+			if (DxLib::GetDrawStringWidthToHandle(buf.c_str(), buf.size(), TextHandle[HandleKind]) > SWidth) {
 				kariBuf = buf;
 
 				buf.pop_back();
@@ -174,9 +174,7 @@ void CTextWindow::PushText(string text,...) {
 		if (text.size() >= 2) {
 			if (text[0] == checkD[0] && text[1] == checkD[1]) {//%dの確認
 				text.erase(0, 2);
-				num = va_arg(args, int);
-				SNum << num;
-				buf += SNum.str();
+				buf += va_arg(args, string);
 				continue;
 			}
 		}
@@ -196,14 +194,16 @@ void CTextWindow::PushText(string text,...) {
 		}
 
 		if (text.size() >= 2) {
-			if (text[0] == checkS[0] && text[1] == checkS[1]) {//%dの確認
+			if (text[0] == checkS[0] && text[1] == checkS[1]) {// /nの確認
 				text.erase(0, 2);
 				buf += va_arg(args, string);
+
 				continue;
 			}
 		}
 
-		if (buf.empty()==true) {
+
+		if (buf.empty() == true) {
 			buf += text[0];
 			text.erase(0, 1);
 
@@ -230,11 +230,6 @@ void CTextWindow::PushText(string text,...) {
 		texts.push(buf);
 	}
 
-
-	while (texts.empty() == false && display.size()<SHigh / intervalY) {
-		display.push_back(texts.front());
-		texts.pop();
-	}
 
 	va_end(args);
 	wordAmount = 0;

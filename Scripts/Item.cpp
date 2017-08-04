@@ -305,14 +305,14 @@ void CItemManager::Add(int itemKind, int num, int addAmount)
 	}
 }
 
-void CItemManager::Remove(int itemKind, int num, int addAmount)
+void CItemManager::Remove(int itemKind, int num, int removeAmount)
 {
 
 	switch (itemKind)
 	{
 	case 0:
 		if (num > 0) {
-			sorce[num-1] -= addAmount;
+			sorce[num-1] -= removeAmount;
 		}
 		if (sorce[num-1] < 0) {
 			sorce[num-1] = 0;
@@ -321,7 +321,7 @@ void CItemManager::Remove(int itemKind, int num, int addAmount)
 		break;
 	case 1:
 		if (num >0) {
-			tool[num-1] -= addAmount;
+			tool[num-1] -= removeAmount;
 		}
 
 		if (tool[num-1] < 0) {
@@ -330,7 +330,7 @@ void CItemManager::Remove(int itemKind, int num, int addAmount)
 		break;
 	case 2:
 		if (num >0) {
-			food[num-1] -= addAmount;
+			food[num-1] -= removeAmount;
 		}
 		if (food[num-1] <0) {
 			food[num-1] = 0;
@@ -344,6 +344,53 @@ void CItemManager::Remove(int itemKind, int num, int addAmount)
 
 }
 
+void CItemManager::Sell(int amount)
+{
+	int num = lookLocate + (lookPage * 20) + 1;
+	int buff=0;
+
+	switch (itemKind)
+	{
+	case 0:
+		if (num > 0) {
+			sorce[num - 1] -= amount;
+		}
+		if (sorce[num - 1] < 0) {
+			sorce[num - 1] = 0;
+		}
+		buff = itemInfo[num - 1][2];
+		buff *= amount;
+		savedata->money += buff;
+		break;
+	case 1:
+		if (num >0) {
+			tool[num - 1] -= amount;
+		}
+
+		if (tool[num - 1] < 0) {
+			tool[num - 1] = 0;
+		}
+		buff = itemInfo[num - 1][3];
+		buff *= amount;
+		savedata->money += buff;
+		break;
+	case 2:
+		if (num >0) {
+			food[num - 1] -= amount;
+		}
+		if (food[num - 1] <0) {
+			food[num - 1] = 0;
+		}
+
+		buff = itemInfo[num - 1][3];
+		buff *= amount;
+		savedata->money += buff;
+		break;
+
+	default:break;
+	}
+}
+
 int CItemManager::GetAmount(int kind, int num)
 {
 	switch (kind) {
@@ -353,6 +400,11 @@ int CItemManager::GetAmount(int kind, int num)
 	}
 	return 0;
 
+}
+
+int CItemManager::GetPointNum()
+{
+	return lookLocate+lookPage*20+1;
 }
 
 void CItemManager::ChangeDrawKind(int kind)

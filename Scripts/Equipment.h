@@ -59,7 +59,7 @@ class CEquipmentManager {
 private:
 	CMySaveData *savedata;
 	vector<intint> haveEquipmentNumLevel[7];
-	int wearWeaponLocate[5][2], bufWearNumLevel[2],lookLocate,lookPage;
+	int  bufWearNumLevel[2];
 	int equipmentKind,equipmentAmount;
 	CEquipmentWindow * equipmentWindow;
 	Graph Window,Arrow;
@@ -71,6 +71,8 @@ private:
 public:
 	CEquipmentManager(CMySaveData* CSD,int equipKind);
 	~CEquipmentManager();
+	int lookLocate, lookPage,wearWeaponLocate[5][2];
+
 	void Draw();
 	void LoopWindow();
 	void DrawWindow();

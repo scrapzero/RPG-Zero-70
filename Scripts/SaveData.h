@@ -10,8 +10,6 @@ class CMySaveData {
 private:
 	CData *data,*otherData;
 	int EquipmentAmount,haveEquipmentKindLevel[400][3];//•ŠííAí—Ş”Ô†ALevel
-	int wearEquipmentLocate[5][2];
-	int money;
 	int sorce[200], tool[60], food[100];
 	int test;
 	int recipeStep[10];
@@ -19,6 +17,11 @@ private:
 	intP itemSet[10][10];
 
 public:
+
+	char bringItemSet;
+	int wearEquipmentLocate[5][2];
+	int money;
+
 	CMySaveData(bool kari);
 	void WriteSaveData();
 	void WriteSaveDataToOther();
