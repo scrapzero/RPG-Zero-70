@@ -1489,10 +1489,112 @@ CSTown::CSMenueWindow::CSMenueWindow(CSTown & cstown):cstown(cstown)
 	Window[0] = "zero/MenueWindow2.png";
 	Window[1] = "zero/TextWindow1.png";
 	Window[2] = "zero/SellWindow.png";
+	Window[3] = "zero/StatusWindow.png";
+	Window[4] = "zero/WearCheckWindow.png";
 	yn = false;
 
 	arrowPoint = 0;
 	arrowPoint2 = 0;
+	int equipmentKind = 0;
+	int num = 0;
+	int buf = 0;
+
+	for (int i = 0; i < 15; i++) {
+		Status[i] = 0;
+	}
+
+	for (int i = 0; i < 5; i++) {
+		equipManager = new CEquipmentManager(cstown.mySaveData,cstown.mySaveData->wearEquipmentLocate[i][0]);
+
+		equipmentKind = cstown.mySaveData->wearEquipmentLocate[i][0];
+		buf = cstown.mySaveData->wearEquipmentLocate[i][1];
+		num = equipManager->haveEquipmentNumLevel[equipmentKind][buf].first;
+		Level= equipManager->haveEquipmentNumLevel[equipmentKind][buf].second;
+		wearWeaponNumLevel[i][0] = equipmentKind;
+		wearWeaponNumLevel[i][1] = num;
+		wearWeaponNumLevel[i][2] = Level;
+		switch (equipmentKind)
+		{
+
+		case 0:	equipmentInfo = new CSV("zero/ZeroData/Soad.txt"); break;
+		case 1: equipmentInfo = new CSV("zero/ZeroData/Arrow.txt"); break;
+		case 2: equipmentInfo = new CSV("zero/ZeroData/Wand.txt"); break;
+		case 3:	equipmentInfo = new CSV("zero/ZeroData/Shield.txt"); break;
+		case 4: equipmentInfo = new CSV("zero/ZeroData/Protecter.txt"); break;
+		case 5: equipmentInfo = new CSV("zero/ZeroData/Shoes.txt"); break;
+		case 6: equipmentInfo = new CSV("zero/ZeroData/Accessory.txt"); break;
+		}
+
+		HP = (*equipmentInfo)[num - 1][2];
+		MP = (*equipmentInfo)[num - 1][3];
+		Atc =(*equipmentInfo)[num - 1][4];
+		Def =(*equipmentInfo)[num - 1][5];
+		MAtc =(*equipmentInfo)[num - 1][6];
+		MDef =(*equipmentInfo)[num - 1][7];
+		Spd =(*equipmentInfo)[num - 1][8];
+		Hit =(*equipmentInfo)[num - 1][9];
+		Escape =(*equipmentInfo)[num - 1][10];
+		Luck =(*equipmentInfo)[num - 1][11];
+
+		if (equipmentKind <= 2) {
+			FireDef =(*equipmentInfo)[num - 1][13];
+			WoodDef =(*equipmentInfo)[num - 1][14];
+			WaterDef =(*equipmentInfo)[num - 1][15];
+			LightDef =(*equipmentInfo)[num - 1][16];
+			DarkDef =(*equipmentInfo)[num - 1][17];
+		}
+		else {
+			FireDef =(*equipmentInfo)[num - 1][12];
+			WoodDef =(*equipmentInfo)[num - 1][13];
+			WaterDef =(*equipmentInfo)[num - 1][14];
+			LightDef =(*equipmentInfo)[num - 1][15];
+			DarkDef =(*equipmentInfo)[num - 1][16];
+
+		}
+
+		HP *= (1.0 + 0.1*Level);
+		MP *= (1.0 + 0.1*Level);
+		Atc *= (1.0 + 0.1*Level);
+		Def *= (1.0 + 0.1*Level);
+		MAtc *= (1.0 + 0.1*Level);
+		MDef *= (1.0 + 0.1*Level);
+		Spd *= (1.0 + 0.1*Level);
+		Hit *= (1.0 + 0.1*Level);
+		Escape *= (1.0 + 0.1*Level);
+		Luck *= (1.0 + 0.1*Level);
+		FireDef *= (1.0 + 0.1*Level);
+		WoodDef *= (1.0 + 0.1*Level);
+		WaterDef *= (1.0 + 0.1*Level);
+		LightDef *= (1.0 + 0.1*Level);
+		DarkDef *= (1.0 + 0.1*Level);
+
+		Status[0] += HP;
+		Status[1] += MP;
+		Status[2] += Atc;
+		Status[3] += Def;
+		Status[4] += MAtc;
+		Status[5] += MDef;
+		Status[6] += Spd;
+		Status[7] += Hit;
+		Status[8] += Escape;
+		Status[9] += Luck;
+		Status[10] += FireDef;
+		Status[11] += WoodDef;
+		Status[12] += WaterDef;
+		Status[13] += LightDef;
+		Status[14] += DarkDef;
+
+
+
+		delete equipmentInfo;
+		delete equipManager;
+		equipmentInfo = NULL;
+		equipManager = NULL;
+
+	}
+
+	Status[15] = cstown.mySaveData->money;
+
 }
 
 void CSTown::CSMenueWindow::Loop()
@@ -1502,6 +1604,40 @@ void CSTown::CSMenueWindow::Loop()
 
 		switch (step)
 		{
+		case 5:
+			if (KeyUp() && arrowPoint3 > 0) {
+				if (0 <= arrowPoint3&&arrowPoint3 < 5) {
+					delete equipWindow;
+					equipWindow = NULL;
+				}
+				arrowPoint3--;
+				equipWindow = new CEquipmentWindow(wearWeaponNumLevel[arrowPoint3][0], wearWeaponNumLevel[arrowPoint3][1], wearWeaponNumLevel[arrowPoint3][2]);
+				
+			}
+
+			if (KeyDown() && arrowPoint3 < 5) {
+				if (0 <= arrowPoint3&&arrowPoint3 < 5) {
+					delete equipWindow;
+					equipWindow = NULL;
+				}
+				arrowPoint3++;
+
+				if (0 <= arrowPoint3&&arrowPoint3 < 5) {
+					equipWindow = new CEquipmentWindow(wearWeaponNumLevel[arrowPoint3][0], wearWeaponNumLevel[arrowPoint3][1], wearWeaponNumLevel[arrowPoint3][2]);
+				}
+			}
+			if (KeyOK() && arrowPoint3 == 5) {
+				step = 0;
+			}
+
+			if (KeyCancel()) {
+				step = 0;
+				if (0 < arrowPoint3&&arrowPoint3 < 5) {
+					delete equipWindow;
+					equipWindow = NULL;
+				}
+			}
+			break;
 		case 4:
 			if (arrowPoint2 < 7) {
 				equipManager->LoopWindow();
@@ -1579,14 +1715,16 @@ void CSTown::CSMenueWindow::Loop()
 					break;
 
 				case 2:
-
+					step = 5;
+					arrowPoint3 = 0;
+					equipWindow = new CEquipmentWindow(wearWeaponNumLevel[0][0], wearWeaponNumLevel[0][1], wearWeaponNumLevel[0][2]);
 					break;
 				case 1:
 					step = 3;
 					arrowPoint2 = 0;
 					break;
 				case 0:
-					ynWindow = new CYesNoWindow(&yn, "ÉZÅ[ÉuÇµÇƒÇÊÇÎÇµÇ¢Ç≈Ç∑Ç©ÅH", false, 360, 10);
+					ynWindow = new CYesNoWindow(&yn, "ÉZÅ[ÉuÇµÇƒÇÊÇÎÇµÇ¢Ç≈Ç∑Ç©ÅH", false, 245, 10);
 					step = 1;
 					break;
 				default:
@@ -1613,8 +1751,49 @@ void CSTown::CSMenueWindow::Loop()
 void CSTown::CSMenueWindow::Draw()
 {
 
+	std::string bufS;
 	switch (step)
 	{
+	case 5:
+		Window[0].Draw(500, 10);
+		Arrow.Draw(510, 30 + arrowPoint * 38);
+		Window[4].Draw(315,90);
+		Arrow.Draw(355, 121 + arrowPoint3 * 40);
+		if (0 <= arrowPoint3&&arrowPoint3 < 5) {
+			equipWindow->Draw();
+		}
+
+		Window[3].DrawExtend(5, 5, 230, 370);
+		DrawFormatString(15, 10, BLACK, "ÉXÉeÅ[É^ÉX");
+
+		for (int i = 0; i < 16; i++) {
+			switch (i)
+			{
+			case 0:	bufS = "HP"; break;
+			case 1:	bufS = "MP"; break;
+			case 2:	bufS = "çU"; break;
+			case 3:	bufS = "ñh"; break;
+			case 4:	bufS = "ñÇçU"; break;
+			case 5:	bufS = "ñÇñh"; break;
+			case 6:	bufS = "ë¨"; break;
+			case 7:	bufS = "ñΩíÜ"; break;
+			case 8:	bufS = "âÒî"; break;
+			case 9:	bufS = "â^"; break;
+			case 10:bufS = "âŒñh"; break;
+			case 11:bufS = "ñÿñh"; break;
+			case 12:bufS = "êÖñh"; break;
+			case 13:bufS = "åıñh"; break;
+			case 14:bufS = "à≈ñh"; break;
+			case 15:bufS = "èäéùã‡"; break;
+
+			default:
+				break;
+			}
+
+			DrawFormatString(15, 30 + 20 * i, BLACK, "%s;%d", bufS.c_str(), Status[i]);
+		}
+
+		break;
 	case 4:
 		if (arrowPoint2 < 7) {
 			equipManager->DrawWindow();
@@ -1629,21 +1808,143 @@ void CSTown::CSMenueWindow::Draw()
 		Arrow.Draw(510, 30 + arrowPoint * 38);
 		Window[2].Draw(315, 60, false);
 		Arrow.Draw(325, 73 + arrowPoint2 * 26);
+
+		Window[3].DrawExtend(5, 5, 230, 370);
+		DrawFormatString(15, 10, BLACK, "ÉXÉeÅ[É^ÉX");
+
+		for (int i = 0; i < 16; i++) {
+			switch (i)
+			{
+			case 0:	bufS = "HP"; break;
+			case 1:	bufS = "MP"; break;
+			case 2:	bufS = "çU"; break;
+			case 3:	bufS = "ñh"; break;
+			case 4:	bufS = "ñÇçU"; break;
+			case 5:	bufS = "ñÇñh"; break;
+			case 6:	bufS = "ë¨"; break;
+			case 7:	bufS = "ñΩíÜ"; break;
+			case 8:	bufS = "âÒî"; break;
+			case 9:	bufS = "â^"; break;
+			case 10:bufS = "âŒñh"; break;
+			case 11:bufS = "ñÿñh"; break;
+			case 12:bufS = "êÖñh"; break;
+			case 13:bufS = "åıñh"; break;
+			case 14:bufS = "à≈ñh"; break;
+			case 15:bufS = "èäéùã‡"; break;
+
+			default:
+				break;
+			}
+
+			DrawFormatString(15, 30 + 20 * i, BLACK, "%s;%d", bufS.c_str(), Status[i]);
+		}
 		break;
 	case 2:
 		Window[0].Draw(500, 10);
 		Arrow.Draw(510, 30 + arrowPoint * 38);
 		textWindow->Draw();
+
+		Window[3].DrawExtend(5, 5, 230, 370);
+		DrawFormatString(15, 10, BLACK, "ÉXÉeÅ[É^ÉX");
+
+		for (int i = 0; i < 16; i++) {
+			switch (i)
+			{
+			case 0:	bufS = "HP"; break;
+			case 1:	bufS = "MP"; break;
+			case 2:	bufS = "çU"; break;
+			case 3:	bufS = "ñh"; break;
+			case 4:	bufS = "ñÇçU"; break;
+			case 5:	bufS = "ñÇñh"; break;
+			case 6:	bufS = "ë¨"; break;
+			case 7:	bufS = "ñΩíÜ"; break;
+			case 8:	bufS = "âÒî"; break;
+			case 9:	bufS = "â^"; break;
+			case 10:bufS = "âŒñh"; break;
+			case 11:bufS = "ñÿñh"; break;
+			case 12:bufS = "êÖñh"; break;
+			case 13:bufS = "åıñh"; break;
+			case 14:bufS = "à≈ñh"; break;
+			case 15:bufS = "èäéùã‡"; break;
+
+			default:
+				break;
+			}
+
+			DrawFormatString(15, 30 + 20 * i, BLACK, "%s;%d", bufS.c_str(), Status[i]);
+		}
 		break;
 	case 1:
 		Window[0].Draw(500, 10);
 		Arrow.Draw(510, 30 + arrowPoint * 38);
 		ynWindow->Draw();
+		Window[3].DrawExtend(5, 5, 230, 370);
+		DrawFormatString(15, 10, BLACK, "ÉXÉeÅ[É^ÉX");
+
+		for (int i = 0; i < 16; i++) {
+			switch (i)
+			{
+			case 0:	bufS = "HP"; break;
+			case 1:	bufS = "MP"; break;
+			case 2:	bufS = "çU"; break;
+			case 3:	bufS = "ñh"; break;
+			case 4:	bufS = "ñÇçU"; break;
+			case 5:	bufS = "ñÇñh"; break;
+			case 6:	bufS = "ë¨"; break;
+			case 7:	bufS = "ñΩíÜ"; break;
+			case 8:	bufS = "âÒî"; break;
+			case 9:	bufS = "â^"; break;
+			case 10:bufS = "âŒñh"; break;
+			case 11:bufS = "ñÿñh"; break;
+			case 12:bufS = "êÖñh"; break;
+			case 13:bufS = "åıñh"; break;
+			case 14:bufS = "à≈ñh"; break;
+			case 15:bufS = "èäéùã‡"; break;
+
+			default:
+				break;
+			}
+
+			DrawFormatString(15, 30 + 20 * i, BLACK, "%s;%d", bufS.c_str(), Status[i]);
+		}
+
+
 		break;
 
 	case 0:
 		Window[0].Draw(500, 10);
 		Arrow.Draw(510, 30 + arrowPoint * 38);
+		Window[3].DrawExtend(5,5,230,370);
+		DrawFormatString(15,10,BLACK,"ÉXÉeÅ[É^ÉX");
+
+		for (int i = 0; i < 16; i++) {
+			switch (i)
+			{
+			case 0:	bufS="HP"; break;
+			case 1:	bufS = "MP"; break;
+			case 2:	bufS = "çU"; break;
+			case 3:	bufS = "ñh"; break;
+			case 4:	bufS = "ñÇçU"; break;
+			case 5:	bufS = "ñÇñh"; break;
+			case 6:	bufS = "ë¨"; break;
+			case 7:	bufS = "ñΩíÜ"; break;
+			case 8:	bufS = "âÒî"; break;
+			case 9:	bufS = "â^"; break;
+			case 10:bufS = "âŒñh"; break;
+			case 11:bufS = "ñÿñh"; break;
+			case 12:bufS = "êÖñh"; break;
+			case 13:bufS = "åıñh"; break;
+			case 14:bufS = "à≈ñh"; break;
+			case 15:bufS = "èäéùã‡"; break;
+				
+			default:
+				break;
+			}
+
+			DrawFormatString(15, 30 + 20 * i, BLACK, "%s;%d",bufS.c_str(), Status[i]);
+		}
+
+
 		break;
 
 	default:break;
@@ -1658,4 +1959,6 @@ void CSTown::CSMenueWindow::End()
 	equipManager = NULL;
 	itemManager = NULL;
 	ynWindow = NULL;
+	equipWindow = NULL;
+	equipmentInfo = NULL;
 }

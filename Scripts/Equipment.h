@@ -58,7 +58,7 @@ enum {
 class CEquipmentManager {
 private:
 	CMySaveData *savedata;
-	vector<intint> haveEquipmentNumLevel[7];
+	
 	int  bufWearNumLevel[2];
 	int equipmentKind,equipmentAmount;
 	CEquipmentWindow * equipmentWindow;
@@ -72,6 +72,7 @@ public:
 	CEquipmentManager(CMySaveData* CSD,int equipKind);
 	~CEquipmentManager();
 	int lookLocate, lookPage,wearWeaponLocate[5][2];
+	vector<intint> haveEquipmentNumLevel[7];
 
 	void Draw();
 	void LoopWindow();

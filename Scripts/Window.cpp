@@ -525,6 +525,11 @@ void CEquipmentWindow::ChangeKind( int num, int level)
 	Escape *= (1.0 + 0.1*Level);
 	Luck *= (1.0 + 0.1*Level);
 	SellMoney *= (1.0 + 0.1*Level);
+	FireDef *= (1.0 + 0.1*Level);
+	WoodDef *= (1.0 + 0.1*Level);
+	WaterDef *= (1.0 + 0.1*Level);
+	LightDef *= (1.0 + 0.1*Level);
+	DarkDef *= (1.0 + 0.1*Level);
 
 
 	switch (ElementNum)
