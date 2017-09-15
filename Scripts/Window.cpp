@@ -35,8 +35,8 @@ CTextWindow::CTextWindow(string text,...) {
 
 	while (text.empty() == false) {
 
-		
-		 if (IsDBCSLeadByte(text[0]) != 0) {
+
+		if (IsDBCSLeadByte(text[0]) != 0) {
 			buf += text[0];
 			buf += text[1];
 			text.erase(0, 2);
@@ -58,13 +58,13 @@ CTextWindow::CTextWindow(string text,...) {
 
 		}
 
-		if (text.size()>=2 ) {
-			 if (text[0] == checkD[0] && text[1] == checkD[1]) {//%d偺妋擣
+		if (text.size() >= 2) {
+			if (text[0] == checkD[0] && text[1] == checkD[1]) {//%d偺妋擣
 				text.erase(0, 2);
-				buf += va_arg(args,string);
+				buf += va_arg(args, string);
 				continue;
-			 }
-		 }
+			}
+		}
 
 		if (text.size() >= 2) {
 			if (text[0] == checkN[0] && text[1] == checkN[1]) {// /n偺妋擣
@@ -81,7 +81,7 @@ CTextWindow::CTextWindow(string text,...) {
 		}
 
 		if (text.size() >= 2) {
-			if (text[0] == checkS[0] && text[1] == checkS[1]) {// /n偺妋擣
+			if (text[0] == checkS[0] && text[1] == checkS[1]) {// %s偺妋擣
 				text.erase(0, 2);
 				buf += va_arg(args, string);
 
@@ -90,7 +90,7 @@ CTextWindow::CTextWindow(string text,...) {
 		}
 
 
-		if (buf.empty() == true) {
+		if (text.empty() == false) {
 			buf += text[0];
 			text.erase(0, 1);
 
@@ -109,6 +109,7 @@ CTextWindow::CTextWindow(string text,...) {
 
 
 	}
+
 
 
 
@@ -194,7 +195,7 @@ void CTextWindow::PushText(string text,...) {
 		}
 
 		if (text.size() >= 2) {
-			if (text[0] == checkS[0] && text[1] == checkS[1]) {// /n偺妋擣
+			if (text[0] == checkS[0] && text[1] == checkS[1]) {// %s偺妋擣
 				text.erase(0, 2);
 				buf += va_arg(args, string);
 
@@ -203,7 +204,7 @@ void CTextWindow::PushText(string text,...) {
 		}
 
 
-		if (buf.empty() == true) {
+		if (text.empty() == false) {
 			buf += text[0];
 			text.erase(0, 1);
 
@@ -293,7 +294,7 @@ void CTextWindow::Draw() {
 			}
 
 			for (int k = 0; k < wordAmount; k++) {
-				if (IsDBCSLeadByte(kariS[repeat - 1][0]) != 0) {
+				if (IsDBCSLeadByte(kariS[repeat - 1][k]) != 0) {
 					S[repeat-1] += kariS[repeat - 1][k];
 					S[repeat-1] += kariS[repeat - 1][k+1];
 					k++;
@@ -327,6 +328,11 @@ bool CTextWindow::GetTextEmpty() {
 	return display.empty();
 }
 
+bool CTextWindow::GetWaitTextEmpty()
+{
+	return texts.empty();
+}
+
 void CTextWindow::ChangeFont(int kind) {
 	if (HandleKind = 0) {
 		kind = 1;
@@ -348,16 +354,19 @@ CEquipmentWindow::CEquipmentWindow(int equipmentKind, int num, int level): equip
 {
 	this->equipmentKind = equipmentKind;
 	Window = "zero/TextWindow2.png";
+	skillInfo = new CSV("zero/ZeroData/Skill.csv");
+	int bufI[2] = {};
+
 	switch (equipmentKind)
 	{
 
-	case 0:	equipmentInfo = "zero/ZeroData/Soad.txt"; break;
-	case 1: equipmentInfo = "zero/ZeroData/Arrow.txt"; break;
-	case 2: equipmentInfo = "zero/ZeroData/Wand.txt"; break;
-	case 3:	equipmentInfo = "zero/ZeroData/Shield.txt"; break;
-	case 4: equipmentInfo = "zero/ZeroData/Protecter.txt"; break;
-	case 5: equipmentInfo = "zero/ZeroData/Shoes.txt"; break;
-	case 6: equipmentInfo = "zero/ZeroData/Accessory.txt"; break;
+	case 0:	equipmentInfo = "zero/ZeroData/Soad.csv"; break;
+	case 1: equipmentInfo = "zero/ZeroData/Arrow.csv"; break;
+	case 2: equipmentInfo = "zero/ZeroData/Wand.csv"; break;
+	case 3:	equipmentInfo = "zero/ZeroData/Shield.csv"; break;
+	case 4: equipmentInfo = "zero/ZeroData/Protecter.csv"; break;
+	case 5: equipmentInfo = "zero/ZeroData/Shoes.csv"; break;
+	case 6: equipmentInfo = "zero/ZeroData/Accessory.csv"; break;
 	}
 
 	KindNum = num;
@@ -375,7 +384,10 @@ CEquipmentWindow::CEquipmentWindow(int equipmentKind, int num, int level): equip
 	Escape = equipmentInfo[num - 1][10];
 	Luck = equipmentInfo[num - 1][11];
 
+
 	if (equipmentKind <= 2) {
+		skillNum[0]= equipmentInfo[num - 1][19];
+		skillNum[1] = equipmentInfo[num - 1][20];
 		ElementNum = equipmentInfo[num - 1][12];
 		FireDef = equipmentInfo[num - 1][13];
 		WoodDef = equipmentInfo[num - 1][14];
@@ -383,32 +395,92 @@ CEquipmentWindow::CEquipmentWindow(int equipmentKind, int num, int level): equip
 		LightDef = equipmentInfo[num - 1][16];
 		DarkDef = equipmentInfo[num - 1][17];
 		SellMoney = equipmentInfo[num - 1][18];
-		skillName[0] = equipmentInfo[num - 1][19];
-		skillMP[0] = equipmentInfo[num - 1][20];
-		skillPower[0] = equipmentInfo[num - 1][21];
-		skillElementNum[0] = equipmentInfo[num - 1][22];
-		skillRatioKind[0] = equipmentInfo[num - 1][23];
-		skillExperience[0] = equipmentInfo[num - 1][24];
-		skillName[1] = equipmentInfo[num - 1][25];
-		skillMP[1] = equipmentInfo[num - 1][26];
-		skillPower[1] = equipmentInfo[num - 1][27];
-		skillElementNum[1] = equipmentInfo[num - 1][28];
-		skillRatioKind[1] = equipmentInfo[num - 1][29];
-		skillExperience[1] = equipmentInfo[num - 1][30];
+
+		skillName[0] = (*skillInfo)[skillNum[0]-1][1];
+		skillMP[0] = (*skillInfo)[skillNum[0]-1][2];
+		skillPower[0] = (*skillInfo)[skillNum[0]-1][10];
+		skillElementNum[0] = (*skillInfo)[skillNum[0]-1][3];
+		bufI[0] = (*skillInfo)[skillNum[0]-1][4];
+		skillExperience[0] = (*skillInfo)[skillNum[0]-1][19];
+
+		skillName[1] = (*skillInfo)[skillNum[1]-1][1];
+		skillMP[1] = (*skillInfo)[skillNum[1]-1][2];
+		skillPower[1] = (*skillInfo)[skillNum[1]-1][10];
+		skillElementNum[1] = (*skillInfo)[skillNum[1]-1][3];
+		bufI[1] = (*skillInfo)[skillNum[1] - 1][4];
+		skillExperience[1] = (*skillInfo)[skillNum[1]-1][19];
+		for (int i = 0; i < 2; i++) {
+			switch (bufI[i]) {
+			case 0:skillPMode[i] = "僟儊乕僕憹壛"; break;
+			case 1:skillPMode[i] = "旐僟儊尭彮"; break;
+			case 2:skillPMode[i] = "峌UP"; break;
+			case 3:skillPMode[i] = "杊UP"; break;
+			case 4:skillPMode[i] = "杺峌UP"; break;
+			case 5:skillPMode[i] = "杺杊UP"; break;
+			case 6:skillPMode[i] = "懍UP"; break;
+			case 7:skillPMode[i] = "柦拞UP"; break;
+			case 8:skillPMode[i] = "夞旔UP"; break;
+			case 9:skillPMode[i] = "塣UP"; break;
+			case 10:skillPMode[i] = "峌DOWN"; break;
+			case 11:skillPMode[i] = "杊DOWN"; break;
+			case 12:skillPMode[i] = "杺峌DOWN"; break;
+			case 13:skillPMode[i] = "杺杊DOWN"; break;
+			case 14:skillPMode[i] = "懍DOWN"; break;
+			case 15:skillPMode[i] = "柦拞DOWN"; break;
+			case 16:skillPMode[i] = "夞旔DOWN"; break;
+			case 17:skillPMode[i] = "塣DOWN"; break;
+			case 18:skillPMode[i] = "夞暅検憹壛"; break;
+			case 19:skillPMode[i] = "愭惂"; break;
+			case 20:skillPMode[i] = "夞悢"; break;
+			case 21:skillPMode[i] = "妋棪忋徃"; break;
+			case 22:skillPMode[i] = "徚旓MP尭彮検"; break;
+			case 23:skillPMode[i] = "堦寕"; break;
+			}
+		}
+
 	}
 	else {
+
+		skillNum[0] = equipmentInfo[num - 1][18];
 		FireDef = equipmentInfo[num - 1][12];
 		WoodDef = equipmentInfo[num - 1][13];
 		WaterDef = equipmentInfo[num - 1][14];
 		LightDef = equipmentInfo[num - 1][15];
 		DarkDef = equipmentInfo[num - 1][16];
 		SellMoney = equipmentInfo[num - 1][17];
-		skillName[0] = equipmentInfo[num - 1][18];
-		skillMP[0] = equipmentInfo[num - 1][19];
-		skillPower[0] = equipmentInfo[num - 1][20];
-		skillElementNum[0] = equipmentInfo[num - 1][21];
-		skillRatioKind[0] = equipmentInfo[num - 1][22];
-		skillExperience[0] = equipmentInfo[num - 1][23];
+		skillName[0] = (*skillInfo)[skillNum[0] - 1][1];
+		skillMP[0] = (*skillInfo)[skillNum[0] - 1][2];
+		skillPower[0] = (*skillInfo)[skillNum[0] - 1][10];
+		skillElementNum[0] = (*skillInfo)[skillNum[0] - 1][3];
+		bufI[0] = (*skillInfo)[skillNum[0] - 1][4];
+		skillExperience[0] = (*skillInfo)[skillNum[0] - 1][19];
+
+		switch (bufI[0]) {
+		case 0:skillPMode[0] = "僟儊乕僕憹壛"; break;
+		case 1:skillPMode[0] = "旐僟儊尭彮"; break;
+		case 2:skillPMode[0] = "峌UP"; break;
+		case 3:skillPMode[0] = "杊UP"; break;
+		case 4:skillPMode[0] = "杺峌UP"; break;
+		case 5:skillPMode[0] = "杺杊UP"; break;
+		case 6:skillPMode[0] = "懍UP"; break;
+		case 7:skillPMode[0] = "柦拞UP"; break;
+		case 8:skillPMode[0] = "夞旔UP"; break;
+		case 9:skillPMode[0] = "塣UP"; break;
+		case 10:skillPMode[0] = "峌DOWN"; break;
+		case 11:skillPMode[0] = "杊DOWN"; break;
+		case 12:skillPMode[0] = "杺峌DOWN"; break;
+		case 13:skillPMode[0] = "杺杊DOWN"; break;
+		case 14:skillPMode[0] = "懍DOWN"; break;
+		case 15:skillPMode[0] = "柦拞DOWN"; break;
+		case 16:skillPMode[0] = "夞旔DOWN"; break;
+		case 17:skillPMode[0] = "塣DOWN"; break;
+		case 18:skillPMode[0] = "夞暅検憹壛"; break;
+		case 19:skillPMode[0] = "愭惂"; break;
+		case 20:skillPMode[0] = "夞悢"; break;
+		case 21:skillPMode[0] = "妋棪忋徃"; break;
+		case 22:skillPMode[0] = "徚旓MP尭彮検"; break;
+		case 23:skillPMode[0] = "堦寕"; break;
+		}
 
 	}
 
@@ -433,6 +505,7 @@ CEquipmentWindow::CEquipmentWindow(int equipmentKind, int num, int level): equip
 	case 3: Element = "悈"; break;
 	case 4: Element = "岝"; break;
 	case 5: Element = "埮"; break;
+	default: break;
 	}
 
 	switch (skillElementNum[0])
@@ -443,6 +516,7 @@ CEquipmentWindow::CEquipmentWindow(int equipmentKind, int num, int level): equip
 	case 3: skillElement[0] = "悈"; break;
 	case 4: skillElement[0] = "岝"; break;
 	case 5: skillElement[0] = "埮"; break;
+	default: break;
 	}
 
 	switch (skillElementNum[1])
@@ -453,15 +527,23 @@ CEquipmentWindow::CEquipmentWindow(int equipmentKind, int num, int level): equip
 	case 3: skillElement[1] = "悈"; break;
 	case 4: skillElement[1] = "岝"; break;
 	case 5: skillElement[1] = "埮"; break;
+	default: break;
 	}
 
 
 
 }
 
+CEquipmentWindow::~CEquipmentWindow()
+{
+	delete skillInfo;
+	skillInfo = NULL;
+}
+
 void CEquipmentWindow::ChangeKind( int num, int level)
 {
 
+	int bufI[2] = {};
 	KindNum = num;
 	Level = level;
 
@@ -478,6 +560,8 @@ void CEquipmentWindow::ChangeKind( int num, int level)
 	Luck = equipmentInfo[num - 1][11];
 
 	if (equipmentKind <= 2) {
+		skillNum[0] = equipmentInfo[num - 1][19];
+		skillNum[1] = equipmentInfo[num - 1][20];
 		ElementNum = equipmentInfo[num - 1][12];
 		FireDef = equipmentInfo[num - 1][13];
 		WoodDef = equipmentInfo[num - 1][14];
@@ -485,34 +569,95 @@ void CEquipmentWindow::ChangeKind( int num, int level)
 		LightDef = equipmentInfo[num - 1][16];
 		DarkDef = equipmentInfo[num - 1][17];
 		SellMoney = equipmentInfo[num - 1][18];
-		skillName[0] = equipmentInfo[num - 1][19];
-		skillMP[0] = equipmentInfo[num - 1][20];
-		skillPower[0] = equipmentInfo[num - 1][21];
-		skillElementNum[0] = equipmentInfo[num - 1][22];
-		skillRatioKind[0] = equipmentInfo[num - 1][23];
-		skillExperience[0] = equipmentInfo[num - 1][24];
-		skillName[1] = equipmentInfo[num - 1][25];
-		skillMP[1] = equipmentInfo[num - 1][26];
-		skillPower[1] = equipmentInfo[num - 1][27];
-		skillElementNum[1] = equipmentInfo[num - 1][28];
-		skillRatioKind[1] = equipmentInfo[num - 1][29];
-		skillExperience[1] = equipmentInfo[num - 1][30];
+
+		skillName[0] = (*skillInfo)[skillNum[0] - 1][1];
+		skillMP[0] = (*skillInfo)[skillNum[0] - 1][2];
+		skillPower[0] = (*skillInfo)[skillNum[0] - 1][10];
+		skillElementNum[0] = (*skillInfo)[skillNum[0] - 1][3];
+		bufI[0] = (*skillInfo)[skillNum[0] - 1][4];
+		skillExperience[0] = (*skillInfo)[skillNum[0] - 1][19];
+
+		skillName[1] = (*skillInfo)[skillNum[1] - 1][1];
+		skillMP[1] = (*skillInfo)[skillNum[1] - 1][2];
+		skillPower[1] = (*skillInfo)[skillNum[1] - 1][10];
+		skillElementNum[1] = (*skillInfo)[skillNum[1] - 1][3];
+		bufI[1] = (*skillInfo)[skillNum[1] - 1][4];
+		skillExperience[1] = (*skillInfo)[skillNum[1] - 1][19];
+		for (int i = 0; i < 2; i++) {
+			switch (bufI[i]) {
+			case 0:skillPMode[i] = "僟儊乕僕憹壛"; break;
+			case 1:skillPMode[i] = "旐僟儊尭彮"; break;
+			case 2:skillPMode[i] = "峌UP"; break;
+			case 3:skillPMode[i] = "杊UP"; break;
+			case 4:skillPMode[i] = "杺峌UP"; break;
+			case 5:skillPMode[i] = "杺杊UP"; break;
+			case 6:skillPMode[i] = "懍UP"; break;
+			case 7:skillPMode[i] = "柦拞UP"; break;
+			case 8:skillPMode[i] = "夞旔UP"; break;
+			case 9:skillPMode[i] = "塣UP"; break;
+			case 10:skillPMode[i] = "峌DOWN"; break;
+			case 11:skillPMode[i] = "杊DOWN"; break;
+			case 12:skillPMode[i] = "杺峌DOWN"; break;
+			case 13:skillPMode[i] = "杺杊DOWN"; break;
+			case 14:skillPMode[i] = "懍DOWN"; break;
+			case 15:skillPMode[i] = "柦拞DOWN"; break;
+			case 16:skillPMode[i] = "夞旔DOWN"; break;
+			case 17:skillPMode[i] = "塣DOWN"; break;
+			case 18:skillPMode[i] = "夞暅検憹壛"; break;
+			case 19:skillPMode[i] = "愭惂"; break;
+			case 20:skillPMode[i] = "夞悢"; break;
+			case 21:skillPMode[i] = "妋棪忋徃"; break;
+			case 22:skillPMode[i] = "徚旓MP尭彮検"; break;
+			case 23:skillPMode[i] = "堦寕"; break;
+			}
+		}
+
 	}
 	else {
+
+		skillNum[0] = equipmentInfo[num - 1][18];
 		FireDef = equipmentInfo[num - 1][12];
 		WoodDef = equipmentInfo[num - 1][13];
 		WaterDef = equipmentInfo[num - 1][14];
 		LightDef = equipmentInfo[num - 1][15];
 		DarkDef = equipmentInfo[num - 1][16];
 		SellMoney = equipmentInfo[num - 1][17];
-		skillName[0] = equipmentInfo[num - 1][18];
-		skillMP[0] = equipmentInfo[num - 1][19];
-		skillPower[0] = equipmentInfo[num - 1][20];
-		skillElementNum[0] = equipmentInfo[num - 1][21];
-		skillRatioKind[0] = equipmentInfo[num - 1][22];
-		skillExperience[0] = equipmentInfo[num - 1][23];
+		skillName[0] = (*skillInfo)[skillNum[0] - 1][1];
+		skillMP[0] = (*skillInfo)[skillNum[0] - 1][2];
+		skillPower[0] = (*skillInfo)[skillNum[0] - 1][10];
+		skillElementNum[0] = (*skillInfo)[skillNum[0] - 1][3];
+		bufI[0] = (*skillInfo)[skillNum[0] - 1][4];
+		skillExperience[0] = (*skillInfo)[skillNum[0] - 1][19];
+
+		switch (bufI[0]) {
+		case 0:skillPMode[0] = "僟儊乕僕憹壛"; break;
+		case 1:skillPMode[0] = "旐僟儊尭彮"; break;
+		case 2:skillPMode[0] = "峌UP"; break;
+		case 3:skillPMode[0] = "杊UP"; break;
+		case 4:skillPMode[0] = "杺峌UP"; break;
+		case 5:skillPMode[0] = "杺杊UP"; break;
+		case 6:skillPMode[0] = "懍UP"; break;
+		case 7:skillPMode[0] = "柦拞UP"; break;
+		case 8:skillPMode[0] = "夞旔UP"; break;
+		case 9:skillPMode[0] = "塣UP"; break;
+		case 10:skillPMode[0] = "峌DOWN"; break;
+		case 11:skillPMode[0] = "杊DOWN"; break;
+		case 12:skillPMode[0] = "杺峌DOWN"; break;
+		case 13:skillPMode[0] = "杺杊DOWN"; break;
+		case 14:skillPMode[0] = "懍DOWN"; break;
+		case 15:skillPMode[0] = "柦拞DOWN"; break;
+		case 16:skillPMode[0] = "夞旔DOWN"; break;
+		case 17:skillPMode[0] = "塣DOWN"; break;
+		case 18:skillPMode[0] = "夞暅検憹壛"; break;
+		case 19:skillPMode[0] = "愭惂"; break;
+		case 20:skillPMode[0] = "夞悢"; break;
+		case 21:skillPMode[0] = "妋棪忋徃"; break;
+		case 22:skillPMode[0] = "徚旓MP尭彮検"; break;
+		case 23:skillPMode[0] = "堦寕"; break;
+		}
 
 	}
+
 
 	HP *= (1.0 + 0.1*Level);
 	MP *= (1.0 + 0.1*Level);
@@ -550,6 +695,7 @@ void CEquipmentWindow::ChangeKind( int num, int level)
 	case 3: skillElement[0] = "悈"; break;
 	case 4: skillElement[0] = "岝"; break;
 	case 5: skillElement[0] = "埮"; break;
+	default: break;
 	}
 
 	switch (skillElementNum[1])
@@ -560,6 +706,7 @@ void CEquipmentWindow::ChangeKind( int num, int level)
 	case 3: skillElement[1] = "悈"; break;
 	case 4: skillElement[1] = "岝"; break;
 	case 5: skillElement[1] = "埮"; break;
+	default: break;
 	}
 
 
@@ -580,10 +727,10 @@ void CEquipmentWindow::Draw()
 	DrawFormatString(175, 420, BLACK, "HP %d  MP %d  峌 %d   杊 %d  杺峌 %d  杺杊 %d",HP, MP,Atc,Def,MAtc,MDef);
 	DrawFormatString(175, 440, BLACK, "壩杊 %d  栘杊 %d  悈杊 %d  岝杊 %d  埮杊 %d",FireDef,WoodDef,WaterDef,LightDef,DarkDef);
 	DrawFormatString(175, 460, BLACK, "懍 %d  柦拞 %d  夞旔 %d  塣 %d", Spd,Hit,Escape,Luck);
-	DrawFormatString(16, 485, BLACK, "SKILL1 %s丗徚旓MP %d   埿椡 %d丂懏惈 %s  P影霓 %s", skillName[0].c_str(), skillMP[0], skillPower[0], skillElement[0].c_str(),skillRatioKind[0].c_str());
+	DrawFormatString(16, 485, BLACK, "媄1 %s丗徚旓MP %d   埿椡 %d丂懏惈 %s  P影霓 %s", skillName[0].c_str(), skillMP[0], skillPower[0], skillElement[0].c_str(),skillPMode[0].c_str());
 	DrawFormatString(16, 505, BLACK,"摿庩岠壥:%s",skillExperience[0].c_str());
 	if (equipmentKind <= 2) {
-		DrawFormatString(16, 525, BLACK, "SKILL2 %s丗徚旓MP %d   埿椡 %d丂懏惈 %s  P影霓 %s", skillName[1].c_str(), skillMP[1], skillPower[1], skillElement[1].c_str(),skillRatioKind[1].c_str());
+		DrawFormatString(16, 525, BLACK, "媄2 %s丗徚旓MP %d   埿椡 %d丂懏惈 %s  P影霓 %s", skillName[1].c_str(), skillMP[1], skillPower[1], skillElement[1].c_str(),skillPMode[1].c_str());
 		DrawFormatString(16, 545, BLACK, "摿庩岠壥:%s", skillExperience[1].c_str());
 	}
 
@@ -687,3 +834,238 @@ int CAmountGetWindow::GetAmount()
 {
 	return amount;
 }
+
+
+CHaniwaWindow::CHaniwaWindow(CMySaveData * savedata, int kind)
+{
+	mySaveData = savedata;
+	haniwaInfo = new CSV("zero/ZeroData/Haniwa.csv");
+	Window = "zero/TextWindow4.png";
+	float bufFlo;
+	int bufI;
+
+	KindNum = kind;
+	Level = mySaveData->haniwaLevel[kind];
+
+	name = (*haniwaInfo)[kind][1];
+
+	for (int i = 0; i < 15; i++) {
+		bufI = (*haniwaInfo)[kind][2 + i];
+		bufFlo = (*haniwaInfo)[kind][17 + i];
+		switch (i)
+		{
+		case 0:
+			HP = bufI + bufFlo*Level;
+			break;
+		case 1:
+			MP = bufI + bufFlo*Level;
+			break;
+		case 2:
+			Atc = bufI + bufFlo*Level;
+			break;
+		case 3:
+			Def = bufI + bufFlo*Level;
+			break;
+		case 4:
+			MAtc = bufI + bufFlo*Level;
+			break;
+		case 5:
+			MDef = bufI + bufFlo*Level;
+			break;
+		case 6:
+			Spd = bufI + bufFlo*Level;
+			break;
+		case 7:
+			Hit = bufI + bufFlo*Level;
+			break;
+		case 8:
+			Escape = bufI + bufFlo*Level;
+			break;
+		case 9:
+			Luck = bufI + bufFlo*Level;
+			break;
+		case 10:
+			FireDef = bufI + bufFlo*Level;
+			break;
+		case 11:
+			WoodDef = bufI + bufFlo*Level;
+			break;
+		case 12:
+			WaterDef = bufI + bufFlo*Level;
+			break;
+		case 13:
+			LightDef = bufI + bufFlo*Level;
+			break;
+		case 14:
+			DarkDef = bufI + bufFlo*Level;
+			break;
+		
+
+
+		default:
+			break;
+		}
+	}
+
+
+}
+
+CHaniwaWindow::~CHaniwaWindow()
+{
+	delete haniwaInfo;
+	haniwaInfo = NULL;
+	mySaveData = NULL;
+
+
+}
+
+void CHaniwaWindow::Draw()
+{
+	Window.DrawExtend(4, 370, 700, 570);
+
+	DrawFormatString(20, 400, BLACK, "%s  Level:%d", name.c_str(),Level);
+	DrawFormatString(20, 430, BLACK, "HP:%d MP:%d", HP,MP);
+	DrawFormatString(20, 460, BLACK, "峌:%d丂杊丗%d 杺峌:%d丂杺杊丗%d", Atc, Def, MAtc, MDef);
+	DrawFormatString(20, 490, BLACK, "懍:%d丂柦拞丗%d 夞旔:%d丂塣丗%d", Spd, Hit, Escape, Luck);
+	DrawFormatString(20, 520, BLACK, "墛杊:%d丂栘杊丗%d 悈杊:%d丂岝杊丗%d丂埮杊丗%d", FireDef, WoodDef, WaterDef, LightDef, DarkDef);
+
+}
+
+void CHaniwaWindow::ChangeKind(int kind)
+{
+
+	float bufFlo;
+	int bufI;
+
+	KindNum = kind;
+	Level = mySaveData->haniwaLevel[kind];
+
+	name = (*haniwaInfo)[kind][1];
+
+	for (int i = 0; i < 15; i++) {
+		bufI = (*haniwaInfo)[kind][2 + i];
+		bufFlo = (*haniwaInfo)[kind][17 + i];
+		switch (i)
+		{
+		case 0:
+			HP = bufI + bufFlo*Level;
+			break;
+		case 1:
+			MP = bufI + bufFlo*Level;
+			break;
+		case 2:
+			Atc = bufI + bufFlo*Level;
+			break;
+		case 3:
+			Def = bufI + bufFlo*Level;
+			break;
+		case 4:
+			MAtc = bufI + bufFlo*Level;
+			break;
+		case 5:
+			MDef = bufI + bufFlo*Level;
+			break;
+		case 6:
+			Spd = bufI + bufFlo*Level;
+			break;
+		case 7:
+			Hit = bufI + bufFlo*Level;
+			break;
+		case 8:
+			Escape = bufI + bufFlo*Level;
+			break;
+		case 9:
+			Luck = bufI + bufFlo*Level;
+			break;
+		case 10:
+			FireDef = bufI + bufFlo*Level;
+			break;
+		case 11:
+			WoodDef = bufI + bufFlo*Level;
+			break;
+		case 12:
+			WaterDef = bufI + bufFlo*Level;
+			break;
+		case 13:
+			LightDef = bufI + bufFlo*Level;
+			break;
+		case 14:
+			DarkDef = bufI + bufFlo*Level;
+			break;
+
+		default:
+			break;
+		}
+	}
+
+
+}
+
+CHaniwaSkillWindow::CHaniwaSkillWindow(int num, int haniLevel)
+{
+	this->num = num;
+	windowGraph= "zero/TextWindow4.png";
+	haniSkill = new CSV("zero/ZeroData/HaniwaSkill.csv");
+	this->haniLevel = haniLevel;
+	if (haniLevel < 30) {
+		lvChange = 0;
+	}
+	else if (haniLevel < 50) {
+		lvChange = 1;
+	}
+	else if (haniLevel < 70) {
+		lvChange = 2;
+	}
+	else {
+		lvChange = 3;
+	}
+
+}
+
+CHaniwaSkillWindow::~CHaniwaSkillWindow()
+{
+	delete haniSkill;
+	haniSkill = NULL;
+
+}
+
+void CHaniwaSkillWindow::Draw() {
+	int bufI[5];
+	string bufS;
+
+	windowGraph.DrawExtend(4, 370, 700, 570);
+
+	bufS = (*haniSkill)[num - 1][1];
+	bufI[0]= (*haniSkill)[num - 1][2+lvChange];
+	DrawFormatString(40,390,BLACK,"%s  徚旓MP:%d", bufS.c_str(),bufI[0]);
+
+	bufI[0]= (*haniSkill)[num - 1][6];
+
+	switch (bufI[0])
+	{
+	case 0: bufS = "柍"; break;
+	case 1: bufS = "壩"; break;
+	case 2: bufS = "栘"; break;
+	case 3: bufS = "悈"; break;
+	case 4: bufS = "岝"; break;
+	case 5: bufS = "埮"; break;
+	}
+
+	bufI[1] = (*haniSkill)[num - 1][7];
+	bufI[2] = (*haniSkill)[num - 1][12+lvChange];
+
+	DrawFormatString(40, 430, BLACK, "懏惈:%s 夞悢:%d 埿椡:%d", bufS.c_str(), bufI[1],bufI[2]);
+
+
+	bufS = (*haniSkill)[num - 1][30];
+
+	DrawFormatString(40, 470, BLACK, "愢柧:%s", bufS.c_str());
+
+}
+
+void CHaniwaSkillWindow::ChangeNum(int num)
+{
+	this->num = num;
+}
+
+

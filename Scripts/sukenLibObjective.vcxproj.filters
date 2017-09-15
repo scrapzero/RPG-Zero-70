@@ -112,6 +112,9 @@
     <ClInclude Include="Produce.h">
       <Filter>メイン ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="Character.h">
+      <Filter>メイン ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -184,5 +187,11 @@
       <Filter>メイン ファイル</Filter>
     </ClCompile>
     <ClCompile Include="MyScene.cpp" />
+    <ClCompile Include="Quest.cpp">
+      <Filter>メイン ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Character.cpp">
+      <Filter>メイン ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

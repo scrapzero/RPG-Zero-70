@@ -54,7 +54,6 @@ enum {
 	Accesaly
 };
 
-
 class CEquipmentManager {
 private:
 	CMySaveData *savedata;

@@ -15,17 +15,17 @@ CItemManager::CItemManager(int kind, CMySaveData *CSD) : itemInfo("")
 	case 0: 
 	mainItemKind = "sorce";
 	itemSize = 200;
-	itemInfo = "zero/ZeroData/Sorce.txt";
+	itemInfo = "zero/ZeroData/Sorce.csv";
 	break;
 	case 1:
 	mainItemKind = "tool";
 	itemSize = 60;
-	itemInfo = "zero/ZeroData/Tool.txt";
+	itemInfo = "zero/ZeroData/Tool.csv";
 	break;
 	case 2:
 	mainItemKind = "food";
 	itemSize = 100;
-	itemInfo = "zero/ZeroData/Food.txt";
+	itemInfo = "zero/ZeroData/Food.csv";
 	break;
 
 	}

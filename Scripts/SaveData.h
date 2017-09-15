@@ -10,7 +10,6 @@ class CMySaveData {
 private:
 	CData *data,*otherData;
 	int EquipmentAmount,haveEquipmentKindLevel[400][3];//•ŠííAí—Ş”Ô†ALevel
-	int sorce[200], tool[60], food[100];
 	int test;
 	int recipeStep[10];
 	typedef pair<int, int> intP;
@@ -18,9 +17,14 @@ private:
 
 public:
 
+	int sorce[200], tool[60], food[100];
 	char bringItemSet;
 	int wearEquipmentLocate[5][2];
-	int money;
+	int money,Rank;
+	int haniwaLevel[10];
+	int bringHaniwaKind[2];
+	bool questClear[120];
+	int clearAmount[3][7];
 
 	CMySaveData(bool kari);
 	void WriteSaveData();

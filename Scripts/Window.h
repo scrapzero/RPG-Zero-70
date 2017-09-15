@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Suken.h"
+#include "SaveData.h"
 #include <list>
 #include <queue>
 #include <string>
@@ -51,6 +52,7 @@ public:
 	~CTextWindow();
 	void PushText(string text,...);
 	bool GetTextEmpty();
+	bool GetWaitTextEmpty();
 
 };
 
@@ -58,6 +60,7 @@ public:
 class CEquipmentWindow {
 private:
 	CSV equipmentInfo;
+	CSV *skillInfo;
 	Graph Window;
 	int equipmentKind;
 
@@ -87,12 +90,14 @@ private:
 	int skillPower[2];
 	int skillElementNum[2];
 	string skillElement[2];
-	string skillRatioKind[2];
+	string skillPMode[2];
 	string skillExperience[2];
+	int skillNum[2];
 
 public:
 
 	CEquipmentWindow(int equipmentKind,int num,int level);
+	~CEquipmentWindow();
 	void ChangeKind( int num, int level);
 	void Draw();
 
@@ -124,3 +129,54 @@ public:
 	int GetAmount();
 
 };
+
+class CHaniwaWindow {
+private:
+	CSV *haniwaInfo;
+	Graph Window;
+	CMySaveData *mySaveData;
+
+	string name;
+	int Level;
+	int KindNum;
+	int HP;
+	int MP;
+	int Atc;
+	int Def;
+	int MAtc;
+	int MDef;
+	int Spd;
+	int Hit;
+	int Escape;
+	int Luck;
+	int FireDef;
+	int WoodDef;
+	int WaterDef;
+	int LightDef;
+	int DarkDef;
+
+public:
+
+	CHaniwaWindow(CMySaveData *savedata,int kind);
+	~CHaniwaWindow();
+	void Draw();
+	void ChangeKind(int kind);
+
+};
+
+class CHaniwaSkillWindow {
+private:
+	Graph windowGraph;
+	int num,haniLevel,lvChange;
+	CSV *haniSkill;
+
+
+public:
+	CHaniwaSkillWindow(int num,int haniLevel);
+	~CHaniwaSkillWindow();
+	void Draw();
+	void ChangeNum(int num);
+
+
+};
+

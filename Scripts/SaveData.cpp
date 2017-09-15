@@ -14,6 +14,11 @@ const std::string NwearEquipmentLocate[5][2] = {"rhsrsrgs","sxfbxfg","rhsrsrgs2"
 const std::string Nmoney = "sida";
 const std::string NitemSet[200] = { "fksffhdppap1","fksffhdppap2","fksffhdppap3","fksffhdppap4","fksffhdppap5","fksffhdppap6","fksffhdppap7","fksffhdppap8","fksffhdppap9","fksffhdppap10","fksffhdppap11","fksffhdppap12","fksffhdppap13","fksffhdppap14","fksffhdppap15","fksffhdppap16","fksffhdppap17","fksffhdppap18","fksffhdppap19","fksffhdppap20","fksffhdppap21","fksffhdppap22","fksffhdppap23","fksffhdppap24","fksffhdppap25","fksffhdppap26","fksffhdppap27","fksffhdppap28","fksffhdppap29","fksffhdppap30","fksffhdppap31","fksffhdppap32","fksffhdppap33","fksffhdppap34","fksffhdppap35","fksffhdppap36","fksffhdppap37","fksffhdppap38","fksffhdppap39","fksffhdppap40","fksffhdppap41","fksffhdppap42","fksffhdppap43","fksffhdppap44","fksffhdppap45","fksffhdppap46","fksffhdppap47","fksffhdppap48","fksffhdppap49","fksffhdppap50","fksffhdppap51","fksffhdppap52","fksffhdppap53","fksffhdppap54","fksffhdppap55","fksffhdppap56","fksffhdppap57","fksffhdppap58","fksffhdppap59","fksffhdppap60","fksffhdppap61","fksffhdppap62","fksffhdppap63","fksffhdppap64","fksffhdppap65","fksffhdppap66","fksffhdppap67","fksffhdppap68","fksffhdppap69","fksffhdppap70","fksffhdppap71","fksffhdppap72","fksffhdppap73","fksffhdppap74","fksffhdppap75","fksffhdppap76","fksffhdppap77","fksffhdppap78","fksffhdppap79","fksffhdppap80","fksffhdppap81","fksffhdppap82","fksffhdppap83","fksffhdppap84","fksffhdppap85","fksffhdppap86","fksffhdppap87","fksffhdppap88","fksffhdppap89","fksffhdppap90","fksffhdppap91","fksffhdppap92","fksffhdppap93","fksffhdppap94","fksffhdppap95","fksffhdppap96","fksffhdppap97","fksffhdppap98","fksffhdppap99","fksffhdppap100","fksffhdppap101","fksffhdppap102","fksffhdppap103","fksffhdppap104","fksffhdppap105","fksffhdppap106","fksffhdppap107","fksffhdppap108","fksffhdppap109","fksffhdppap110","fksffhdppap111","fksffhdppap112","fksffhdppap113","fksffhdppap114","fksffhdppap115","fksffhdppap116","fksffhdppap117","fksffhdppap118","fksffhdppap119","fksffhdppap120","fksffhdppap121","fksffhdppap122","fksffhdppap123","fksffhdppap124","fksffhdppap125","fksffhdppap126","fksffhdppap127","fksffhdppap128","fksffhdppap129","fksffhdppap130","fksffhdppap131","fksffhdppap132","fksffhdppap133","fksffhdppap134","fksffhdppap135","fksffhdppap136","fksffhdppap137","fksffhdppap138","fksffhdppap139","fksffhdppap140","fksffhdppap141","fksffhdppap142","fksffhdppap143","fksffhdppap144","fksffhdppap145","fksffhdppap146","fksffhdppap147","fksffhdppap148","fksffhdppap149","fksffhdppap150","fksffhdppap151","fksffhdppap152","fksffhdppap153","fksffhdppap154","fksffhdppap155","fksffhdppap156","fksffhdppap157","fksffhdppap158","fksffhdppap159","fksffhdppap160","fksffhdppap161","fksffhdppap162","fksffhdppap163","fksffhdppap164","fksffhdppap165","fksffhdppap166","fksffhdppap167","fksffhdppap168","fksffhdppap169","fksffhdppap170","fksffhdppap171","fksffhdppap172","fksffhdppap173","fksffhdppap174","fksffhdppap175","fksffhdppap176","fksffhdppap177","fksffhdppap178","fksffhdppap179","fksffhdppap180","fksffhdppap181","fksffhdppap182","fksffhdppap183","fksffhdppap184","fksffhdppap185","fksffhdppap186","fksffhdppap187","fksffhdppap188","fksffhdppap189","fksffhdppap190","fksffhdppap191","fksffhdppap192","fksffhdppap193","fksffhdppap194","fksffhdppap195","fksffhdppap196","fksffhdppap197","fksffhdppap198","fksffhdppap199","fksffhdppap200" };
 const std::string NbringItemSet = "dfvwsdiw3d3";
+const std::string NhaniwaLevel[10] = { "fkpophdppap1","fkpophdppap2","fkpophdppap3","fkpophdppap4","fkpophdppap5","fkpophdppap6","fkpophdppap7","fkpophdppap8","fkpophdppap9","fkpophdppap10"};
+const std::string NbringHaniwaKind[2] = {"adfvafba","svsvsfb"};
+const std::string NRank = "sqqrvw";
+const std::string NQuestClear[120] = { "oao[0]d1","oao[0]d2","oao[0]d3","oao[0]d4","oao[0]d5","oao[0]d6","oao[0]d7","oao[0]d8","oao[0]d9","oao[0]d10","oao[0]d11","oao[0]d12","oao[0]d13","oao[0]d14","oao[0]d15","oao[0]d16","oao[0]d17","oao[0]d18","oao[0]d19","oao[0]d20","oao[0]d21","oao[0]d22","oao[0]d23","oao[0]d24","oao[0]d25","oao[0]d26","oao[0]d27","oao[0]d28","oao[0]d29","oao[0]d30","oao[0]d31","oao[0]d32","oao[0]d33","oao[0]d34","oao[0]d35","oao[0]d36","oao[0]d37","oao[0]d38","oao[0]d39","oao[0]d40","oao[0]d41","oao[0]d42","oao[0]d43","oao[0]d44","oao[0]d45","oao[0]d46","oao[0]d47","oao[0]d48","oao[0]d49","oao[0]d50","oao[0]d51","oao[0]d52","oao[0]d53","oao[0]d54","oao[0]d55","oao[0]d56","oao[0]d57","oao[0]d58","oao[0]d59","oao[0]d60","oao[0]d61","oao[0]d62","oao[0]d63","oao[0]d64","oao[0]d65","oao[0]d66","oao[0]d67","oao[0]d68","oao[0]d69","oao[0]d70","oao[0]d71","oao[0]d72","oao[0]d73","oao[0]d74","oao[0]d75","oao[0]d76","oao[0]d77","oao[0]d78","oao[0]d79","oao[0]d80","oao[0]d81","oao[0]d82","oao[0]d83","oao[0]d84","oao[0]d85","oao[0]d86","oao[0]d87","oao[0]d88","oao[0]d89","oao[0]d90","oao[0]d91","oao[0]d92","oao[0]d93","oao[0]d94","oao[0]d95","oao[0]d96","oao[0]d97","oao[0]d98","oao[0]d99","oao[0]d100","oao[0]d101","oao[0]d102","oao[0]d103","oao[0]d104","oao[0]d105","oao[0]d106","oao[0]d107","oao[0]d108","oao[0]d109","oao[0]d110","oao[0]d111","oao[0]d112","oao[0]d113","oao[0]d114","oao[0]d115","oao[0]d116","oao[0]d117","oao[0]d118","oao[0]d119","oao[0]d120"};
+const std::string NClearAmount[3][7] = { "eedppap1","eedppap2","eedppap3","eedppap4","eedppap5","eedppap6","eedppap7","eedppap8","eedppap9","eedppap10","eedppap11","eedppap12","eedppap13","eedppap14","eedppap15","eedppap16","eedppap17","eedppap18","eedppap19","eedppap20","eedppap21" };
 
 
 CMySaveData::CMySaveData(bool kari) {
@@ -62,6 +67,26 @@ CMySaveData::CMySaveData(bool kari) {
 
 	bringItemSet = data->GetInt(NbringItemSet);
 
+	for (int i = 0; i < 10; i++) {
+		haniwaLevel[i] = data->GetInt(NhaniwaLevel[i]);
+	}
+
+	for (int i = 0; i < 2; i++) {
+		bringHaniwaKind[i] = data->GetInt(NbringHaniwaKind[i]);
+	}
+	Rank = data->GetInt(NRank);
+
+	for (int i = 0; i < 120; i++) {
+		questClear[i] = data->GetInt(NQuestClear[i]);
+	}
+
+	for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < 7; j++) {
+			clearAmount[i][j] = data->GetInt(NClearAmount[i][j]);
+		}
+	}
+
+
 	if (EquipmentAmount==0) {
 		EquipmentAmount = 7;
 		for (int i = 0; i < 7; i++) {
@@ -109,6 +134,25 @@ CMySaveData::CMySaveData(bool kari) {
 		itemSet[0][0].second = 1;
 		bringItemSet = 0;
 
+		for (int i = 0; i < 10; i++) {
+			haniwaLevel[i] = 1;
+		}
+
+		for (int i = 0; i < 2; i++) {
+			bringHaniwaKind[i] = i + 1;
+		}
+		Rank = 1;
+
+		for (int i = 0; i < 120; i++) {
+			questClear[i] = false;
+		}
+
+		for (int i = 0; i < 3; i++) {
+			for (int j = 0; j < 7; j++) {
+				clearAmount[i][j] = 0;
+			}
+		}
+
 	}
 
 
@@ -155,6 +199,25 @@ void CMySaveData::WriteSaveData() {
 
 	data->Set(NbringItemSet,bringItemSet);
 
+	for (int i = 0; i < 10; i++) {
+		data->Set(NhaniwaLevel[i], haniwaLevel[i]);
+	}
+
+	for (int i = 0; i < 2; i++) {
+		data->Set(NbringHaniwaKind[i], bringHaniwaKind[i]);
+	}
+	data->Set(NRank, Rank);
+	for (int i = 0; i < 120; i++) {
+		data->Set(NQuestClear[i], questClear[i]);
+	}
+
+	for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < 7; j++) {
+			data->Set(NClearAmount[i][j], NClearAmount[i][j]);
+		}
+	}
+
+
 	data->WriteAll();
 }
 
@@ -193,7 +256,28 @@ void CMySaveData::WriteSaveDataToOther() {
 		}
 	}
 
+	for (int i = 0; i < 10; i++) {
+		otherData->Set(NhaniwaLevel[i], haniwaLevel[i]);
+	}
+
+	for (int i = 0; i < 2; i++) {
+		otherData->Set(NbringHaniwaKind[i], bringHaniwaKind[i]);
+	}
+
 	otherData->Set(NbringItemSet, bringItemSet);
+
+
+	otherData->Set(NRank, Rank);
+
+	for (int i = 0; i < 120; i++) {
+		otherData->Set(NQuestClear[i], questClear[i]);
+	}
+
+	for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < 7; j++) {
+			otherData->Set(NClearAmount[i][j], NClearAmount[i][j]);
+		}
+	}
 
 	otherData->WriteAll();
 }

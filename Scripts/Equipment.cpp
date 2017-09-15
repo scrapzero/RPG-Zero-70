@@ -40,13 +40,13 @@ CEquipmentManager::CEquipmentManager(CMySaveData* CSD, int equipKind) : equipmen
 	switch (equipmentKind)
 	{
 
-	case 0:	equipmentInfo = "zero/ZeroData/Soad.txt"; break;
-	case 1: equipmentInfo = "zero/ZeroData/Arrow.txt"; break;
-	case 2: equipmentInfo = "zero/ZeroData/Wand.txt"; break;
-	case 3:	equipmentInfo = "zero/ZeroData/Shield.txt"; break;
-	case 4: equipmentInfo = "zero/ZeroData/Protecter.txt"; break;
-	case 5: equipmentInfo = "zero/ZeroData/Shoes.txt"; break;
-	case 6: equipmentInfo = "zero/ZeroData/Accessory.txt"; break;
+	case 0:	equipmentInfo = "zero/ZeroData/Soad.csv"; break;
+	case 1: equipmentInfo = "zero/ZeroData/Arrow.csv"; break;
+	case 2: equipmentInfo = "zero/ZeroData/Wand.csv"; break;
+	case 3:	equipmentInfo = "zero/ZeroData/Shield.csv"; break;
+	case 4: equipmentInfo = "zero/ZeroData/Protecter.csv"; break;
+	case 5: equipmentInfo = "zero/ZeroData/Shoes.csv"; break;
+	case 6: equipmentInfo = "zero/ZeroData/Accessory.csv"; break;
 	}
 
 	equipmentWindow = new CEquipmentWindow(equipmentKind,haveEquipmentNumLevel[equipmentKind][0].first, haveEquipmentNumLevel[equipmentKind][0].second);

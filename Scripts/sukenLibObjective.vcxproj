@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Character.h" />
     <ClInclude Include="Equipment.h" />
     <ClInclude Include="Item.h" />
     <ClInclude Include="Jiki.h" />
@@ -40,6 +41,7 @@
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Character.cpp" />
     <ClCompile Include="CSTown.cpp" />
     <ClCompile Include="CSTitle.cpp" />
     <ClCompile Include="Equipment.cpp" />
@@ -48,6 +50,7 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MyScene.cpp" />
     <ClCompile Include="Produce.cpp" />
+    <ClCompile Include="Quest.cpp" />
     <ClCompile Include="SaveData.cpp" />
     <ClCompile Include="sukenlib\DebugWindow\Debug.cpp" />
     <ClCompile Include="sukenlib\GameEngine\Game.cpp" />

@@ -1,5 +1,6 @@
 #include "Produce.h"
 #include <algorithm>
+#include "MyScene.h"
 
 bool KeyOK();
 bool KeyCancel();
@@ -20,52 +21,52 @@ CProduce::CProduce(CMySaveData * CSD, int proKind) :RecipeInfo("")
 	switch (proKind)
 	{
 
-	case 0:	RecipeInfo = "zero/ZeroData/SoadRecipe.txt";
+	case 0:	RecipeInfo = "zero/ZeroData/SoadRecipe.csv";
 		kindNum=100; 
 		recipeNameKind = "剣レシピ";
 		break;
-	case 1: RecipeInfo = "zero/ZeroData/ArrowRecipe.txt";
+	case 1: RecipeInfo = "zero/ZeroData/ArrowRecipe.csv";
 		kindNum = 100; 
 		recipeNameKind = "弓レシピ";
 		break;
-	case 2: RecipeInfo = "zero/ZeroData/WandRecipe.txt";
+	case 2: RecipeInfo = "zero/ZeroData/WandRecipe.csv";
 		kindNum=100; 
 		recipeNameKind = "杖レシピ";
 		break;
-	case 3:	RecipeInfo = "zero/ZeroData/ShieldRecipe.txt"; 
+	case 3:	RecipeInfo = "zero/ZeroData/ShieldRecipe.csv"; 
 		recipeNameKind = "盾レシピ";
 		kindNum = 100;
 		break;
-	case 4: RecipeInfo = "zero/ZeroData/ProtecterRecipe.txt"; 
+	case 4: RecipeInfo = "zero/ZeroData/ProtecterRecipe.csv"; 
 		recipeNameKind = "胴レシピ";
 		kindNum = 100;
 		break;
-	case 5: RecipeInfo = "zero/ZeroData/ShoesRecipe.txt"; 
+	case 5: RecipeInfo = "zero/ZeroData/ShoesRecipe.csv"; 
 		recipeNameKind = "靴レシピ";
 		kindNum = 100;
 		break;
-	case 6: RecipeInfo = "zero/ZeroData/AccessoryRecipe.txt"; 
+	case 6: RecipeInfo = "zero/ZeroData/AccessoryRecipe.csv"; 
 		recipeNameKind = "装飾品レシピ";
 		kindNum = 100;
 		break;
-	case 7: RecipeInfo = "zero/ZeroData/SorceRecipe.txt"; 
+	case 7: RecipeInfo = "zero/ZeroData/SorceRecipe.csv"; 
 		recipeNameKind = "加工素材レシピ";
 		kindNum = 100;
 		break;
-	case 8: RecipeInfo = "zero/ZeroData/ToolRecipe.txt"; 
+	case 8: RecipeInfo = "zero/ZeroData/ToolRecipe.csv"; 
 		recipeNameKind = "道具レシピ";
 		kindNum = 100;
 		break;
-	case 9: RecipeInfo = "zero/ZeroData/FoodRecipe.txt"; 
+	case 9: RecipeInfo = "zero/ZeroData/FoodRecipe.csv"; 
 		kindNum = 100;
 		recipeNameKind = "料理レシピ";
 		break;
 	default: break;
 	}
 
-	SorceInfo[0] = new CSV("zero/ZeroData/Sorce.txt");
-	SorceInfo[1] = new CSV("zero/ZeroData/Tool.txt");
-	SorceInfo[2] = new CSV("zero/ZeroData/Food.txt");
+	SorceInfo[0] = new CSV("zero/ZeroData/Sorce.csv");
+	SorceInfo[1] = new CSV("zero/ZeroData/Tool.csv");
+	SorceInfo[2] = new CSV("zero/ZeroData/Food.csv");
 
 	lookLocate = 0;
 	lookPage = 0;
