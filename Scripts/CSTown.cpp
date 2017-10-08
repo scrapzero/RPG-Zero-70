@@ -7,20 +7,74 @@ bool KeyLeft();
 bool KeyUp();
 bool KeyDown();
 
-void CSTown::Start() {
-	LoadDivGraph("zero/jiki.png", 12, 3, 4, 32, 32,jikiGraph);
+CSTown::CSTown(int jikiMapX, int jikiMapY, int hatuSerihu) {
+	this->jikiMapX = jikiMapX;
+	this->jikiMapY = jikiMapY;
+	txWindow = NULL;
+
+	switch (hatuSerihu)
+	{
+	case 0:
+		graphDirect = 0;
+		break;
+	case 1:
+		txWindow = new CTextWindow("無理はしないよう、またクエストに出るときは話しかけてください。");
+		graphDirect = 3;
+		break;
+	case 2:
+		break;
+
+	default:
+		break;
+	}
+
+	LoadDivGraph("zero/jiki.png", 12, 3, 4, 32, 32, jikiGraph);
 	LoadDivGraph("zero/MyMapChip1.png", 156, 26, 6, 32, 32, mapChip);
 	TownMap = "zero/MCE/Town.mce";
 	mapWidth = TownMap.GetWidth();
 	mapHeight = TownMap.GetHeight();
+
+
 	jikiX = 11 * 32;
 	jikiY = 10 * 32;
-	jikiMapX = 40;
-	jikiMapY = 34;
 	scrollX = 29 * 32;
 	scrollY = 24 * 32;
+
+	if (jikiMapX < 11) {
+		jikiX = jikiMapX * 32;
+		scrollX = 0;
+	}
+	else if (jikiMapX - (mapWidth - 1 - 21) >= 10) {
+		jikiX = (jikiMapX - (mapWidth - 1 - 21)) * 32;
+		scrollX = (mapWidth - 1 - 21) * 32;
+	}
+	else {
+		jikiX = 11 * 32;
+		scrollX = (jikiMapX - 11) * 32;
+	}
+
+	if (jikiMapY < 10) {
+		jikiY = jikiMapY * 32;
+		scrollY = 0;
+	}
+	else if (jikiMapY - (mapHeight - 1 - 17) >= 6) {
+		jikiY = (jikiMapY - (mapHeight - 1 - 17)) * 32;
+		scrollY = (mapHeight - 1 - 17) * 32;
+	}
+	else
+	{
+		jikiY = 10 * 32;
+		scrollY = (jikiMapY - 10) * 32;
+	}
+
+	if (txWindow == NULL) {
+		jikiX = 11 * 32;
+		jikiY = 10 * 32;
+		scrollX = 29 * 32;
+		scrollY = 24 * 32;
+	}
+
 	moveDirect = 4;
-	graphDirect = 0;
 	graphStep = 1;
 	moveF = false;
 	animeF = false;
@@ -32,6 +86,11 @@ void CSTown::Start() {
 
 }
 
+void CSTown::Start() {
+	
+
+}
+
 void CSTown::Loop() {
 	int HitKeyNum = 0;
 	canMoveDown = true;
@@ -40,21 +99,15 @@ void CSTown::Loop() {
 	canMoveUp = true;
 	int checkAround[2] = {};
 	int jikiStandChip[2] = { TownMap.Get(TownMap.layer.C, jikiMapX, jikiMapY) -1, TownMap.Get(TownMap.layer.B, jikiMapX, jikiMapY) -1 };
+	
+	
 
-	if (jikiMapX > 0) {
-		checkAround[0] = TownMap.Get(TownMap.layer.C, jikiMapX - 1, jikiMapY)-1;
-		checkAround[1] = TownMap.Get(TownMap.layer.B, jikiMapX - 1, jikiMapY)-1;
+	if (txWindow == NULL) {
+		if (jikiMapX > 0) {
+			checkAround[0] = TownMap.Get(TownMap.layer.C, jikiMapX - 1, jikiMapY) - 1;
+			checkAround[1] = TownMap.Get(TownMap.layer.B, jikiMapX - 1, jikiMapY) - 1;
 
-		if (jikiStandChip[0]<26||jikiStandChip[0]%26>=20 ) {
-			if (checkAround[0] >= 26 && checkAround[0] % 26 < 20 ) {
-				canMoveLeft = false;
-			}
-			if ( checkAround[1] >= 26 && checkAround[1] % 26 < 20) {
-				canMoveLeft = false;
-			}
-		}
-		if (jikiStandChip[1]<26 || jikiStandChip[1] % 26 >= 20) {
-			if (jikiStandChip[1] >= 0 && jikiStandChip[1] % 26 != 25) {
+			if (jikiStandChip[0] < 26 || jikiStandChip[0] % 26 >= 20) {
 				if (checkAround[0] >= 26 && checkAround[0] % 26 < 20) {
 					canMoveLeft = false;
 				}
@@ -62,60 +115,60 @@ void CSTown::Loop() {
 					canMoveLeft = false;
 				}
 			}
-		}
-
-		if (jikiStandChip[0] >= 27 && jikiStandChip[0]  <40) {
-			if (checkAround[0] < 27 || checkAround[0] >=40) {
-				if (checkAround[0] >= 0) {
-					canMoveLeft = false;
+			if (jikiStandChip[1] < 26 || jikiStandChip[1] % 26 >= 20) {
+				if (jikiStandChip[1] >= 0 && jikiStandChip[1] % 26 != 25) {
+					if (checkAround[0] >= 26 && checkAround[0] % 26 < 20) {
+						canMoveLeft = false;
+					}
+					if (checkAround[1] >= 26 && checkAround[1] % 26 < 20) {
+						canMoveLeft = false;
+					}
 				}
 			}
-			if (checkAround[1] < 27 || checkAround[1] >= 40 ) {
-				if (checkAround[1] >= 0) {
-					canMoveLeft = false;
+
+			if (jikiStandChip[0] >= 27 && jikiStandChip[0] < 40) {
+				if (checkAround[0] < 27 || checkAround[0] >= 40) {
+					if (checkAround[0] >= 0) {
+						canMoveLeft = false;
+					}
+				}
+				if (checkAround[1] < 27 || checkAround[1] >= 40) {
+					if (checkAround[1] >= 0) {
+						canMoveLeft = false;
+					}
 				}
 			}
-		}
 
-		if (jikiStandChip[1]%26==25) {
-			if (checkAround[0] <= 26 || checkAround[0] >= 40) {
-				if (checkAround[0] >= 0) {
-					canMoveLeft = false;
+			if (jikiStandChip[1] % 26 == 25) {
+				if (checkAround[0] <= 26 || checkAround[0] >= 40) {
+					if (checkAround[0] >= 0) {
+						canMoveLeft = false;
+					}
+					else {
+						canMoveLeft = true;
+					}
 				}
 				else {
 					canMoveLeft = true;
 				}
 			}
-			else {
-				canMoveLeft = true;
-			}
-		}
 
-		if (checkAround[1] % 26 == 25 || jikiStandChip[1] % 26 == 25) {
-			if (jikiStandChip[0] >= 27 && jikiStandChip[0]  <40) {
-				if (checkAround[0] >= 27 && checkAround[0] < 40) {
+			if (checkAround[1] % 26 == 25 || jikiStandChip[1] % 26 == 25) {
+				if (jikiStandChip[0] >= 27 && jikiStandChip[0] < 40) {
+					if (checkAround[0] >= 27 && checkAround[0] < 40) {
 
-					canMoveLeft = true;
+						canMoveLeft = true;
+					}
 				}
 			}
+
 		}
 
-	}
+		if (jikiMapY > 0) {
+			checkAround[0] = TownMap.Get(TownMap.layer.C, jikiMapX, jikiMapY - 1) - 1;
+			checkAround[1] = TownMap.Get(TownMap.layer.B, jikiMapX, jikiMapY - 1) - 1;
 
-	if (jikiMapY > 0) {
-		checkAround[0] = TownMap.Get(TownMap.layer.C, jikiMapX , jikiMapY-1) - 1;
-		checkAround[1] = TownMap.Get(TownMap.layer.B, jikiMapX , jikiMapY-1) - 1;
-		
-		if (jikiStandChip[0]<26 || jikiStandChip[0] % 26 >= 20) {
-			if (checkAround[0] >= 26 && checkAround[0] % 26 < 20) {
-				canMoveUp = false;
-			}
-			if (checkAround[1] >= 26 && checkAround[1] % 26 < 20) {
-				canMoveUp = false;
-			}
-		}
-		if (jikiStandChip[1]<26 || jikiStandChip[1] % 26 >= 20) {
-			if (jikiStandChip[1] >= 0) {
+			if (jikiStandChip[0] < 26 || jikiStandChip[0] % 26 >= 20) {
 				if (checkAround[0] >= 26 && checkAround[0] % 26 < 20) {
 					canMoveUp = false;
 				}
@@ -123,55 +176,55 @@ void CSTown::Loop() {
 					canMoveUp = false;
 				}
 			}
-		}
-
-		if (jikiStandChip[0] >= 27 && jikiStandChip[0]  <40) {
-			if (checkAround[0] < 27 || checkAround[0] >= 40 ) {
-				if (checkAround[0] >= 0) {
-					canMoveUp = false;
+			if (jikiStandChip[1] < 26 || jikiStandChip[1] % 26 >= 20) {
+				if (jikiStandChip[1] >= 0) {
+					if (checkAround[0] >= 26 && checkAround[0] % 26 < 20) {
+						canMoveUp = false;
+					}
+					if (checkAround[1] >= 26 && checkAround[1] % 26 < 20) {
+						canMoveUp = false;
+					}
 				}
 			}
-			if (checkAround[1] < 27 || checkAround[1] >= 40) {
-				if (checkAround[1] >= 0) {
-					canMoveUp = false;
+
+			if (jikiStandChip[0] >= 27 && jikiStandChip[0] < 40) {
+				if (checkAround[0] < 27 || checkAround[0] >= 40) {
+					if (checkAround[0] >= 0) {
+						canMoveUp = false;
+					}
+				}
+				if (checkAround[1] < 27 || checkAround[1] >= 40) {
+					if (checkAround[1] >= 0) {
+						canMoveUp = false;
+					}
 				}
 			}
-		}
 
-		if (jikiStandChip[1] % 26 == 25) {
-			if (checkAround[0] ==26 || checkAround[0] >= 40) {
-				if (checkAround[0] % 26 < 20) {
-					canMoveUp = false;
+			if (jikiStandChip[1] % 26 == 25) {
+				if (checkAround[0] == 26 || checkAround[0] >= 40) {
+					if (checkAround[0] % 26 < 20) {
+						canMoveUp = false;
+					}
+					else {
+						canMoveUp = true;
+					}
 				}
 				else {
 					canMoveUp = true;
 				}
 			}
-			else {
+
+			if (checkAround[1] % 26 == 25) {
 				canMoveUp = true;
 			}
+
 		}
 
-		if (checkAround[1] % 26 == 25) {
-			canMoveUp = true;
-		}
+		if (jikiMapX + 1 < mapWidth) {
+			checkAround[0] = TownMap.Get(TownMap.layer.C, jikiMapX + 1, jikiMapY) - 1;
+			checkAround[1] = TownMap.Get(TownMap.layer.B, jikiMapX + 1, jikiMapY) - 1;
 
-	}
-
-	if (jikiMapX+1 < mapWidth) {
-		checkAround[0] = TownMap.Get(TownMap.layer.C, jikiMapX + 1, jikiMapY) - 1;
-		checkAround[1] = TownMap.Get(TownMap.layer.B, jikiMapX + 1, jikiMapY) - 1;
-
-		if (jikiStandChip[0]<26 || jikiStandChip[0] % 26 >= 20) {
-			if (checkAround[0] >= 26 && checkAround[0] % 26 < 20) {
-				canMoveRight = false;
-			}
-			if (checkAround[1] >= 26 && checkAround[1] % 26 < 20) {
-				canMoveRight = false;
-			}
-		}
-		if (jikiStandChip[1]<26 || jikiStandChip[1] % 26 >= 20) {
-			if (jikiStandChip[1] >= 0 && jikiStandChip[1] % 26 != 25) {
+			if (jikiStandChip[0] < 26 || jikiStandChip[0] % 26 >= 20) {
 				if (checkAround[0] >= 26 && checkAround[0] % 26 < 20) {
 					canMoveRight = false;
 				}
@@ -179,284 +232,302 @@ void CSTown::Loop() {
 					canMoveRight = false;
 				}
 			}
-		}
-
-		if (jikiStandChip[0] >= 27 && jikiStandChip[0]  <40) {
-			if (checkAround[0] < 27 || checkAround[0] >= 40) {
-				if (checkAround[0] >= 0) {
-					canMoveRight = false;
+			if (jikiStandChip[1] < 26 || jikiStandChip[1] % 26 >= 20) {
+				if (jikiStandChip[1] >= 0 && jikiStandChip[1] % 26 != 25) {
+					if (checkAround[0] >= 26 && checkAround[0] % 26 < 20) {
+						canMoveRight = false;
+					}
+					if (checkAround[1] >= 26 && checkAround[1] % 26 < 20) {
+						canMoveRight = false;
+					}
 				}
 			}
-			if (checkAround[1] < 27 || checkAround[1] >= 40) {
-				if (checkAround[1] >= 0) {
-					canMoveRight = false;
+
+			if (jikiStandChip[0] >= 27 && jikiStandChip[0] < 40) {
+				if (checkAround[0] < 27 || checkAround[0] >= 40) {
+					if (checkAround[0] >= 0) {
+						canMoveRight = false;
+					}
+				}
+				if (checkAround[1] < 27 || checkAround[1] >= 40) {
+					if (checkAround[1] >= 0) {
+						canMoveRight = false;
+					}
 				}
 			}
-		}
 
-		if (jikiStandChip[1] % 26 == 25) {
-			if (checkAround[0] <= 26 || checkAround[0] >= 40) {
-				if (checkAround[0] >=0) {
-					canMoveRight = false;
+			if (jikiStandChip[1] % 26 == 25) {
+				if (checkAround[0] <= 26 || checkAround[0] >= 40) {
+					if (checkAround[0] >= 0) {
+						canMoveRight = false;
+					}
+					else {
+						canMoveRight = true;
+					}
 				}
 				else {
 					canMoveRight = true;
 				}
 			}
-			else {
-				canMoveRight = true;
-			}
-		}
 
-		if (checkAround[1] % 26 == 25 || jikiStandChip[1] % 26 == 25) {
-			if (jikiStandChip[0] >= 27 && jikiStandChip[0]  <40) {
-				if (checkAround[0] >= 27 && checkAround[0] < 40) {
+			if (checkAround[1] % 26 == 25 || jikiStandChip[1] % 26 == 25) {
+				if (jikiStandChip[0] >= 27 && jikiStandChip[0] < 40) {
+					if (checkAround[0] >= 27 && checkAround[0] < 40) {
 
-					canMoveRight = true;
+						canMoveRight = true;
+					}
 				}
-			} 
+			}
+
 		}
 
-	}
+		if (jikiMapY + 1 < mapHeight) {
+			checkAround[0] = TownMap.Get(TownMap.layer.C, jikiMapX, jikiMapY + 1) - 1;
+			checkAround[1] = TownMap.Get(TownMap.layer.B, jikiMapX, jikiMapY + 1) - 1;
 
-	if (jikiMapY+1 < mapHeight) {
-		checkAround[0] = TownMap.Get(TownMap.layer.C, jikiMapX , jikiMapY+1) - 1;
-		checkAround[1] = TownMap.Get(TownMap.layer.B, jikiMapX , jikiMapY+1) - 1;
-
-		if (jikiStandChip[0]<26 || jikiStandChip[0] % 26 >= 20) {
-			if (checkAround[0] >= 26 && checkAround[0] % 26 < 20) {
-				canMoveDown = false;
-			}
-			if (checkAround[1] >= 26 && checkAround[1] % 26 < 20) {
-				canMoveDown = false;
-			}
-		}
-		if (jikiStandChip[1]<26 || jikiStandChip[1] % 26 >= 20) {
-			if (jikiStandChip[1] >= 0) {
+			if (jikiStandChip[0] < 26 || jikiStandChip[0] % 26 >= 20) {
 				if (checkAround[0] >= 26 && checkAround[0] % 26 < 20) {
 					canMoveDown = false;
 				}
-				if (checkAround[1] >= 26 && checkAround[1] % 26 < 20 ) {
+				if (checkAround[1] >= 26 && checkAround[1] % 26 < 20) {
 					canMoveDown = false;
 				}
 			}
-		}
+			if (jikiStandChip[1] < 26 || jikiStandChip[1] % 26 >= 20) {
+				if (jikiStandChip[1] >= 0) {
+					if (checkAround[0] >= 26 && checkAround[0] % 26 < 20) {
+						canMoveDown = false;
+					}
+					if (checkAround[1] >= 26 && checkAround[1] % 26 < 20) {
+						canMoveDown = false;
+					}
+				}
+			}
 
-		if (jikiStandChip[0] >= 27 && jikiStandChip[0]  <40) {
-			if (checkAround[0] < 27 || checkAround[0] >= 40) {
-				if (checkAround[0] >= 0) {
-					canMoveDown = false;
+			if (jikiStandChip[0] >= 27 && jikiStandChip[0] < 40) {
+				if (checkAround[0] < 27 || checkAround[0] >= 40) {
+					if (checkAround[0] >= 0) {
+						canMoveDown = false;
+					}
+				}
+				if (checkAround[1] < 27 || checkAround[1] >= 40) {
+					if (checkAround[1] >= 0) {
+						canMoveDown = false;
+					}
 				}
 			}
-			if (checkAround[1] < 27 || checkAround[1] >= 40) {
-				if (checkAround[1] >= 0) {
-					canMoveDown = false;
-				}
-			}
-		}
 
-		if (jikiStandChip[1] % 26 == 25) {
-			if (checkAround[0] == 26 || checkAround[0] >= 40) {
-				if (checkAround[0] % 26 < 20) {
-					canMoveDown = false;
+			if (jikiStandChip[1] % 26 == 25) {
+				if (checkAround[0] == 26 || checkAround[0] >= 40) {
+					if (checkAround[0] % 26 < 20) {
+						canMoveDown = false;
+					}
+					else {
+						canMoveDown = true;
+					}
 				}
 				else {
 					canMoveDown = true;
 				}
 			}
-			else {
+
+			if (checkAround[1] % 26 == 25) {
 				canMoveDown = true;
 			}
+
 		}
 
-		if (checkAround[1] % 26 == 25) {
-			canMoveDown = true;
-		}
-
-	}
-
-	if (Input.GetKeyDown(Input.key.DOWN)) {
-		HitKeyNum++;
-	}
-	if (Input.GetKeyDown(Input.key.LEFT)) {
-		HitKeyNum++;
-	}
-	if (Input.GetKeyDown(Input.key.RIGHT)) {
-		HitKeyNum++;
-	}
-	if (Input.GetKeyDown(Input.key.UP)) {
-		HitKeyNum++;
-	}
-
-	if (Input.GetKeyDown(Input.key.DOWN) && moveF==false &&canMoveDown==true) {
-		if (HitKeyNum <= 1 || moveDirect != 0) {
-			moveF = true;
-			moveDirect = 0;
-			graphDirect = 0;
-		}
-	}
-	if (Input.GetKeyDown(Input.key.LEFT) &&moveF == false && canMoveLeft == true) {
-		if (HitKeyNum <= 1 || moveDirect != 1) {
-			moveF = true;
-			moveDirect = 1;
-			graphDirect = 1;
-		}
-	}
-	if (Input.GetKeyDown(Input.key.RIGHT) && moveF == false && canMoveRight == true) {
-		if (HitKeyNum <= 1 || moveDirect != 2) {
-			moveF = true;
-			moveDirect = 2;
-			graphDirect = 2;
-		}
-	}
-	if (Input.GetKeyDown(Input.key.UP) && moveF == false && canMoveUp == true) {
-		if (HitKeyNum <= 1 || moveDirect != 3) {
-			moveF = true;
-			moveDirect = 3;
-			graphDirect = 3;
-		}
-	}
-	
-	if (moveF == true) {
-		switch (moveDirect) {
-		case 0:
-			if (jikiY == 320 && mapHeight > jikiMapY + 8) {
-				scrollY += walkSpeed;
-
-			}
-			else {
-				jikiY += walkSpeed;
-			}
-		break;
-		case 1:
-			if (jikiX == 352 && scrollX>0) {
-				scrollX -= walkSpeed;
-
-			}
-			else {
-				jikiX -= walkSpeed;
-			}
-		break;
-		case 2:
-			if (jikiX == 352 && mapWidth > jikiMapX + 11) {
-				scrollX += walkSpeed;
-
-			}
-			else {
-				jikiX += walkSpeed;
-			}
-		break;
-		case 3:
-			if (jikiY == 320 && scrollY>0) {
-				scrollY -= walkSpeed;
-
-			}
-			else {
-				jikiY -= walkSpeed;
-			}
-		break;
-
-
-		default:break;
-		}
-	}
-	if (moveF == false) {
-		moveDirect = 4;
 		if (Input.GetKeyDown(Input.key.DOWN)) {
-			graphDirect = 0;
-			moveDirect = 0;
+			HitKeyNum++;
 		}
 		if (Input.GetKeyDown(Input.key.LEFT)) {
-			graphDirect = 1;
-			moveDirect = 1;
+			HitKeyNum++;
 		}
 		if (Input.GetKeyDown(Input.key.RIGHT)) {
-			graphDirect = 2;
-			moveDirect = 2;
+			HitKeyNum++;
 		}
 		if (Input.GetKeyDown(Input.key.UP)) {
-			graphDirect = 3;
-			moveDirect = 3;
+			HitKeyNum++;
+		}
+
+		if (Input.GetKeyDown(Input.key.DOWN) && moveF == false && canMoveDown == true) {
+			if (HitKeyNum <= 1 || moveDirect != 0) {
+				moveF = true;
+				moveDirect = 0;
+				graphDirect = 0;
+			}
+		}
+		if (Input.GetKeyDown(Input.key.LEFT) && moveF == false && canMoveLeft == true) {
+			if (HitKeyNum <= 1 || moveDirect != 1) {
+				moveF = true;
+				moveDirect = 1;
+				graphDirect = 1;
+			}
+		}
+		if (Input.GetKeyDown(Input.key.RIGHT) && moveF == false && canMoveRight == true) {
+			if (HitKeyNum <= 1 || moveDirect != 2) {
+				moveF = true;
+				moveDirect = 2;
+				graphDirect = 2;
+			}
+		}
+		if (Input.GetKeyDown(Input.key.UP) && moveF == false && canMoveUp == true) {
+			if (HitKeyNum <= 1 || moveDirect != 3) {
+				moveF = true;
+				moveDirect = 3;
+				graphDirect = 3;
+			}
+		}
+
+		if (moveF == true) {
+			switch (moveDirect) {
+			case 0:
+				if (jikiY == 320 && mapHeight > jikiMapY + 8) {
+					scrollY += walkSpeed;
+
+				}
+				else {
+					jikiY += walkSpeed;
+				}
+				break;
+			case 1:
+				if (jikiX == 352 && scrollX > 0) {
+					scrollX -= walkSpeed;
+
+				}
+				else {
+					jikiX -= walkSpeed;
+				}
+				break;
+			case 2:
+				if (jikiX == 352 && mapWidth > jikiMapX + 11) {
+					scrollX += walkSpeed;
+
+				}
+				else {
+					jikiX += walkSpeed;
+				}
+				break;
+			case 3:
+				if (jikiY == 320 && scrollY > 0) {
+					scrollY -= walkSpeed;
+
+				}
+				else {
+					jikiY -= walkSpeed;
+				}
+				break;
+
+
+			default:break;
+			}
+		}
+		if (moveF == false) {
+			moveDirect = 4;
+			if (Input.GetKeyDown(Input.key.DOWN)) {
+				graphDirect = 0;
+				moveDirect = 0;
+			}
+			if (Input.GetKeyDown(Input.key.LEFT)) {
+				graphDirect = 1;
+				moveDirect = 1;
+			}
+			if (Input.GetKeyDown(Input.key.RIGHT)) {
+				graphDirect = 2;
+				moveDirect = 2;
+			}
+			if (Input.GetKeyDown(Input.key.UP)) {
+				graphDirect = 3;
+				moveDirect = 3;
+			}
+		}
+
+		if ((jikiX + scrollX) % 32 == 0 && (jikiY + scrollY) % 32 == 0) {
+			moveF = false;
+			graphStep = 1;
+		}
+
+		if ((jikiX + scrollX) % 32 == 16 || (jikiY + scrollY) % 32 == 16) {
+			if (animeF == true) {
+				graphStep = 0;
+				animeF = false;
+			}
+			else {
+				graphStep = 2;
+				animeF = true;
+			}
+		}
+
+		if (graphDirect == 3 && KeyOK()) {
+			checkAround[0] = TownMap.Get(TownMap.layer.C, jikiMapX, jikiMapY - 1) - 1;
+			checkAround[1] = TownMap.Get(TownMap.layer.B, jikiMapX, jikiMapY - 1) - 1;
+
+			if (checkAround[0] == 135 || checkAround[1] == 135) {
+				FlipScene(new CSProTool(*this), Flip::SLIDE_UP, 10);
+			}
+
+			if (checkAround[0] == 136 || checkAround[1] == 136) {
+				FlipScene(new CSProEquipment(*this), Flip::SLIDE_UP, 10);
+			}
+
+			if (checkAround[0] == 137 || checkAround[1] == 137) {
+				FlipScene(new CSCook(*this), Flip::SLIDE_UP, 10);
+			}
+
+			if (checkAround[0] == 138 || checkAround[1] == 138) {
+				FlipScene(new CSGoToQuest(*this), Flip::SLIDE_UP, 10);
+			}
+
+			if (checkAround[0] == 139 || checkAround[1] == 139) {
+				FlipScene(new CSSorceRemake(*this), Flip::SLIDE_UP, 10);
+			}
+
+			if (checkAround[0] == 141 || checkAround[1] == 141) {
+				FlipScene(new CSSellItem(*this), Flip::SLIDE_UP, 10);
+			}
+
+			if (checkAround[0] == 144 || checkAround[1] == 144) {
+				FlipScene(new CSHaniwa(*this), Flip::SLIDE_UP, 10);
+			}
+
+
+		}
+
+		if (graphDirect == 2 && KeyOK()) {
+			checkAround[0] = TownMap.Get(TownMap.layer.C, jikiMapX + 1, jikiMapY) - 1;
+			checkAround[1] = TownMap.Get(TownMap.layer.B, jikiMapX + 1, jikiMapY) - 1;
+
+			if (checkAround[0] == 142 || checkAround[1] == 142) {
+				FlipScene(new CSItemSet(*this), Flip::SLIDE_UP, 10);
+			}
+
+		}
+
+		if (graphDirect == 1 && KeyOK()) {
+			checkAround[0] = TownMap.Get(TownMap.layer.C, jikiMapX - 1, jikiMapY) - 1;
+			checkAround[1] = TownMap.Get(TownMap.layer.B, jikiMapX - 1, jikiMapY) - 1;
+
+			if (checkAround[0] == 143 || checkAround[1] == 143) {
+				FlipScene(new CSSetEquipment(*this), Flip::SLIDE_UP, 10);
+			}
+
+		}
+
+		if (Input.GetKeyEnter(Input.key.SPACE)) {
+			FlipScene(new CSMenueWindow(*this), Flip::SLIDE_UP, 10);
+		}
+
+		jikiMapX = (jikiX + scrollX) / 32;
+		jikiMapY = (jikiY + scrollY) / 32;
+	}
+	else {
+		txWindow->Loop();
+		if (txWindow->GetTextEmpty() && txWindow->GetWaitTextEmpty()) {
+			delete txWindow;
+			txWindow = NULL;
 		}
 	}
 
-	if ((jikiX + scrollX) % 32 == 0 && (jikiY + scrollY) % 32 == 0) {
-		moveF = false;
-		graphStep = 1;
-	}
-
-	if ((jikiX + scrollX) % 32 == 16 || (jikiY + scrollY) % 32 == 16) {
-		if (animeF == true) {
-			graphStep = 0;
-			animeF = false;
-		}
-		else {
-			graphStep = 2;
-			animeF = true;
-		}
-	}
-
-	if (graphDirect == 3 && KeyOK()) {
-		checkAround[0] = TownMap.Get(TownMap.layer.C, jikiMapX, jikiMapY - 1) - 1;
-		checkAround[1] = TownMap.Get(TownMap.layer.B, jikiMapX, jikiMapY - 1) - 1;
-		
-		if (checkAround[0] == 135 || checkAround[1] == 135) {
-			FlipScene(new CSProTool(*this), Flip::SLIDE_UP, 10);
-		}
-
-		if (checkAround[0] == 136 || checkAround[1] == 136) {
-			FlipScene(new CSProEquipment(*this),Flip::SLIDE_UP,10);
-		}
-
-		if (checkAround[0] == 137 || checkAround[1] == 137) {
-			FlipScene(new CSCook(*this), Flip::SLIDE_UP, 10);
-		}
-
-		if (checkAround[0] == 138 || checkAround[1] == 138) {
-			FlipScene(new CSGoToQuest(*this), Flip::SLIDE_UP, 10);
-		}
-
-		if (checkAround[0] == 139 || checkAround[1] == 139) {
-			FlipScene(new CSSorceRemake(*this), Flip::SLIDE_UP, 10);
-		}
-
-		if (checkAround[0] == 141 || checkAround[1] == 141) {
-			FlipScene(new CSSellItem(*this), Flip::SLIDE_UP, 10);
-		}
-
-		if (checkAround[0] == 144 || checkAround[1] == 144) {
-			FlipScene(new CSHaniwa(*this), Flip::SLIDE_UP, 10);
-		}
-	
-	
-	}
-
-	if (graphDirect == 2 && KeyOK()) {
-		checkAround[0] = TownMap.Get(TownMap.layer.C, jikiMapX + 1, jikiMapY) - 1;
-		checkAround[1] = TownMap.Get(TownMap.layer.B, jikiMapX + 1, jikiMapY) - 1;
-
-		if (checkAround[0] == 142 || checkAround[1] == 142) {
-			FlipScene(new CSItemSet(*this), Flip::SLIDE_UP, 10);
-		}
-
-	}
-
-	if (graphDirect == 1 && KeyOK()) {
-		checkAround[0] = TownMap.Get(TownMap.layer.C, jikiMapX - 1, jikiMapY) - 1;
-		checkAround[1] = TownMap.Get(TownMap.layer.B, jikiMapX - 1, jikiMapY) - 1;
-
-		if (checkAround[0] == 143 || checkAround[1] == 143) {
-			FlipScene(new CSSetEquipment(*this), Flip::SLIDE_UP, 10);
-		}
-
-	}
-
-	if (Input.GetKeyEnter(Input.key.SPACE)) {
-		FlipScene(new CSMenueWindow(*this), Flip::SLIDE_UP, 10);
-	}
-
-	jikiMapX = (jikiX + scrollX) / 32;
-	jikiMapY = (jikiY + scrollY) / 32;
 }
 
 
@@ -487,6 +558,9 @@ void CSTown::Draw() {
 				mapChip[TownMap.Get(TownMap.layer.B, i, j)-1].Draw(i * 32 - scrollX, j * 32 - scrollY);
 			}
 		}
+	}
+	if (txWindow != NULL) {
+		txWindow->Draw();
 	}
 
 	jikiGraph[graphDirect*3+graphStep].Draw(jikiX, jikiY-4);
@@ -2071,12 +2145,12 @@ void CSTown::CSHaniwa::Loop()
 		case 4:
 			if (arrow3 >= 1 && KeyUp()) {
 				arrow3--;
-				haniwaWindow->ChangeKind(cstown.mySaveData->bringHaniwaKind[arrow3]);
+				haniwaWindow->ChangeKind(cstown.mySaveData->bringHaniwaKind[arrow3] - 1);
 			}
 			if (arrow3 < 2 && KeyDown()) {
 				arrow3++;
 				if (arrow3 < 2) {
-					haniwaWindow->ChangeKind(cstown.mySaveData->bringHaniwaKind[arrow3]);
+					haniwaWindow->ChangeKind(cstown.mySaveData->bringHaniwaKind[arrow3] - 1);
 				}
 			}
 			if (KeyOK()) {
@@ -2103,10 +2177,10 @@ void CSTown::CSHaniwa::Loop()
 				switch (arrow2)
 				{
 				case 0:
-					if (arrow != cstown.mySaveData->bringHaniwaKind[0] && arrow != cstown.mySaveData->bringHaniwaKind[1]) {
+					if (arrow != cstown.mySaveData->bringHaniwaKind[0] - 1 && arrow != cstown.mySaveData->bringHaniwaKind[1] - 1) {
 						step = 4;
 						arrow3 = 0;
-						haniwaWindow->ChangeKind(cstown.mySaveData->bringHaniwaKind[0]);
+						haniwaWindow->ChangeKind(cstown.mySaveData->bringHaniwaKind[0] - 1);
 					}
 					break;
 				case 1:
@@ -2222,7 +2296,7 @@ void CSTown::CSHaniwa::Draw()
 			DrawFormatString(40, 30 + 32 * i, BLACK, "%s", bufS.c_str());
 		}
 		for (int i = 0; i<2; i++) {
-			DrawFormatString(40, 45 + 32 * cstown.mySaveData->bringHaniwaKind[i], RED, "（お供選択中↑）");
+			DrawFormatString(40, 45 + 32 * (cstown.mySaveData->bringHaniwaKind[i] -1) , RED, "（お供選択中↑）");
 		}
 
 		for (int i = 0; i < 4; i++) {
@@ -2264,7 +2338,7 @@ void CSTown::CSHaniwa::Draw()
 			DrawFormatString(40, 30 + 32 * i, BLACK, "%s", bufS.c_str());
 		}
 		for (int i = 0; i < 2; i++) {
-			DrawFormatString(40, 45 + 32 * cstown.mySaveData->bringHaniwaKind[i], RED, "（お供選択中↑）");
+			DrawFormatString(40, 45 + 32 * (cstown.mySaveData->bringHaniwaKind[i] -1), RED, "（お供選択中↑）");
 		}
 
 		break;
@@ -2291,7 +2365,7 @@ void CSTown::CSHaniwa::Draw()
 		}
 
 		for (int i = 0; i < 2; i++) {
-			bufS = (*haniwaInfo)[cstown.mySaveData->bringHaniwaKind[i]][1];
+			bufS = (*haniwaInfo)[cstown.mySaveData->bringHaniwaKind[i] - 1][1];
 			DrawFormatString(430, 25 + 32 * arrow + 30 * i, BLACK, "お供%d:%s", i + 1, bufS.c_str());
 		}
 		DrawFormatString(430, 25 + 32 * arrow + 30 * 2, BLACK, "閉じる");
@@ -2302,7 +2376,7 @@ void CSTown::CSHaniwa::Draw()
 			DrawFormatString(40, 30 + 32 * i, BLACK, "%s", bufS.c_str());
 		}
 		for (int i = 0; i < 2; i++) {
-			DrawFormatString(40, 45 + 32 * cstown.mySaveData->bringHaniwaKind[i], RED, "（お供選択中↑）");
+			DrawFormatString(40, 45 + 32 * (cstown.mySaveData->bringHaniwaKind[i] -1) , RED, "（お供選択中↑）");
 		}
 		break;
 
@@ -2331,7 +2405,7 @@ void CSTown::CSHaniwa::Draw()
 			DrawFormatString(40, 30 + 32 * i, BLACK, "%s", bufS.c_str());
 		}
 		for (int i = 0; i<2; i++) {
-			DrawFormatString(40, 45 + 32 * cstown.mySaveData->bringHaniwaKind[i], RED, "（お供選択中↑）");
+			DrawFormatString(40, 45 + 32 * (cstown.mySaveData->bringHaniwaKind[i]-1), RED, "（お供選択中↑）");
 		}
 
 		break;
@@ -2348,7 +2422,7 @@ void CSTown::CSHaniwa::Draw()
 			DrawFormatString(40, 30+32*i, BLACK, "%s",bufS.c_str());
 		}
 		for (int i = 0; i<2; i++) {
-			DrawFormatString(40, 45 + 32 * cstown.mySaveData->bringHaniwaKind[i], RED, "（お供選択中↑）");
+			DrawFormatString(40, 45 + 32 * (cstown.mySaveData->bringHaniwaKind[i]-1), RED, "（お供選択中↑）");
 		}
 
 		if (cstown.mySaveData->haniwaLevel[arrow] >= cstown.mySaveData->Rank * 10) {
@@ -2398,6 +2472,10 @@ CSTown::CSGoToQuest::CSGoToQuest(CSTown & cstown) :cstown(cstown)
 	Window[2] = "zero/ItemSelectWindow2.png";
 	Window[3] = "zero/TextWindow4.png";
 	vq = new vector<Squest>;
+	vItem = new vector<SItem>;
+	SItem bufItem;
+	CSV *itemInfo;
+	int bufI = 0;
 
 	for (int i = 0; i < 3; i++) {
 		arrowPoint[i] = 0;
@@ -2405,6 +2483,72 @@ CSTown::CSGoToQuest::CSGoToQuest(CSTown & cstown) :cstown(cstown)
 
 	goQuest = false;
 
+	for (int i = 0; i++; i < 10) {
+		bufItem.kind = cstown.mySaveData->GetSetItem(cstown.mySaveData->bringItemSet, i, true);
+		bufItem.num = cstown.mySaveData->GetSetItem(cstown.mySaveData->bringItemSet, i, false);
+		switch (bufItem.kind)
+		{
+		case 0:
+			itemInfo = new CSV("zero/ZeroData/Sorce.csv");
+			break;
+		case 1:
+			itemInfo =new CSV( "zero/ZeroData/Tool.csv");
+			break;
+		case 2:
+			itemInfo = new CSV("zero/ZeroData/Food.csv");
+			break;
+
+		default:
+			break;
+		}
+
+		bufItem.name = (*itemInfo)[bufItem.num - 1][1];
+		bufI= (*itemInfo)[bufItem.num - 1][2];
+		bufItem.useScene = (char)bufI;
+
+		for (int j = 0; j < 3; j++) {
+			bufItem.experience[j] = (*itemInfo)[bufItem.num - 1][4+j];
+		}
+
+		bufItem.skill.times= (*itemInfo)[bufItem.num - 1][7];
+		bufItem.skill.classifyNum= (*itemInfo)[bufItem.num - 1][8];
+
+		for (int j = 0; j < 3; j++) {
+			bufItem.skill.target[j] = (*itemInfo)[bufItem.num - 1][9+j*4];
+			bufItem.skill.classify[j] = (*itemInfo)[bufItem.num - 1][10 + j * 4];
+			bufItem.skill.content[j] = (*itemInfo)[bufItem.num - 1][11 + j * 4];
+			bufItem.skill.power[j] = (*itemInfo)[bufItem.num - 1][12 + j * 4];
+		}
+
+		switch (bufItem.kind)
+		{
+		case 0:
+			if (cstown.mySaveData->sorce[bufItem.num - 1] > 0) {
+				vItem->push_back(bufItem);
+				cstown.mySaveData->sorce[bufItem.num - 1]--;
+			}
+			break;
+		case 1:
+			if (cstown.mySaveData->tool[bufItem.num - 1] > 0) {
+				vItem->push_back(bufItem);
+				cstown.mySaveData->tool[bufItem.num - 1]--;
+			}
+			break;
+		case 2:
+			if (cstown.mySaveData->food[bufItem.num - 1] > 0) {
+				vItem->push_back(bufItem);
+				cstown.mySaveData->food[bufItem.num - 1]--;
+			}
+			break;
+
+		default:
+			break;
+		}
+
+		delete itemInfo;
+		itemInfo = NULL;
+
+	}
 
 }
 
@@ -2415,6 +2559,7 @@ delete textWindow;
 textWindow = NULL;
 delete vq;
 vq = NULL;
+vItem = NULL;
 
 }
 
@@ -2437,7 +2582,8 @@ void CSTown::CSGoToQuest::Loop()
 				(*vq).clear();
 				delete vq;
 				vq = NULL;
-				Game.FlipScene(new CSQuestBase(GetRand(syokyuMap-1)+1, &bufSQ), Flip::ROTATION_RIGHT);
+
+				Game.FlipScene(new CSQuestBase(GetRand(syokyuMap-1)+1, &bufSQ , vItem), Flip::ROTATION_RIGHT);
 				
 			}
 			break;
@@ -2733,6 +2879,7 @@ void CSTown::CSGoToQuest::Loop()
 				step = 1;
 				textWindow->TextClear();
 				textWindow->PushText("また準備ができたら、話しかけてください。");
+				delete vItem;
 			}
 
 			break;

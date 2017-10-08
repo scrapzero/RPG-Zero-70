@@ -32,6 +32,16 @@ struct Squest
 
 };
 
+struct SItem {
+	int kind,num;
+	string name;
+	char useScene;
+	string experience[3];
+	Skill skill;
+
+
+};
+
 enum {
 	walkSpeed = 4,
 	syokyuMap = 1,
@@ -64,8 +74,10 @@ class CSTitle :public CScene {
 class CSTown :public CScene {
 	//～変数宣言～ 22*18
 
+public:
+	CSTown(int jikiMapX, int jikiMapY,int hatuSerihu);
 
-
+	CTextWindow *txWindow;
 	CMySaveData *mySaveData;
 	Graph jikiGraph[12],mapChip[156];
 	MCE TownMap;
@@ -266,6 +278,7 @@ class CSTown :public CScene {
 		CYesNoWindow *ynWindow;
 		Squest bufq;
 		vector <Squest> *vq;
+		vector<SItem> *vItem;
 		CSGoToQuest(CSTown& cstown);
 		~CSGoToQuest();
 		int qLevel;
@@ -294,12 +307,13 @@ class CSTown :public CScene {
 
 class CSQuestBase :public CScene {
 public:
-	CSQuestBase(int mapNum,Squest *bufVQ);
+	CSQuestBase(int mapNum,Squest *bufVQ, vector<SItem> *vItemSet);
 	~CSQuestBase();
 private:
 
 	CTextWindow *textWindow;
 	Squest *vq;
+	vector<SItem> *vItemSet;
 	int mapLocateX, mapLocateY;
 	CMySaveData *mySaveData;
 	Graph jikiGraph[12];
@@ -314,6 +328,8 @@ private:
 	int  bufscrollX, bufscrollY;
 
 	CCharacterBase *character[3];
+	CHaniwaSkillWindow *haniwaSkillWindow;
+	CSkillWindow *skillWindow;
 
 	//初期化　画像のロードなども
 	void Start() {};
@@ -322,7 +338,7 @@ private:
 	//描画　毎フレーム呼ばれる
 	void Draw();
 	//後片付け	FlipSceneされた時に呼び出される
-	void End() {};
+	void End();
 
 
 	class CSMap :public CScene {
@@ -333,6 +349,7 @@ private:
 		Graph mapChip[156];
 		CSQuestBase & csQuestBase;
 		MCE QuestMap;
+		CItemManager *itemManager;
 		int jikiX, jikiY, jikiMapX, jikiMapY;
 		int mapWidth, mapHeight, scrollX, scrollY;
 		int moveDirect, graphDirect, graphStep;//下左右上止
@@ -356,17 +373,35 @@ private:
 	public:
 		CSBattle(CSQuestBase& csQuestBase, bool boss, int bossNum);
 		~CSBattle();
+		void charAct(bool jiki,Skill *bufSk,char *death);
+
+		bool drawSkillWindow;
+
 	private:
+		char preStep,preStep2;
 		Graph backGraph;
+		Graph cardG[6];
+		Graph bWindow[4],bArrowG,bArrowG2;
 		CSQuestBase & csQuestBase;
 		int enAmount;
 		CCharacterBase *enemy[5];
+		CItemManager *itemM;
 		bool boss;
+		bool nigeta,battleStart;
 		int bossNum;
-		int arrow[3];
+		int bArrow[4];
+		int nigeru;
+		bool hazureta;
+		char winTextStep;
 
+		bool actNext,preActNext;
+		int stepAct[2],skTimes;
+		int step,zentaiStep;
 		
+		Skill *targetSelectSkill;//少し注意
 
+		vector <Skill> vSkill[3];
+		Skill skillCard[4];
 
 		//初期化　画像のロードなども
 		void Start() {};

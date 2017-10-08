@@ -164,6 +164,22 @@ public:
 
 };
 
+class CSkillWindow {
+private:
+	Graph windowGraph;
+	int num, haniLevel, lvChange;
+	CSV *jikiSkill;
+
+
+public:
+	CSkillWindow(int num);
+	~CSkillWindow();
+	void Draw(int y);
+	void ChangeNum(int num);
+
+
+};
+
 class CHaniwaSkillWindow {
 private:
 	Graph windowGraph;
@@ -175,8 +191,11 @@ public:
 	CHaniwaSkillWindow(int num,int haniLevel);
 	~CHaniwaSkillWindow();
 	void Draw();
+	void Draw(int y);
 	void ChangeNum(int num);
 
 
 };
+
+
 

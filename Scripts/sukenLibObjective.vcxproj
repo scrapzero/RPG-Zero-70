@@ -23,6 +23,7 @@
     <ClInclude Include="sukenlib\GameEngine\Algolithm\Algorithm.h" />
     <ClInclude Include="sukenlib\GameEngine\Game.h" />
     <ClInclude Include="sukenlib\GameEngine\Input.h" />
+    <ClInclude Include="sukenlib\GameEngine\Music.h" />
     <ClInclude Include="sukenlib\GameEngine\Object\Object.h" />
     <ClInclude Include="sukenlib\GameEngine\Object\ObjectField.h" />
     <ClInclude Include="sukenlib\GameEngine\Object\Transform.h" />
@@ -55,6 +56,7 @@
     <ClCompile Include="sukenlib\DebugWindow\Debug.cpp" />
     <ClCompile Include="sukenlib\GameEngine\Game.cpp" />
     <ClCompile Include="sukenlib\GameEngine\Input.cpp" />
+    <ClCompile Include="sukenlib\GameEngine\Music.cpp" />
     <ClCompile Include="sukenlib\GameEngine\Object\Object.cpp" />
     <ClCompile Include="sukenlib\GameEngine\Scene.cpp" />
     <ClCompile Include="sukenlib\System\System.cpp" />

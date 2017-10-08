@@ -41,9 +41,7 @@ void suken::Awake() {
 	mysavedata = new CMySaveData(false);
 	mysavedata->WriteSaveDataToOther();
 
-	Game.DebugRegistFunc("GoTitle", [] {
-		Game.FlipScene(new CSTitle);
-	});
+	
 
 
 }

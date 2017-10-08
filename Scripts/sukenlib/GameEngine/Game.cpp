@@ -9,7 +9,6 @@ void suken::CGame::Init(CScene* scene) {
 	now.Reset(scene);
 	if (now) {
 		now->Start();
-		now->Regist();
 	}
 }
 
@@ -19,7 +18,6 @@ void suken::CGame::Init(CScene* scene, Flip flip) {
 	next.Reset(scene);
 	if (next) {
 		next->Start();
-		next->Regist();
 	}
 	flag |= isFliping;//bit演算　フラグオン
 	this->flip = new Flip(flip);
@@ -50,22 +48,8 @@ void suken::CGame::FlipScene(CScene* scene, Flip::Type flipType, unsigned char s
 	flip = new Flip(flipType, "", "", speed);
 }
 
-void suken::CGame::DebugRegistFunc(const char* name, std::function<void()> func) {
-#ifdef DEBUG
-	debugFuncVoid.push_back(std::make_pair(name, func));
-#endif // DEBUG
-}
-
-void suken::CGame::DebugRegistFuncInt(const char* name, std::function<void(int)> func) {
-#ifdef DEBUG
-	debugFuncInt.push_back(std::make_pair(name, func));
-#endif // DEBUG
-}
-
-void suken::CGame::DebugRegistFuncDouble(const char* name, std::function<void(double)> func) {
-#ifdef DEBUG
-	debugFuncDouble.push_back(std::make_pair(name, func));
-#endif // DEBUG
+suken::CScene::Debug suken::CGame::Debug() {
+	return debug;
 }
 
 void suken::CGame::DrawNowLoading() {

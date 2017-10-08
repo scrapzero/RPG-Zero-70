@@ -277,27 +277,27 @@ void CItemManager::Add(int itemKind, int num, int addAmount)
 	switch (itemKind)
 	{
 	case 0:
-		if (num < 200) {
+		if (num <= 200) {
 			sorce[num-1] += addAmount;
 		}
-		if (sorce[num - 1] > 999) {
-			sorce[num - 1] = 999;
+		if (sorce[num - 1] > 9999) {
+			sorce[num - 1] = 9999;
 		}
 		break;
 	case 1:
-		if (num < 60) {
+		if (num <= 60) {
 			tool[num-1] += addAmount;
 		}
-		if (tool[num - 1] > 999) {
-			tool[num - 1] = 999;
+		if (tool[num - 1] > 9999) {
+			tool[num - 1] = 9999;
 		}
 		break;
 	case 2:
-		if (num < 100) {
+		if (num <= 100) {
 			food[num-1] += addAmount;
 		}
-		if (food[num - 1] > 999) {
-			food[num - 1] = 999;
+		if (food[num - 1] > 9999) {
+			food[num - 1] = 9999;
 		}
 		break;
 

@@ -1,5 +1,4 @@
 #include "Scene.h"
-#include "Object\Object.h"
 #include "../System/System.h"
 
 suken::DrawMode::DrawMode(unsigned char blendMode, unsigned char param, unsigned char red, unsigned char green, unsigned char blue) :
@@ -8,7 +7,6 @@ suken::DrawMode::DrawMode(unsigned char blendMode, unsigned char param, unsigned
 suken::CScene::CScene() {
 	screen = MakeScreen(System.GetWindowX(),System.GetWindowY(),true);
 	nextScreen = MakeScreen(System.GetWindowX(), System.GetWindowY(), true);
-	scrol.Set(0, 0);
 	flip = nullptr;
 	mode = nullptr;
 	flag = 0;
@@ -19,27 +17,23 @@ suken::CScene::CScene(bool fake) {}
 suken::CScene::CScene(CScene* scene) {
 	screen = MakeScreen(System.GetWindowX(), System.GetWindowY(), true);
 	nextScreen = MakeScreen(System.GetWindowX(), System.GetWindowY(), true);
-	scrol.Set(0, 0);
 	flip = nullptr;
 	mode = nullptr;
 	flag = 0;
 	now.Reset(scene);
 	if (now) {
 		now->Start();
-		now->Regist();
 	}
 }
 
 suken::CScene::CScene(CScene* scene, const char* ruleGraph, unsigned char speed, unsigned char gradate) {
 	screen = MakeScreen(System.GetWindowX(), System.GetWindowY(), true);
 	nextScreen = MakeScreen(System.GetWindowX(), System.GetWindowY(), true);
-	scrol.Set(0, 0);
 	mode = nullptr;
 	flag = 0;
 	next.Reset(scene);
 	if (next) {
 		next->Start();
-		next->Regist();
 	}
 	flag |= isFliping;//bit演算　フラグオン
 	flip = new Flip(Flip::DEFAULT, ruleGraph, "", speed, gradate);
@@ -48,13 +42,11 @@ suken::CScene::CScene(CScene* scene, const char* ruleGraph, unsigned char speed,
 suken::CScene::CScene(CScene* scene, const char* ruleGraph, const char* ruleGraph2, unsigned char speed, unsigned char gradate) {
 	screen = MakeScreen(System.GetWindowX(), System.GetWindowY(), true);
 	nextScreen = MakeScreen(System.GetWindowX(), System.GetWindowY(), true);
-	scrol.Set(0, 0);
 	mode = nullptr;
 	flag = 0;
 	next.Reset(scene);
 	if (next) {
 		next->Start();
-		next->Regist();
 	}
 	flag |= isFliping;//bit演算　フラグオン
 	flip = new Flip(Flip::DEFAULT, ruleGraph, ruleGraph2, speed, gradate);
@@ -63,13 +55,11 @@ suken::CScene::CScene(CScene* scene, const char* ruleGraph, const char* ruleGrap
 suken::CScene::CScene(CScene* scene, Flip::Type flipType, unsigned char speed) {
 	screen = MakeScreen(System.GetWindowX(), System.GetWindowY(), true);
 	nextScreen = MakeScreen(System.GetWindowX(), System.GetWindowY(), true);
-	scrol.Set(0, 0);
 	mode = nullptr;
 	flag = 0;
 	next.Reset(scene);
 	if (next) {
 		next->Start();
-		next->Regist();
 	}
 	flag |= isFliping;//bit演算　フラグオン
 	flip = new Flip(flipType, "", "", speed);
@@ -123,27 +113,6 @@ void suken::CScene::RemoveScene(Flip::Type flipType, unsigned char speed) {
 	flip = new Flip(flipType, "", "", speed);
 }
 
-void suken::CScene::AddObject(CObject* object) {
-	this->object.AddObject(object);
-	object->SetScene(this);
-}
-
-void suken::CScene::SetScrol(float x, float y) {
-	scrol.Set(x, y);
-}
-
-suken::Twin<float> suken::CScene::GetScrol() {
-	return scrol;
-}
-
-float suken::CScene::GetScrolX() {
-	return scrol.x;
-}
-
-float suken::CScene::GetScrolY() {
-	return scrol.y;
-}
-
 void suken::CScene::SetBlendMode(unsigned char blendMode, unsigned char param) {
 	if (mode == nullptr) {
 		mode = new DrawMode(blendMode,param,255,255,255);
@@ -173,81 +142,81 @@ void suken::CScene::SetBackGround(const char* fileName) {
 	backGround = fileName;
 }
 
-void suken::CScene::DebugPrint(const char* name, const char* string) {
+void suken::CScene::Debug::Print(const char* name, const char* string) {
 #ifdef DEBUG
 	debugStr.push_back(std::make_pair(name, string));
 #endif // DEBUG
 }
 
-void suken::CScene::DebugPrintFlag(const char* name, bool flag) {
+void suken::CScene::Debug::PrintFlag(const char* name, bool flag) {
 #ifdef DEBUG
 	debugFlag.push_back(std::make_pair(name, flag));
 #endif // DEBUG
 }
 
-void suken::CScene::DebugRegistFunc(const char* name, std::function<void()> func) {
+void suken::CScene::Debug::RegistFunc(const char* name, std::function<void()> func) {
 #ifdef DEBUG
 	debugFuncVoid.push_back(std::make_pair(name, func));
 #endif // DEBUG
 }
 
-void suken::CScene::DebugRegistFuncInt(const char* name, std::function<void(int)> func) {
-#ifdef DEBUG
-	debugFuncInt.push_back(std::make_pair(name, func));
-#endif // DEBUG
-}
+//void suken::CScene::Debug::RegistFuncInt(const char* name, std::function<void(int)> func) {
+//#ifdef DEBUG
+//	debugFuncInt.push_back(std::make_pair(name, func));
+//#endif // DEBUG
+//}
 
-void suken::CScene::DebugRegistFuncDouble(const char* name, std::function<void(double)> func) {
-#ifdef DEBUG
-	debugFuncDouble.push_back(std::make_pair(name, func));
-#endif // DEBUG
-}
+//void suken::CScene::Debug::RegistFuncDouble(const char* name, std::function<void(double)> func) {
+//#ifdef DEBUG
+//	debugFuncDouble.push_back(std::make_pair(name, func));
+//#endif // DEBUG
+//}
 
-void suken::CScene::DebugRegist(const char* name, unsigned char* value) {
-#ifdef DEBUG
-	debugUchar.push_back(std::make_pair(name, value));
-#endif // DEBUG
-}
+//void suken::CScene::Debug::Regist(const char* name, unsigned char* value) {
+//#ifdef DEBUG
+//	debugUchar.push_back(std::make_pair(name, value));
+//#endif // DEBUG
+//}
 
-void suken::CScene::DebugRegist(const char* name, int* value) {
+void suken::CScene::Debug::Regist(const char* name, int* value) {
 #ifdef DEBUG
 	debugInt.push_back(std::make_pair(name, value));
 #endif // DEBUG
 }
 
-void suken::CScene::DebugRegist(const char* name, unsigned int* value) {
-#ifdef DEBUG
-	debugUint.push_back(std::make_pair(name, value));
-#endif // DEBUG
-}
+//void suken::CScene::Debug::Regist(const char* name, unsigned int* value) {
+//#ifdef DEBUG
+//	debugUint.push_back(std::make_pair(name, value));
+//#endif // DEBUG
+//}
 
-void suken::CScene::DebugRegist(const char* name, float* value) {
+void suken::CScene::Debug::Regist(const char* name, float* value) {
 #ifdef DEBUG
 	debugFloat.push_back(std::make_pair(name, value));
 #endif // DEBUG
 }
 
-void suken::CScene::DebugRegist(const char* name, double* value) {
+void suken::CScene::Debug::Regist(const char* name, double* value) {
 #ifdef DEBUG
 	debugDouble.push_back(std::make_pair(name, value));
 #endif // DEBUG
 }
 
-void suken::CScene::DebugRegist(const char* name, bool* value) {
+void suken::CScene::Debug::Regist(const char* name, bool* value) {
 #ifdef DEBUG
 	debugBool.push_back(std::make_pair(name, value));
 #endif // DEBUG
 }
 
-void suken::CScene::DebugRemove(unsigned char* value) {
-#ifdef DEBUG
-	debugUchar.remove_if([value](const std::pair<std::string, unsigned char*>& p) {
-		return p.second == value;
-	});
-#endif // DEBUG
-}
+//void suken::CScene::Debug::Remove(unsigned char* value) {
+//#ifdef DEBUG
+//	debugUchar.remove_if([value](const std::pair<std::string, unsigned char*>& p) {
+//		return p.second == value;
+//	});
+//#endif // DEBUG
+//}
 
-void suken::CScene::DebugRemove(int* value) {
+void suken::CScene::Debug::Remove(int* value) {
 #ifdef DEBUG
 	debugInt.remove_if([value](const std::pair<std::string, int*>& p) {
 		return p.second == value;
@@ -255,15 +224,15 @@ void suken::CScene::DebugRemove(int* value) {
 #endif // DEBUG
 }
 
-void suken::CScene::DebugRemove(unsigned int* value) {
-#ifdef DEBUG
-	debugUint.remove_if([value](const std::pair<std::string, unsigned int*>& p) {
-		return p.second == value;
-	});
-#endif // DEBUG
-}
+//void suken::CScene::Debug::Remove(unsigned int* value) {
+//#ifdef DEBUG
+//	debugUint.remove_if([value](const std::pair<std::string, unsigned int*>& p) {
+//		return p.second == value;
+//	});
+//#endif // DEBUG
+//}
 
-void suken::CScene::DebugRemove(float* value) {
+void suken::CScene::Debug::Remove(float* value) {
 #ifdef DEBUG
 	debugFloat.remove_if([value](const std::pair<std::string, float*>& p) {
 		return p.second == value;
@@ -271,7 +240,7 @@ void suken::CScene::DebugRemove(float* value) {
 #endif // DEBUG
 }
 
-void suken::CScene::DebugRemove(double* value) {
+void suken::CScene::Debug::Remove(double* value) {
 #ifdef DEBUG
 	debugDouble.remove_if([value](const std::pair<std::string, double*>& p) {
 		return p.second == value;
@@ -279,7 +248,7 @@ void suken::CScene::DebugRemove(double* value) {
 #endif // DEBUG
 }
 
-void suken::CScene::DebugRemove(bool* value) {
+void suken::CScene::Debug::Remove(bool* value) {
 #ifdef DEBUG
 	debugBool.remove_if([value](const std::pair<std::string, bool*>& p) {
 		return p.second == value;
@@ -291,18 +260,14 @@ void suken::CScene::Start() {}
 
 void suken::CScene::Update() {
 #ifdef DEBUG
-	debugStr.clear();
-	debugFlag.clear();
+	debug.debugStr.clear();
+	debug.debugFlag.clear();
 #endif // DEBUG
 	if ((flag & isFliping) == 0) {//bit演算　フラグ判定　偽
 		if (now) {
 			now->Update();
 		}
 		else {
-			object.Loop();
-			for (auto i = manager().begin(); i != manager().end(); ++i) {
-				(*i)->Loop();
-			}
 			Loop();
 		}
 	}
@@ -312,10 +277,6 @@ void suken::CScene::Loop() {}
 
 void suken::CScene::Graphic() {
 	backGround();
-	object.Draw();
-	for (auto i = manager().begin(); i != manager().end(); ++i) {
-		(*i)->Draw();
-	}
 	Draw();
 	if ((flag & isFliping) == 0) {//bit演算　フラグ判定　偽
 		if (now) {
@@ -352,10 +313,6 @@ void suken::CScene::Graphic() {
 void suken::CScene::Draw() {}
 
 void suken::CScene::LoopEnd() {
-	for (auto i = manager().begin(); i != manager().end(); ++i) {
-		(*i)->LoopEnd();
-	}
-	Regist();
 	if (now) {
 		now->LoopEnd();
 	}
@@ -372,12 +329,10 @@ void suken::CScene::LoopEnd() {
 			next.Reset();
 			if (now) {
 				now->Start();
-				now->Regist();
 			}
 		}
 		if (next) {
 			next->Start();
-			next->Regist();
 		}
 		flag &= ~isNextFlip;//bit演算　フラグオフ
 		System.EndLoad();
@@ -385,13 +340,6 @@ void suken::CScene::LoopEnd() {
 }
 
 void suken::CScene::End() {}
-
-void suken::CScene::Regist() {
-	object.Regist();
-	for (auto i = manager().begin(); i != manager().end(); ++i) {
-		(*i)->Regist();
-	}
-}
 
 void suken::CScene::SetDrawMode(CScene* obj) {
 	if (obj != nullptr && obj->mode != nullptr) {

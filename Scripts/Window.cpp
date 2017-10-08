@@ -137,6 +137,7 @@ void CTextWindow::PushText(string text,...) {
 	textArrow = "zero/TextArrow.png";
 	arrowInterval = 0;
 
+	bool motomotDisplayMax = false;
 	string buf = "";
 	string kariBuf = "";
 	string checkD = "%d";
@@ -146,6 +147,9 @@ void CTextWindow::PushText(string text,...) {
 	int num = 0;
 	va_list args;
 	va_start(args, text);
+	if (display.size() >= 5) {
+		motomotDisplayMax = true;
+	}
 
 	while (text.empty() == false) {
 
@@ -234,6 +238,11 @@ void CTextWindow::PushText(string text,...) {
 
 	va_end(args);
 	wordAmount = 0;
+	if (display.size() >= 5 && motomotDisplayMax==true) {
+		display.pop_front();
+		display.push_back(texts.front());
+		texts.pop();
+	}
 }
 
 
@@ -241,10 +250,15 @@ void CTextWindow::Loop() {
 
 
 	if (KeyOK()) {
-		if (texts.empty()) {
+		if (wordAmount !=  display.back().size()) {
+			wordAmount = display.back().size();
+		}
+		else if (texts.empty()) {
 			display.clear();
 		}
-		else if (endDisplay == true ) {
+		//else if (endDisplay == true ) {
+		else
+		{
 			display.pop_front();
 			display.push_back(texts.front());
 			texts.pop();
@@ -410,31 +424,24 @@ CEquipmentWindow::CEquipmentWindow(int equipmentKind, int num, int level): equip
 		bufI[1] = (*skillInfo)[skillNum[1] - 1][4];
 		skillExperience[1] = (*skillInfo)[skillNum[1]-1][19];
 		for (int i = 0; i < 2; i++) {
-			switch (bufI[i]) {
-			case 0:skillPMode[i] = "É_ÉÅÅ[ÉWëùâ¡"; break;
-			case 1:skillPMode[i] = "îÌÉ_ÉÅå∏è≠"; break;
-			case 2:skillPMode[i] = "çUUP"; break;
-			case 3:skillPMode[i] = "ñhUP"; break;
-			case 4:skillPMode[i] = "ñÇçUUP"; break;
-			case 5:skillPMode[i] = "ñÇñhUP"; break;
-			case 6:skillPMode[i] = "ë¨UP"; break;
-			case 7:skillPMode[i] = "ñΩíÜUP"; break;
-			case 8:skillPMode[i] = "âÒîUP"; break;
-			case 9:skillPMode[i] = "â^UP"; break;
-			case 10:skillPMode[i] = "çUDOWN"; break;
-			case 11:skillPMode[i] = "ñhDOWN"; break;
-			case 12:skillPMode[i] = "ñÇçUDOWN"; break;
-			case 13:skillPMode[i] = "ñÇñhDOWN"; break;
-			case 14:skillPMode[i] = "ë¨DOWN"; break;
-			case 15:skillPMode[i] = "ñΩíÜDOWN"; break;
-			case 16:skillPMode[i] = "âÒîDOWN"; break;
-			case 17:skillPMode[i] = "â^DOWN"; break;
-			case 18:skillPMode[i] = "âÒïúó ëùâ¡"; break;
-			case 19:skillPMode[i] = "êÊêß"; break;
-			case 20:skillPMode[i] = "âÒêî"; break;
-			case 21:skillPMode[i] = "ämó¶è„è∏"; break;
-			case 22:skillPMode[i] = "è¡îÔMPå∏è≠ó "; break;
-			case 23:skillPMode[i] = "àÍåÇ"; break;
+			switch (bufI[i])
+			{
+			case 0: skillPMode[i] = "É_ÉÅÅ[ÉWëùâ¡"; break;
+			case 1: skillPMode[i] = "îÌÉ_ÉÅå∏è≠"; break;
+			case 2: skillPMode[i] = "ï®çUè„è∏"; break;
+			case 3: skillPMode[i] = "ï®ñhè„è∏"; break;
+			case 4: skillPMode[i] = "ñÇçUè„è∏"; break;
+			case 5: skillPMode[i] = "ñÇñhè„è∏"; break;
+			case 6: skillPMode[i] = "ë¨ìxè„è∏"; break;
+			case 7: skillPMode[i] = "ñΩíÜè„è∏"; break;
+			case 8: skillPMode[i] = "âÒîè„è∏"; break;
+			case 9: skillPMode[i] = "â^è„è∏"; break;
+			case 10: skillPMode[i] = "âÒïúó ëùâ¡"; break;
+			case 11: skillPMode[i] = "êÊêß"; break;
+			case 12: skillPMode[i] = "âÒêîëùâ¡"; break;
+			case 13: skillPMode[i] = "ämó¶è„è∏"; break;
+			case 14: skillPMode[i] = "è¡îÔMPå∏è≠"; break;
+			case 15: skillPMode[i] = "àÍåÇ"; break;
 			}
 		}
 
@@ -1001,6 +1008,87 @@ void CHaniwaWindow::ChangeKind(int kind)
 
 }
 
+
+CSkillWindow::CSkillWindow(int num)
+{
+	this->num = num;
+	windowGraph= "zero/TextWindow4.png";
+	jikiSkill = new CSV("zero/ZeroData/Skill.csv");
+	
+}
+
+CSkillWindow::~CSkillWindow()
+{
+	delete jikiSkill;
+	jikiSkill = NULL;
+
+}
+
+
+void CSkillWindow::Draw(int y)
+{
+	int bufI[5];
+	string bufS;
+	string buffS;
+
+	windowGraph.DrawExtend(4, y, 700, y+120);
+
+	bufS = (*jikiSkill)[num - 1][1];
+	bufI[0] = (*jikiSkill)[num - 1][2];
+
+	bufI[1] = (*jikiSkill)[num - 1][4];
+	switch (bufI[1])
+	{
+	case 0: buffS = "É_ÉÅÅ[ÉWëùâ¡"; break;
+	case 1: buffS = "îÌÉ_ÉÅå∏è≠"; break;
+	case 2: buffS = "ï®çUè„è∏"; break;
+	case 3: buffS = "ï®ñhè„è∏"; break;
+	case 4: buffS = "ñÇçUè„è∏"; break;
+	case 5: buffS = "ñÇñhè„è∏"; break;
+	case 6: buffS = "ë¨ìxè„è∏"; break;
+	case 7: buffS = "ñΩíÜè„è∏"; break;
+	case 8: buffS = "âÒîè„è∏"; break;
+	case 9: buffS = "â^è„è∏"; break;
+	case 10: buffS = "âÒïúó ëùâ¡"; break;
+	case 11: buffS = "êÊêß"; break;
+	case 12: buffS = "âÒêîëùâ¡"; break;
+	case 13: buffS = "ämó¶è„è∏"; break;
+	case 14: buffS = "è¡îÔMPå∏è≠"; break;
+	case 15: buffS = "àÍåÇ"; break;
+	}
+
+	DrawFormatString(40, y+20, BLACK, "%s  è¡îÔMP:%d  PÉÇÅ[Éh:%s", bufS.c_str(), bufI[0], buffS.c_str());
+
+	bufI[0] = (*jikiSkill)[num - 1][3];
+
+	switch (bufI[0])
+	{
+	case 0: bufS = "ñ≥"; break;
+	case 1: bufS = "âŒ"; break;
+	case 2: bufS = "ñÿ"; break;
+	case 3: bufS = "êÖ"; break;
+	case 4: bufS = "åı"; break;
+	case 5: bufS = "à≈"; break;
+	}
+
+	
+
+	bufI[1] = (*jikiSkill)[num - 1][5];
+	bufI[2] = (*jikiSkill)[num - 1][10];
+
+	DrawFormatString(40, y+50, BLACK, "ëÆê´:%s âÒêî:%d à–óÕ:%d", bufS.c_str(), bufI[1], bufI[2]);
+
+
+	bufS = (*jikiSkill)[num - 1][19];
+
+	DrawFormatString(40, y+80, BLACK, "ê‡ñæ:%s", bufS.c_str());
+}
+
+void CSkillWindow::ChangeNum(int num)
+{
+	this->num = num;
+}
+
 CHaniwaSkillWindow::CHaniwaSkillWindow(int num, int haniLevel)
 {
 	this->num = num;
@@ -1061,6 +1149,40 @@ void CHaniwaSkillWindow::Draw() {
 
 	DrawFormatString(40, 470, BLACK, "ê‡ñæ:%s", bufS.c_str());
 
+}
+
+void CHaniwaSkillWindow::Draw(int y)
+{
+	int bufI[5];
+	string bufS;
+
+	windowGraph.DrawExtend(4, y, 700, y+120);
+
+	bufS = (*haniSkill)[num - 1][1];
+	bufI[0] = (*haniSkill)[num - 1][2 + lvChange];
+	DrawFormatString(40, y+20, BLACK, "%s  è¡îÔMP:%d", bufS.c_str(), bufI[0]);
+
+	bufI[0] = (*haniSkill)[num - 1][6];
+
+	switch (bufI[0])
+	{
+	case 0: bufS = "ñ≥"; break;
+	case 1: bufS = "âŒ"; break;
+	case 2: bufS = "ñÿ"; break;
+	case 3: bufS = "êÖ"; break;
+	case 4: bufS = "åı"; break;
+	case 5: bufS = "à≈"; break;
+	}
+
+	bufI[1] = (*haniSkill)[num - 1][7];
+	bufI[2] = (*haniSkill)[num - 1][12 + lvChange];
+
+	DrawFormatString(40, y+50, BLACK, "ëÆê´:%s âÒêî:%d à–óÕ:%d", bufS.c_str(), bufI[1], bufI[2]);
+
+
+	bufS = (*haniSkill)[num - 1][30];
+
+	DrawFormatString(40, y+80, BLACK, "ê‡ñæ:%s", bufS.c_str());
 }
 
 void CHaniwaSkillWindow::ChangeNum(int num)

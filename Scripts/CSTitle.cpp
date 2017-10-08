@@ -20,13 +20,14 @@ void CSTitle::Start() {
 	mySaveData = new CMySaveData(false);
 	mySaveData->WriteSaveData();
 	mySaveData->WriteSaveDataToOther();
+	Music.Load(0, "test.wav");
 }
 
 
 
 void CSTitle::Loop() {
 	if (KeyOK()) {
-		Game.FlipScene(new CSTown(),Flip::FADE_OUT_IN);
+		Game.FlipScene(new CSTown(40,34,0),Flip::FADE_OUT_IN);
 		//equipmentManager->PushEquipment(0, 1, 3);
 		//equipmentManager->PushEquipment(0, 2, 100);
 	}

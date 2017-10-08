@@ -8,15 +8,42 @@
 #include <string>
 #include <vector>
 
+#define effectTime1 60
+
 
 using namespace std;
+
+class CCharacterBase;
+
+class CEffect1 {
+public:
+	CEffect1();
+	~CEffect1();
+
+	void PushEffect(CCharacterBase *fromChar, CCharacterBase *toChar);
+	void DrawEffect();
+
+private:
+
+	struct SEffect {
+		int drawTime;
+		float x, y, vx, vy;
+	};
+	vector<SEffect> vSEffect;
+
+	Graph Effect[1];
+
+
+};
 
 struct Skill
 {
 	int num;
 	string neme;
 	int  Point;
-	Skill():Point(0){}
+	char cardNum;
+	bool hajime;
+	Skill():Point(0), item(false),hajime(true) {}
 	int MP, element,PMode, times;
 	int classifyNum;
 	int target[3];
@@ -24,9 +51,12 @@ struct Skill
 	int content[3];
 	int power[3];
 	int speed;
+	CCharacterBase *useChar;
+	int UseNum;
 
 	int targetNum;
 	bool ene;
+	bool item;
 
 	string experience;
 
@@ -44,24 +74,40 @@ class CCharacterBase {
 public:
 	CCharacterBase();
 	~CCharacterBase();
+	void Reset();
+
+	
+
 	virtual void Loop();
 	virtual void Draw(int x, int y);
 	virtual void Draw(int x,int y, bool nameZurasi);
+	virtual void ItemDrop(CMySaveData *mySD ,CTextWindow *txWindow) {};
+
 	void statusHenkaReset();
 	void DrawHPBar(int x,int y, bool onlyLive);
 	void DrawMPBar(int x, int y, bool onlyLive);
 	void DrawStatusWindow(int x, int y);
 	void DrawSmallHPBar(int x, int y, bool onlyLive);
 	void DrawSmallMPBar(int x, int y, bool onlyLive);
-	void DrawDamage();
+	void DrawDamageAndCure();
+	void DrawStatusHenkaWindow(int x,int y);
 
 	void GiveDamge(int amount, CTextWindow *textWindow);
-	void GiveButuriDamge(CCharacterBase *atackChar,Skill *atackSkill, int skillNum, CTextWindow *textWindow);
-	void GiveMahouDamge(CCharacterBase *atackChar, Skill *atackSkill, int skillNum, CTextWindow *textWindow);
+	void GiveCureHP(int amount, CTextWindow *textWindow);
+	void GiveDamgeMP(int amount, CTextWindow *textWindow);
+	void GiveCureMP(int amount, CTextWindow *textWindow);
+	void GiveButuriDamge(CCharacterBase *atackChar,Skill *atackSkill, int skillNum, CTextWindow *textWindow, bool *hazureta);
+	void GiveMahouDamge(CCharacterBase *atackChar, Skill *atackSkill, int skillNum, CTextWindow *textWindow, bool *hazureta);
 	void Cure(Skill *atackSkill, int skillNum, CTextWindow *textWindow);
 	void statusChange(Skill *atackSkill, int skillNum, CTextWindow *textWindow);
 	void JoutaiIjou(Skill *atackSkill, int skillNum, CTextWindow *textWindow);
+	void Tokusyu(CCharacterBase *atackChar, Skill *atackSkill, int skillNum, CTextWindow *textWindow);
 	void DethJudge(CTextWindow *textWindow);
+
+	Skill returnSkill();
+	void SkillSpeadRand();
+	void skillHatudou(CCharacterBase *atackChar, Skill *atackSkill, int skillNum, CTextWindow *textWindow,bool *oneMore,bool *hazureta);
+
 
 	string name;
 	int x, y;
@@ -84,19 +130,37 @@ public:
 	int DarkDef;
 	int Status[17];
 
+	int drawHP;
+	int drawMP;
+
+
 	int Element;//0Ç©ÇÁèáÇ…Å@ñ≥âŒñÿêÖåıà≈
+	int damageCut[2];
 
-
-	bool live;
+	bool live,bigBoss;
 	int tenmetsu;
+	int buturiDamageCut;
+	int maHouDamageCut;
 	bool doku, mahi, housin, huchi, hirumi;
 
 	int element;
 	int damageDisplayTime;
 	int displayDamage;
+	int cureDisplayTime;
+	int displayCure;
+	int damageMPDisplayTime;
+	int displayDamageMP;
+	int cureMPDisplayTime;
+	int displayCureMP;
+	int statusChangeDisplayTime;
+	int displayStatusChange;
 
 
 	int statusHenka[8];
+
+
+	int dropItem[3][2];
+	string dropItemName[3];
 
 	
 	Graph charGraph;
@@ -106,6 +170,10 @@ public:
 	Skill skill[10];
 	Skill normalAtack;
 	Skill normalDefence;
+	Skill *jikiSkillCard[4];
+
+private:
+	CEffect1 effect1;
 
 };
 
@@ -153,17 +221,19 @@ private:
 	CMySaveData *mySaveData;
 	CSV *enemyInfo;
 	CSV *skillInfo;
+	CSV *itemInfo;
 
 	int wearWeaponNumLevel[5][3];
 	int kind;
 	int skillNum[5];
-	int Item[4][2];
 
 
 public:
-	CEnemy(CMySaveData *mySD, int kind);
+
+	CEnemy(CMySaveData *mySD, int kind,bool bigBoss);
 	~CEnemy();
 	void Draw(int x,int y,bool nameZurasi);
-
 };
+
+
 

@@ -36,20 +36,7 @@ namespace suken {
 		*/
 		void FlipScene(CScene* scene, Flip::Type flipType, unsigned char speed = 10);
 
-		/**
-		*	@brief	デバッグウインドウから実行できる関数　　Awakeで関数ごとに一度使う
-		*/
-		void DebugRegistFunc(const char* name, std::function<void()> func);
-
-		/**
-		*	@brief	デバッグウインドウから実行できる関数　　Awakeで関数ごとに一度使う
-		*/
-		void DebugRegistFuncInt(const char* name, std::function<void(int)> func);
-
-		/**
-		*	@brief	デバッグウインドウから実行できる関数　　Awakeで関数ごとに一度使う
-		*/
-		void DebugRegistFuncDouble(const char* name, std::function<void(double)> func);
+		CScene::Debug Debug();
 
 	private:
 		Anim loadingAnim;

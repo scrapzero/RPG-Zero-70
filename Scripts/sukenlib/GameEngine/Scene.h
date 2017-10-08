@@ -7,10 +7,7 @@
 */
 
 #include "../Utility/Graph.h"
-#include "Object\Transform.h"
-#include "Object\Object.h"
 #include "../Utility/UniquePtr.h"
-#include "../Utility/safe_vector.h"
 #include <string>
 #include <list>
 #include <queue>
@@ -153,73 +150,6 @@ namespace suken {
 		void RemoveScene(Flip::Type flipType, unsigned char speed = 10);
 
 		/**
-		*	@brief　クラス専用のマネージャーの使用宣言
-		*/
-		template<typename Object>
-		void UseManager() {
-			if (managerKey.count(typeid(Object).raw_name()) > 0)return;
-			managerKey.insert(std::map<std::string, const char>::value_type(std::string(typeid(Object).raw_name()),manager().size()));
-			manager().push_back(new CManager<Object>());
-		}
-
-		/**
-		*	@brief　クラス専用のマネージャーの使用宣言 コンストラクタ使用バージョン
-		*/
-		template<typename Object>
-		void UseManager(CManager<Object>* ptr) {
-			if (managerKey.count(typeid(Object).raw_name()) > 0)return;
-			managerKey.insert(std::map<std::string, const char>::value_type(std::string(typeid(Object).raw_name()), manager().size()));
-			manager().push_back(ptr);
-		}
-
-		/**
-		*	@brief　普通にオブジェクト追加
-		*/
-		void AddObject(CObject* object);
-
-		/**
-		*	@brief　クラス専用のマネージャーにオブジェクト追加　存在しないならfalse　使用宣言しましょう
-		*/
-		template<class Object>
-		bool AddObjectToManager(Object* object) {
-			auto it = managerKey.find(typeid(Object).raw_name());
-			if (it == managerKey.end())return false;
-			object->SetScene(this);
-			(static_cast<CManager<Object>*>(manager()[it->second]))->AddObject(object);
-			return true;
-		}
-
-		/**
-		*	@brief　クラス専用のマネージャー取得　存在しないならnullptr Algorithm使うだけならいらない　特殊化されたマネージャー向け
-		*/
-		template<class Object>
-		CManager<Object>* GetManager() {
-			auto it = managerKey.find(typeid(Object).raw_name());
-			if (it == managerKey.end())return nullptr;
-			return static_cast<CManager<Object>*>(manager()[it->second]);//コードさえ間違っていなかったら、確実にキャストでき、仮想継承ではないので、問題ない
-		}
-
-		/**
-		*	@brief　スクロール値指定　スクロールは手動です　シーンごとに共有管理できるから、十分だろう
-		*/
-		void SetScrol(float x = 0, float y = 0);
-
-		/**
-		*	@brief　スクロール値取得　スクロールは手動です　シーンごとに共有管理できるから、十分だろう
-		*/
-		Twin<float> GetScrol();
-
-		/**
-		*	@brief　スクロール値取得　スクロールは手動です　シーンごとに共有管理できるから、十分だろう
-		*/
-		float GetScrolX();
-
-		/**
-		*	@brief　スクロール値取得　スクロールは手動です　シーンごとに共有管理できるから、十分だろう
-		*/
-		float GetScrolY();
-
-		/**
 		*	@brief　シーンのブレンドモードを設定　詳しくはDxLibのSetDrawBlendModeのリファレンスを参照
 		*/
 		void SetBlendMode(unsigned char blendMode = DX_BLENDMODE_NOBLEND,unsigned char param = 255);
@@ -239,90 +169,112 @@ namespace suken {
 		*/
 		void SetBackGround(const char* fileName);
 
-		/**
-		*	@brief	デバッグウインドウに文字列出力　使ったフレームだけ
-		*/
-		void DebugPrint(const char* name, const char* string);
+		struct Debug{
 
-		/**
-		*	@brief	デバッグウインドウにフラグ出力　使ったフレームだけ
-		*/
-		void DebugPrintFlag(const char* name, bool flag);
+			/**
+			*	@brief	デバッグウインドウに文字列出力　使ったフレームだけ
+			*/
+			void Print(const char* name, const char* string);
 
-		/**
-		*	@brief	デバッグウインドウから実行できる関数　　Startで関数ごとに一度使う
-		*/
-		void DebugRegistFunc(const char* name, std::function<void()> func);
+			/**
+			*	@brief	デバッグウインドウにフラグ出力　使ったフレームだけ
+			*/
+			void PrintFlag(const char* name, bool flag);
 
-		/**
-		*	@brief	デバッグウインドウから実行できる関数　　Startで関数ごとに一度使う
-		*/
-		void DebugRegistFuncInt(const char* name, std::function<void(int)> func);
+			/**
+			*	@brief	デバッグウインドウから実行できる関数　　Startで関数ごとに一度使う
+			*/
+			void RegistFunc(const char* name, std::function<void()> func);
 
-		/**
-		*	@brief	デバッグウインドウから実行できる関数　　Startで関数ごとに一度使う
-		*/
-		void DebugRegistFuncDouble(const char* name, std::function<void(double)> func);
+			/**
+			*	@brief	デバッグウインドウから実行できる関数　　Startで関数ごとに一度使う
+			*/
+			//		void RegistFuncInt(const char* name, std::function<void(int)> func);
 
-		/**
-		*	@brief	デバッグウインドウに変数出力　Startで変数ごとに一度使う　シーン中に消すならRemove使う
-		*/
-		void DebugRegist(const char* name, unsigned char* value);
+			/**
+			*	@brief	デバッグウインドウから実行できる関数　　Startで関数ごとに一度使う
+			*/
+			//		void RegistFuncDouble(const char* name, std::function<void(double)> func);
 
-		/**
-		*	@brief	デバッグウインドウに変数出力　Startで変数ごとに一度使う　シーン中に消すならRemove使う
-		*/
-		void DebugRegist(const char* name, int* value);
+			/**
+			*	@brief	デバッグウインドウに変数出力　Startで変数ごとに一度使う　シーン中に消すならRemove使う
+			*/
+			//		void Regist(const char* name, unsigned char* value);
 
-		/**
-		*	@brief	デバッグウインドウに変数出力　Startで変数ごとに一度使う　シーン中に消すならRemove使う
-		*/
-		void DebugRegist(const char* name, unsigned int* value);
+			/**
+			*	@brief	デバッグウインドウに変数出力　Startで変数ごとに一度使う　シーン中に消すならRemove使う
+			*/
+			void Regist(const char* name, int* value);
 
-		/**
-		*	@brief	デバッグウインドウに変数出力　Startで変数ごとに一度使う　シーン中に消すならRemove使う
-		*/
-		void DebugRegist(const char* name, float* value);
+			/**
+			*	@brief	デバッグウインドウに変数出力　Startで変数ごとに一度使う　シーン中に消すならRemove使う
+			*/
+			//	void Regist(const char* name, unsigned int* value);
 
-		/**
-		*	@brief	デバッグウインドウに変数出力　Startで変数ごとに一度使う　シーン中に消すならRemove使う
-		*/
-		void DebugRegist(const char* name, double* value);
+			/**
+			*	@brief	デバッグウインドウに変数出力　Startで変数ごとに一度使う　シーン中に消すならRemove使う
+			*/
+			void Regist(const char* name, float* value);
 
-		/**
-		*	@brief	デバッグウインドウに変数出力　Startで変数ごとに一度使う　シーン中に消すならRemove使う
-		*/
-		void DebugRegist(const char* name, bool* value);
+			/**
+			*	@brief	デバッグウインドウに変数出力　Startで変数ごとに一度使う　シーン中に消すならRemove使う
+			*/
+			void Regist(const char* name, double* value);
 
-		/**
-		*	@brief	動的確保した変数、オブジェクトの変数は消去時に使う
-		*/
-		void DebugRemove(unsigned char* value);
+			/**
+			*	@brief	デバッグウインドウに変数出力　Startで変数ごとに一度使う　シーン中に消すならRemove使う
+			*/
+			void Regist(const char* name, bool* value);
 
-		/**
-		*	@brief	動的確保した変数、オブジェクトの変数は消去時に使う
-		*/
-		void DebugRemove(int* value);
+			/**
+			*	@brief	動的確保した変数、オブジェクトの変数は消去時に使う
+			*/
+			//		void Remove(unsigned char* value);
 
-		/**
-		*	@brief	動的確保した変数、オブジェクトの変数は消去時に使う
-		*/
-		void DebugRemove(unsigned int* value);
+			/**
+			*	@brief	動的確保した変数、オブジェクトの変数は消去時に使う
+			*/
+			void Remove(int* value);
 
-		/**
-		*	@brief	動的確保した変数、オブジェクトの変数は消去時に使う
-		*/
-		void DebugRemove(float* value);
+			/**
+			*	@brief	動的確保した変数、オブジェクトの変数は消去時に使う
+			*/
+			//		void Remove(unsigned int* value);
 
-		/**
-		*	@brief	動的確保した変数、オブジェクトの変数は消去時に使う
-		*/
-		void DebugRemove(double* value);
+			/**
+			*	@brief	動的確保した変数、オブジェクトの変数は消去時に使う
+			*/
+			void Remove(float* value);
 
-		/**
-		*	@brief	動的確保した変数、オブジェクトの変数は消去時に使う
-		*/
-		void DebugRemove(bool* value);
+			/**
+			*	@brief	動的確保した変数、オブジェクトの変数は消去時に使う
+			*/
+			void Remove(double* value);
+
+			/**
+			*	@brief	動的確保した変数、オブジェクトの変数は消去時に使う
+			*/
+			void Remove(bool* value);
+		private:
+
+#ifdef DEBUG 
+
+			std::list<std::pair<std::string, std::string>> debugStr;
+			std::list<std::pair<std::string, bool>> debugFlag;
+			//		std::list<std::pair<std::string, unsigned char*>> debugUchar;
+			std::list<std::pair<std::string, int*>> debugInt;
+			//		std::list<std::pair<std::string, unsigned int*>> debugUint;
+			std::list<std::pair<std::string, float*>> debugFloat;
+			std::list<std::pair<std::string, double*>> debugDouble;
+			std::list<std::pair<std::string, bool*>> debugBool;
+			std::list<std::pair<std::string, std::function<void()>>> debugFuncVoid;
+			//		std::list<std::pair<std::string, std::function<void(int)>>> debugFuncInt;
+			//		std::list<std::pair<std::string, std::function<void(double)>>> debugFuncDouble;
+			friend class CScene;
+			friend class CDebug;
+#endif 
+
+		}debug;
 
 	private:
 		CScene(bool fake);
@@ -356,8 +308,6 @@ namespace suken {
 		*/
 		virtual void End();
 
-		void Regist();
-
 		void SetDrawMode(CScene* obj);
 
 		void SetDrawBlendMode(CScene* obj);
@@ -366,32 +316,12 @@ namespace suken {
 
 		UniquePtr<CScene> now, next;
 		Graph screen, nextScreen, backGround;
-		Twin<float> scrol;
 		Flip* flip;
 		DrawMode* mode;
 		unsigned char flag;
 
-		CManager<CObject> object;
-		safe_vector<CManagerBase> manager;//削除が起きないのでvector
-		std::map<std::string, const char> managerKey;//検索を要するのでmap
-
-#ifdef DEBUG 
-		std::list<std::pair<std::string, std::string>> debugStr;
-		std::list<std::pair<std::string, bool>> debugFlag;
-		std::list<std::pair<std::string, unsigned char*>> debugUchar;
-		std::list<std::pair<std::string, int*>> debugInt;
-		std::list<std::pair<std::string, unsigned int*>> debugUint;
-		std::list<std::pair<std::string, float*>> debugFloat;
-		std::list<std::pair<std::string, double*>> debugDouble;
-		std::list<std::pair<std::string, bool*>> debugBool;
-		std::list<std::pair<std::string, std::function<void()>>> debugFuncVoid;
-		std::list<std::pair<std::string, std::function<void(int)>>> debugFuncInt;
-		std::list<std::pair<std::string, std::function<void(double)>>> debugFuncDouble;
-#endif 
-
-
 		/**
-		*	@brief　これをオーバーライドする人は呪い殺されます　独自のシーン切り替え効果を作りたい人は、コードを完全に理解したうえでオーバーライドすればいいと思います　バグっても責任は取りません
+		*	@brief　オーバーライドしない　独自のシーン切り替え効果を作りたい人は、コードを完全に理解したうえでオーバーライドすればいいと思います　バグっても責任は取りません
 		*/
 		virtual bool FlipTransition();
 
