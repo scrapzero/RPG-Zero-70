@@ -20,7 +20,7 @@ void CSTitle::Start() {
 	mySaveData = new CMySaveData(false);
 	mySaveData->WriteSaveData();
 	mySaveData->WriteSaveDataToOther();
-	Music.Load(0, "test.wav");
+	//Music.Load(0, "test.wav");
 }
 
 

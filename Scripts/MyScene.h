@@ -38,7 +38,7 @@ struct SItem {
 	char useScene;
 	string experience[3];
 	Skill skill;
-
+	bool turnUsed;
 
 };
 
@@ -76,10 +76,12 @@ class CSTown :public CScene {
 
 public:
 	CSTown(int jikiMapX, int jikiMapY,int hatuSerihu);
+	~CSTown();
 
 	CTextWindow *txWindow;
 	CMySaveData *mySaveData;
 	Graph jikiGraph[12],mapChip[156];
+	CMusic Music,SoundEffect;
 	MCE TownMap;
 	int jikiX, jikiY, jikiMapX, jikiMapY;
 	int mapWidth, mapHeight,scrollX,scrollY;
@@ -317,6 +319,9 @@ private:
 	int mapLocateX, mapLocateY;
 	CMySaveData *mySaveData;
 	Graph jikiGraph[12];
+	
+	bool bossLive[3];
+	char bossWinNum;
 	int mapNum;
 	int mode[2];
 	CSV *itemInfo;
@@ -346,7 +351,8 @@ private:
 		CSMap(CSQuestBase& csQuestBase);
 		~CSMap();
 	private:
-		Graph mapChip[156];
+		Graph mapChip[156],bossMapChip;
+		CMusic Music, SoundEffect;
 		CSQuestBase & csQuestBase;
 		MCE QuestMap;
 		CItemManager *itemManager;
@@ -367,6 +373,30 @@ private:
 		void Draw();
 		//後片付け	FlipSceneされた時に呼び出される
 		void End() {};
+
+		class CSMenueWindow :public CScene {
+		public:
+			CSMap &csmap;
+			CSMenueWindow(CSMap &csmap);
+			~CSMenueWindow();
+			CSkillWindow *skillWindow[6];
+			CHaniwaSkillWindow *haniwaSkillWindow[4];
+			CYesNoWindow *ynWindow;
+			bool classStart, yn;
+			bool useItem;
+			char wearWeaponNumLevel[5][3];
+			int step, arrowPoint, arrowPoint2, arrowPoint3;
+			Graph Arrow, Window[3];
+			CSV *equipmentInfo;
+			void DrawItemSetumei(int y, int locate);
+		
+			void Loop();
+			void Draw();
+			void End();
+
+		};
+
+
 	};
 
 	class CSBattle :public CScene {
@@ -382,6 +412,7 @@ private:
 		Graph backGraph;
 		Graph cardG[6];
 		Graph bWindow[4],bArrowG,bArrowG2;
+		CMusic Music, SoundEffect;
 		CSQuestBase & csQuestBase;
 		int enAmount;
 		CCharacterBase *enemy[5];
@@ -393,15 +424,19 @@ private:
 		int nigeru;
 		bool hazureta;
 		char winTextStep;
+		char  lookItemPage;
 
 		bool actNext,preActNext;
 		int stepAct[2],skTimes;
 		int step,zentaiStep;
+		char dokuStep[2];
 		
 		Skill *targetSelectSkill;//少し注意
 
 		vector <Skill> vSkill[3];
 		Skill skillCard[4];
+
+		void DrawItemSetumei(int y,int locate);
 
 		//初期化　画像のロードなども
 		void Start() {};

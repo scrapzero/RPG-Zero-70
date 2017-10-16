@@ -8,6 +8,10 @@
 #Map1X9Y9
 4
 #Map1X10Y8
+5
+#Map2X10Y10
+6
+#Town2
 #light
 1
 #width
@@ -17,7 +21,7 @@
 #edge
 32
 #number
-5
+7
 #graphA
 #MapIroiro
 #graphB

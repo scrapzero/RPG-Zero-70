@@ -22,14 +22,30 @@ CSTown::CSTown(int jikiMapX, int jikiMapY, int hatuSerihu) {
 		graphDirect = 3;
 		break;
 	case 2:
+		txWindow = new CTextWindow("クエストクリアおめでとうございます！/nまたクエストに出るときはいつでも話しかけてください。");
+		graphDirect = 3;
 		break;
-
+	case 3:
+		txWindow = new CTextWindow("クエストクリアおめでとうございます！/nランクアップクエストが出ましたよ。/nぜひ挑戦してくださいね。/nクエストに出るときはいつでも話しかけてください。");
+		graphDirect = 3;
+		break;
+	case 4:
+		txWindow = new CTextWindow("クエストクリア、そしてランクアップおめでとうございます！/nランクが上がったことで難しいクエストが受けらるようになりました。");
+		txWindow->PushText("新しいレシピが入荷したり、人が訪れたりしているかもしれないので時間があれば町を歩いてみてはどうですか？/nクエストを受けたいときはいつでも話しかけてください。");
+		graphDirect = 3;
+		break;
+	case 5:
+		txWindow = new CTextWindow("クエストクリア、そしてランクアップおめでとうございます！/n伝説級になった今、この辺りはとても平和になりました。/nみんな本当に感謝しています。");
+		txWindow->PushText("過去、何人もの勇者がクリアできなっかたと言われている「伝説級クエスト」が解放されたので時間げあれば受けてみるのをお勧めします。/nクエストを受けたいときはいつでも話しかけてください。");
+		txWindow->PushText("(伝説級達成おめでとう。/nこれで一応ゲームクリアです。/n伝説級クエストは難しいけど、ぜひ挑戦してみよう！)");
+		graphDirect = 3;
+		break;
 	default:
 		break;
 	}
 
 	LoadDivGraph("zero/jiki.png", 12, 3, 4, 32, 32, jikiGraph);
-	LoadDivGraph("zero/MyMapChip1.png", 156, 26, 6, 32, 32, mapChip);
+	LoadDivGraph("zero/MyMapChip2.png", 156, 26, 6, 32, 32, mapChip);
 	TownMap = "zero/MCE/Town.mce";
 	mapWidth = TownMap.GetWidth();
 	mapHeight = TownMap.GetHeight();
@@ -84,10 +100,20 @@ CSTown::CSTown(int jikiMapX, int jikiMapY, int hatuSerihu) {
 	canMoveUp = false;
 	mySaveData = new CMySaveData(true);
 
+
+	Music.Load(0, "zero/Music/town2.mp3");
+	Music.PlayLoop(0);
+}
+
+CSTown::~CSTown()
+{
+	for (int i = 0; i < 100;i++) {
+		Music.StopLoop(i);
+		SoundEffect.StopLoop(i);
+	}
 }
 
 void CSTown::Start() {
-	
 
 }
 
@@ -1677,6 +1703,7 @@ CSTown::CSMenueWindow::CSMenueWindow(CSTown & cstown):cstown(cstown)
 
 }
 
+
 void CSTown::CSMenueWindow::Loop()
 {
 
@@ -2483,72 +2510,79 @@ CSTown::CSGoToQuest::CSGoToQuest(CSTown & cstown) :cstown(cstown)
 
 	goQuest = false;
 
-	for (int i = 0; i++; i < 10) {
-		bufItem.kind = cstown.mySaveData->GetSetItem(cstown.mySaveData->bringItemSet, i, true);
-		bufItem.num = cstown.mySaveData->GetSetItem(cstown.mySaveData->bringItemSet, i, false);
-		switch (bufItem.kind)
-		{
-		case 0:
-			itemInfo = new CSV("zero/ZeroData/Sorce.csv");
-			break;
-		case 1:
-			itemInfo =new CSV( "zero/ZeroData/Tool.csv");
-			break;
-		case 2:
-			itemInfo = new CSV("zero/ZeroData/Food.csv");
-			break;
+	for (int i = 0; i < 10; i++) {
+		if (cstown.mySaveData->GetSetItem(cstown.mySaveData->bringItemSet, i, false) > 0) {
+			bufItem.kind = cstown.mySaveData->GetSetItem(cstown.mySaveData->bringItemSet, i, true);
+			bufItem.num = cstown.mySaveData->GetSetItem(cstown.mySaveData->bringItemSet, i, false);
+			switch (bufItem.kind)
+			{
+			case 0:
+				itemInfo = new CSV("zero/ZeroData/Sorce.csv");
+				break;
+			case 1:
+				itemInfo = new CSV("zero/ZeroData/Tool.csv");
+				break;
+			case 2:
+				itemInfo = new CSV("zero/ZeroData/Food.csv");
+				break;
 
-		default:
-			break;
-		}
-
-		bufItem.name = (*itemInfo)[bufItem.num - 1][1];
-		bufI= (*itemInfo)[bufItem.num - 1][2];
-		bufItem.useScene = (char)bufI;
-
-		for (int j = 0; j < 3; j++) {
-			bufItem.experience[j] = (*itemInfo)[bufItem.num - 1][4+j];
-		}
-
-		bufItem.skill.times= (*itemInfo)[bufItem.num - 1][7];
-		bufItem.skill.classifyNum= (*itemInfo)[bufItem.num - 1][8];
-
-		for (int j = 0; j < 3; j++) {
-			bufItem.skill.target[j] = (*itemInfo)[bufItem.num - 1][9+j*4];
-			bufItem.skill.classify[j] = (*itemInfo)[bufItem.num - 1][10 + j * 4];
-			bufItem.skill.content[j] = (*itemInfo)[bufItem.num - 1][11 + j * 4];
-			bufItem.skill.power[j] = (*itemInfo)[bufItem.num - 1][12 + j * 4];
-		}
-
-		switch (bufItem.kind)
-		{
-		case 0:
-			if (cstown.mySaveData->sorce[bufItem.num - 1] > 0) {
-				vItem->push_back(bufItem);
-				cstown.mySaveData->sorce[bufItem.num - 1]--;
+			default:
+				break;
 			}
-			break;
-		case 1:
-			if (cstown.mySaveData->tool[bufItem.num - 1] > 0) {
-				vItem->push_back(bufItem);
-				cstown.mySaveData->tool[bufItem.num - 1]--;
-			}
-			break;
-		case 2:
-			if (cstown.mySaveData->food[bufItem.num - 1] > 0) {
-				vItem->push_back(bufItem);
-				cstown.mySaveData->food[bufItem.num - 1]--;
-			}
-			break;
 
-		default:
-			break;
+			bufItem.name = (*itemInfo)[bufItem.num - 1][1];
+			bufItem.skill.neme = (*itemInfo)[bufItem.num - 1][1];
+			bufI = (*itemInfo)[bufItem.num - 1][2];
+			bufItem.useScene = (char)bufI;
+
+			for (int j = 0; j < 3; j++) {
+				bufItem.experience[j] = (*itemInfo)[bufItem.num - 1][4 + j];
+			}
+
+			bufItem.skill.times = (*itemInfo)[bufItem.num - 1][7];
+			bufItem.skill.classifyNum = (*itemInfo)[bufItem.num - 1][8];
+
+			for (int j = 0; j < 3; j++) {
+				bufItem.skill.target[j] = (*itemInfo)[bufItem.num - 1][9 + j * 4];
+				bufItem.skill.classify[j] = (*itemInfo)[bufItem.num - 1][10 + j * 4];
+				bufItem.skill.content[j] = (*itemInfo)[bufItem.num - 1][11 + j * 4];
+				bufItem.skill.power[j] = (*itemInfo)[bufItem.num - 1][12 + j * 4];
+			}
+
+			switch (bufItem.kind)
+			{
+			case 0:
+				if (cstown.mySaveData->sorce[bufItem.num - 1] > 0) {
+					vItem->push_back(bufItem);
+					cstown.mySaveData->sorce[bufItem.num - 1]--;
+				}
+				break;
+			case 1:
+				if (cstown.mySaveData->tool[bufItem.num - 1] > 0) {
+					vItem->push_back(bufItem);
+					cstown.mySaveData->tool[bufItem.num - 1]--;
+				}
+				break;
+			case 2:
+				if (cstown.mySaveData->food[bufItem.num - 1] > 0) {
+					vItem->push_back(bufItem);
+					cstown.mySaveData->food[bufItem.num - 1]--;
+				}
+				break;
+
+			default:
+				break;
+			}
+
+			delete itemInfo;
+			itemInfo = NULL;
+
 		}
-
-		delete itemInfo;
-		itemInfo = NULL;
-
 	}
+
+	questInfo = NULL;
+	enemyInfo = NULL;
+	bigBossInfo = NULL;
 
 }
 
@@ -2560,6 +2594,19 @@ textWindow = NULL;
 delete vq;
 vq = NULL;
 vItem = NULL;
+
+if (questInfo != NULL) {
+	delete questInfo;
+	questInfo = NULL;
+}
+if (enemyInfo != NULL) {
+	delete enemyInfo;
+	enemyInfo = NULL;
+}
+if (bigBossInfo != NULL) {
+	delete bigBossInfo;
+	bigBossInfo = NULL;
+}
 
 }
 
@@ -2582,6 +2629,7 @@ void CSTown::CSGoToQuest::Loop()
 				(*vq).clear();
 				delete vq;
 				vq = NULL;
+
 
 				Game.FlipScene(new CSQuestBase(GetRand(syokyuMap-1)+1, &bufSQ , vItem), Flip::ROTATION_RIGHT);
 				
@@ -2614,7 +2662,10 @@ void CSTown::CSGoToQuest::Loop()
 				arrowPoint[2]++;
 			}
 
-
+			if (KeyOK()) {
+				step = 7;
+				ynWindow = new CYesNoWindow(&goQuest, "このクエストにしますか？", false, 305, 30 + 25 * (arrowPoint[2] + 1));
+			}
 
 			if (KeyCancel()) {
 				step = 3;
@@ -2658,7 +2709,7 @@ void CSTown::CSGoToQuest::Loop()
 				arrowPoint[1]--;
 			}
 
-			if (KeyDown() && arrowPoint[1] < cstown.mySaveData->Rank - 6 && arrowPoint[1]<6) {
+			if (KeyDown() && arrowPoint[1] < cstown.mySaveData->Rank - 5 && arrowPoint[1]<5) {
 				arrowPoint[1]++;
 			}
 			if (KeyOK()) {
@@ -2694,13 +2745,13 @@ void CSTown::CSGoToQuest::Loop()
 						bufq.rewardMoney = (*questInfo)[i][48];
 
 						bufq.difficult = arrowPoint[0];
-						bufq.qLevel = arrowPoint[1];
+						bufq.qLevel = (*questInfo)[i][1];
 
 						(*vq).push_back(bufq);
 
 					}
 
-					if(bufI == qLevel + 100 && cstown.mySaveData->clearAmount[arrowPoint[0]][arrowPoint[1]]>=5) {
+					if(bufI == qLevel + 100 && cstown.mySaveData->rankUpQuest[arrowPoint[0]][qLevel-1]) {
 						bufq.Qnum = (*questInfo)[i][0];
 						bufq.Qname = (*questInfo)[i][2];
 						for (int j = 0; j < 8; j++) {
@@ -2724,7 +2775,7 @@ void CSTown::CSGoToQuest::Loop()
 
 						bufq.rewardMoney = (*questInfo)[i][48];
 						bufq.difficult = arrowPoint[0];
-						bufq.qLevel = arrowPoint[1];
+						bufq.qLevel = (*questInfo)[i][1];
 
 						(*vq).push_back(bufq);
 
@@ -2749,7 +2800,7 @@ void CSTown::CSGoToQuest::Loop()
 				arrowPoint[1]--;
 			}
 
-			if (KeyDown() && arrowPoint[1] < cstown.mySaveData->Rank-1 && arrowPoint[1]<4) {
+			if (KeyDown() && arrowPoint[1] < cstown.mySaveData->Rank-1 && arrowPoint[1]<3) {
 				arrowPoint[1]++;
 			}
 
@@ -2786,15 +2837,16 @@ void CSTown::CSGoToQuest::Loop()
 						bufq.rewardMoney = (*questInfo)[i][48];
 
 						bufq.difficult = arrowPoint[0];
-						bufq.qLevel = arrowPoint[1];
+						bufq.qLevel = (*questInfo)[i][1];
 
 						(*vq).push_back(bufq);
 
 					}
 
-					if (bufI == qLevel + 100 && cstown.mySaveData->clearAmount[arrowPoint[0]][arrowPoint[1]] >= 5) {
+					if (bufI == qLevel + 100 && cstown.mySaveData->rankUpQuest[arrowPoint[0]][qLevel-1] ==true) {
 						bufq.Qnum = (*questInfo)[i][0];
 						bufq.Qname = (*questInfo)[i][2];
+						bufq.Qname += "<RUクエスト>";
 						for (int j = 0; j < 8; j++) {
 							bufq.enemy[j] = (*questInfo)[i][3 + j];
 						}
@@ -2817,7 +2869,7 @@ void CSTown::CSGoToQuest::Loop()
 						bufq.rewardMoney = (*questInfo)[i][48];
 
 						bufq.difficult = arrowPoint[0];
-						bufq.qLevel = arrowPoint[1];
+						bufq.qLevel = (*questInfo)[i][1];
 
 						(*vq).push_back(bufq);
 
@@ -2840,10 +2892,24 @@ void CSTown::CSGoToQuest::Loop()
 
 			if (KeyUp() && arrowPoint[0] > 0) {
 				arrowPoint[0]--;
+				if (arrowPoint[0] == 2 && cstown.mySaveData->Rank < 11) {
+					arrowPoint[0]--;
+				}
+				if (arrowPoint[0] == 1 && cstown.mySaveData->Rank < 5) {
+					arrowPoint[0]--;
+				}
+
 			}
 
 			if (KeyDown() && arrowPoint[0] < 2) {
 				arrowPoint[0]++;
+				if (arrowPoint[0] == 1 && cstown.mySaveData->Rank < 5) {
+					arrowPoint[0]++;
+				}
+				if (arrowPoint[0] == 2 && cstown.mySaveData->Rank < 11) {
+					arrowPoint[0]++;
+				}
+				
 			}
 
 			if (KeyOK()) {
@@ -2856,13 +2922,18 @@ void CSTown::CSGoToQuest::Loop()
 					break;
 
 				case 1:
-					if (cstown.mySaveData->Rank > 5) {
+					if (cstown.mySaveData->Rank >= 5) {
 						step = 4;
 						arrowPoint[1] = 0;
 					}
 					break;
-
 				case 2:
+					if (cstown.mySaveData->Rank >= 11) {
+						step = 4;
+						arrowPoint[1] = 0;
+					}
+					break;
+				case 3:
 					step = 1;
 					textWindow->TextClear();
 					textWindow->PushText("また準備ができたら、話しかけてください。");
@@ -2917,12 +2988,18 @@ void CSTown::CSGoToQuest::Draw()
 	int bufI;
 	string bufS;
 
-	if (step >= 2&& step<=8) {
-		Window[1].DrawExtend(5, 5,120,160);
+	if (step >= 2 && step <= 8) {
+		Window[1].DrawExtend(5, 5, 120, 160);
 		Arrow.Draw(10, 30 + 25 * arrowPoint[0]);
 		DrawFormatString(28, 30 + 25 * 0, BLACK, "下級");
-		DrawFormatString(28, 30 + 25 * 1, BLACK, "上級");
-		DrawFormatString(28, 30 + 25 * 2, BLACK, "閉じる");
+		if (cstown.mySaveData->Rank >= 5) {
+			DrawFormatString(28, 30 + 25 * 1, BLACK, "上級");
+		}
+		if (cstown.mySaveData->Rank >= 11) {
+			DrawFormatString(28, 30 + 25 * 2, BLACK, "伝説級");
+		}
+		DrawFormatString(28, 30 + 25 * 3, BLACK, "閉じる");
+
 	}
 
 	switch (step)
@@ -2940,12 +3017,12 @@ void CSTown::CSGoToQuest::Draw()
 		Arrow.Draw(137, 30 + 25 * arrowPoint[1]);
 		Arrow.Draw(305, 30 + 25 * arrowPoint[2]);
 
-		for (int i = 0; i < cstown.mySaveData->Rank; i++) {
-			if (i > 4) {
+		for (int i = 4; i < cstown.mySaveData->Rank; i++) {
+			if (i >= 10) {
 				break;
 			}
 
-			DrawFormatString(159, 30 + 25 * i, BLACK, "LEVEL.%d", i + 1);
+			DrawFormatString(159, 30 + 25 * (i-4), BLACK, "LEVEL.%d", i + 1);
 
 		}
 		DrawFormatString(132, 30 + 25 * 7, BLACK, "X又はback space");
@@ -2959,8 +3036,8 @@ void CSTown::CSGoToQuest::Draw()
 		}
 		bufS.clear();
 		bufS += (*vq)[arrowPoint[2]].Qname;
-		if (cstown.mySaveData->questClear[(*vq)[arrowPoint[2]].Qnum]) {
-			bufS += "　　clear済み";
+		if (cstown.mySaveData->questClear[(*vq)[arrowPoint[2]].Qnum - 1]) {
+			DrawFormatString(600, 370 + 30 * 0, GREEN, "clear済み");
 		}
 
 		DrawFormatString(20, 370 + 30 * 0, BLACK, "<%s>", bufS.c_str());
@@ -2997,7 +3074,7 @@ void CSTown::CSGoToQuest::Draw()
 
 		bufI = (*vq)[arrowPoint[2]].rewardMoney;
 
-		DrawFormatString(20, 400 + 30 * 1, BLACK, "報酬金:%d", bufI);
+		//DrawFormatString(20, 400 + 30 * 1, BLACK, "報酬金:%d", bufI);
 
 		break;
 
@@ -3012,7 +3089,7 @@ void CSTown::CSGoToQuest::Draw()
 		Arrow.Draw(305, 30 + 25 * arrowPoint[2]);
 
 		for (int i = 0; i < cstown.mySaveData->Rank; i++) {
-			if (i > 4) {
+			if (i >= 4) {
 				break;
 			}
 
@@ -3030,8 +3107,8 @@ void CSTown::CSGoToQuest::Draw()
 		}
 		bufS.clear();
 		bufS += (*vq)[arrowPoint[2]].Qname;
-		if (cstown.mySaveData->questClear[(*vq)[arrowPoint[2]].Qnum]) {
-			bufS += "　　clear済み";
+		if (cstown.mySaveData->questClear[(*vq)[arrowPoint[2]].Qnum - 1]) {
+			DrawFormatString(600, 370 + 30 * 0, GREEN, "clear済み");
 		}
 
 		DrawFormatString(20, 370 + 30 * 0, BLACK, "<%s>", bufS.c_str());
@@ -3068,7 +3145,7 @@ void CSTown::CSGoToQuest::Draw()
 
 		bufI = (*vq)[arrowPoint[2]].rewardMoney;
 
-		DrawFormatString(20, 400 + 30 * 1, BLACK, "報酬金:%d", bufI);
+		//DrawFormatString(20, 400 + 30 * 1, BLACK, "報酬金:%d", bufI);
 		
 		ynWindow->Draw();
 
@@ -3084,12 +3161,12 @@ void CSTown::CSGoToQuest::Draw()
 		Arrow.Draw(137, 30 + 25 * arrowPoint[1]);
 		Arrow.Draw(305, 30 + 25 * arrowPoint[2]);
 
-		for (int i = 0; i < cstown.mySaveData->Rank; i++) {
-			if (i > 4) {
+		for (int i = 4; i < cstown.mySaveData->Rank; i++) {
+			if (i >= 10) {
 				break;
 			}
 
-			DrawFormatString(159, 30 + 25 * i, BLACK, "LEVEL.%d", i + 1);
+			DrawFormatString(159, 30 + 25 * (i-4), BLACK, "LEVEL.%d", i + 1);
 
 		}
 		DrawFormatString(132, 30 + 25 * 7, BLACK, "X又はback space");
@@ -3103,8 +3180,8 @@ void CSTown::CSGoToQuest::Draw()
 		}
 		bufS.clear();
 		bufS += (*vq)[arrowPoint[2]].Qname;
-		if (cstown.mySaveData->questClear[(*vq)[arrowPoint[2]].Qnum]) {
-			bufS += "　　clear済み";
+		if (cstown.mySaveData->questClear[(*vq)[arrowPoint[2]].Qnum - 1]) {
+			DrawFormatString(600, 370 + 30 * 0, GREEN, "clear済み");
 		}
 
 		DrawFormatString(20, 370 + 30 * 0, BLACK, "<%s>", bufS.c_str());
@@ -3141,7 +3218,7 @@ void CSTown::CSGoToQuest::Draw()
 
 		bufI = (*vq)[arrowPoint[2]].rewardMoney;
 
-		DrawFormatString(20, 400 + 30 * 1, BLACK, "報酬金:%d", bufI);
+		//DrawFormatString(20, 400 + 30 * 1, BLACK, "報酬金:%d", bufI);
 
 		break;
 
@@ -3156,7 +3233,7 @@ void CSTown::CSGoToQuest::Draw()
 		Arrow.Draw(305, 30 + 25 * arrowPoint[2]);
 
 		for (int i = 0; i < cstown.mySaveData->Rank; i++) {
-			if (i > 4) {
+			if (i >= 4) {
 				break;
 			}
 
@@ -3174,8 +3251,8 @@ void CSTown::CSGoToQuest::Draw()
 		}
 		bufS.clear();
 		bufS += (*vq)[arrowPoint[2]].Qname;
-		if (cstown.mySaveData->questClear[(*vq)[arrowPoint[2]].Qnum]) {
-			bufS += "　　clear済み";
+		if (cstown.mySaveData->questClear[(*vq)[arrowPoint[2]].Qnum -1]) {
+			DrawFormatString(600, 370 + 30 * 0, GREEN, "clear済み");
 		}
 
 		DrawFormatString(20,370 + 30*0, BLACK, "<%s>", bufS.c_str());
@@ -3212,7 +3289,7 @@ void CSTown::CSGoToQuest::Draw()
 
 		bufI = (*vq)[arrowPoint[2]].rewardMoney;
 
-		DrawFormatString(20, 400 + 30 * 1, BLACK, "報酬金:%d", bufI);
+		//DrawFormatString(20, 400 + 30 * 1, BLACK, "報酬金:%d", bufI);
 
 		break;
 
@@ -3221,12 +3298,12 @@ void CSTown::CSGoToQuest::Draw()
 
 		Arrow.Draw(137, 30 + 25 * arrowPoint[1]);
 
-		for (int i = 0; i < cstown.mySaveData->Rank-5; i++) {
-			if (i>6) {
+		for (int i = 4; i < cstown.mySaveData->Rank; i++) {
+			if (i>=10) {
 				break;
 			}
 
-			DrawFormatString(159, 30 + 25 * i, BLACK, "LEVEL.%d", i + 1);
+			DrawFormatString(159, 30 + 25 * (i-4), BLACK, "LEVEL.%d", i + 1);
 
 		}
 		DrawFormatString(132, 30 + 25 * 8, BLACK, "X又はback space");
@@ -3239,11 +3316,11 @@ void CSTown::CSGoToQuest::Draw()
 		Arrow.Draw(137, 30 + 25 * arrowPoint[1]);
 
 		for (int i = 0; i < cstown.mySaveData->Rank; i++) {
-			if(i>4){
+			if(i>=4){
 				break;
 			}
 
-			DrawFormatString(159, 30 + 25 * i, BLACK, "LEVEL.%d",i+1);
+			DrawFormatString(159, 30 + 25 * i, BLACK, "LEVEL.%d",i + 1);
 
 		}
 		DrawFormatString(132, 30 + 25 * 7, BLACK, "X又はback space");

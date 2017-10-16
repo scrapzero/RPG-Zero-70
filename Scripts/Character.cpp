@@ -23,23 +23,24 @@ CEffect1::~CEffect1()
 void CEffect1::PushEffect(CCharacterBase * fromChar, CCharacterBase * toChar)
 {
 	SEffect bufSEf;
-	bufSEf.x = fromChar->x;
-	bufSEf.y = fromChar->y;
-	if (fromChar->y <= 270) {
-		bufSEf.x += 25;
-	}
-	else
-	{
-		bufSEf.x += 10;
-	}
-	bufSEf.vx = (toChar->x - fromChar->x) / effectTime1;
-	bufSEf.vy = (toChar->y - fromChar->y) / effectTime1;
-	if (toChar->y <= 270) {
-		bufSEf.vx += 0.400;
+	if (fromChar->enemyF == false) {
+		bufSEf.x = fromChar->x+15;
+		bufSEf.y = fromChar->y;
 	}
 	else {
-		bufSEf.vx += 0.100;
+		bufSEf.x = fromChar->x;
+		bufSEf.y = fromChar->y;
 	}
+
+	if (toChar->enemyF == false) {
+		bufSEf.vx = (toChar->x+15 - bufSEf.x) / effectTime1;
+		bufSEf.vy = (toChar->y - bufSEf.y) / effectTime1;
+	}
+	else {
+		bufSEf.vx = (toChar->x - bufSEf.x) / effectTime1;
+		bufSEf.vy = (toChar->y - bufSEf.y) / effectTime1;
+	}
+
 	bufSEf.drawTime = 0;
 	vSEffect.push_back(bufSEf);
 
@@ -76,6 +77,7 @@ CCharacterBase::CCharacterBase()
 	smallHPBar = "zero/SmallHPBar.png";
 	smallMPBar = "zero/SmallMPBar.png";
 	Window[0]= "zero/ItemSelectWindow3.png";
+	Window[1] = "zero/StatusWindow2.png";
 
 	for (int i = 0; i < 8; i++) {
 		statusHenka[i] = 0;
@@ -104,6 +106,8 @@ CCharacterBase::CCharacterBase()
 	damageCut[0] = 0;
 	damageCut[1] = 0;
 
+	skill30 = false;
+	skill50 = false;
 
 	for (int i = 0; i < 10; i++)
 	{
@@ -290,7 +294,7 @@ void CCharacterBase::GiveButuriDamge(CCharacterBase *atackChar, Skill *atackSkil
 			bufI *= (float)(10 + statusHenka[7] / 10) / 10;
 			//bufI /= 10;
 		}
-
+		buffI = 1;
 		if (atackSkill->content[skillNum] == 3) {
 			buffI = 7;
 		}
@@ -332,9 +336,6 @@ void CCharacterBase::GiveButuriDamge(CCharacterBase *atackChar, Skill *atackSkil
 		if (damage <= 0) {
 			damage = 1;
 		}
-
-		//damage /= 100;
-		//damage /= 100;
 		
 
 		bufSS << name.c_str();
@@ -355,6 +356,14 @@ void CCharacterBase::GiveButuriDamge(CCharacterBase *atackChar, Skill *atackSkil
 			atackChar->GiveCureMP((float)damage*0.06 + 1, textWindow);
 			bufS = atackChar->name.c_str();
 			bufS += "はMP回復した。";
+			textWindow->PushText(bufS.c_str());
+		}
+
+		if (atackSkill->content[skillNum] == 8) {
+			atackChar->GiveDamge((float)damage*0.06, textWindow);
+			bufS = atackChar->name.c_str();
+			bufS += "は反動でダメージを受けた。";
+			damageDisplayTime = 0;
 			textWindow->PushText(bufS.c_str());
 		}
 
@@ -428,6 +437,7 @@ void CCharacterBase::GiveMahouDamge(CCharacterBase * atackChar, Skill * atackSki
 			//bufI /= 10;
 		}
 
+		buffI = 1;
 		if (atackSkill->content[skillNum] == 3) {
 			buffI = 7;
 		}
@@ -466,9 +476,6 @@ void CCharacterBase::GiveMahouDamge(CCharacterBase * atackChar, Skill * atackSki
 			damage /= 20;
 		}
 
-		//damage /= 100;
-		//damage /= 100;
-
 
 		if (damage <= 0) {
 			damage = 1;
@@ -497,6 +504,14 @@ void CCharacterBase::GiveMahouDamge(CCharacterBase * atackChar, Skill * atackSki
 			textWindow->PushText(bufS.c_str());
 		}
 
+		if (atackSkill->content[skillNum] == 8) {
+			atackChar->GiveDamge((float)damage*0.06, textWindow);
+			bufS = atackChar->name.c_str();
+			bufS += "は反動でダメージを受けた。";
+			damageDisplayTime = 0;
+			textWindow->PushText(bufS.c_str());
+		}
+
 	}
 	else {
 		bufS += "攻撃が外れた。";
@@ -522,7 +537,6 @@ void CCharacterBase::Cure(Skill * atackSkill, int skillNum, CTextWindow * textWi
 		textWindow->PushText(bufS.c_str());
 	}
 	else {
-		effect1.PushEffect(atackSkill->useChar, this);
 
 		switch (atackSkill->content[skillNum])
 		{
@@ -765,11 +779,11 @@ void CCharacterBase::JoutaiIjou(Skill *atackSkill, int skillNum, CTextWindow *te
 		{
 		case 0:bufS+="は毒状態になった。";  break;
 		case 1:bufS += "は麻痺状態になった。";  break;
-		case 2:bufS += "は放心状態になった。";  break;
+		//case 2:bufS += "は放心状態になった。";  break;
 		case 3:bufS += "は不治状態になった。";  break;
 		case 4:bufS += "はひるんだ。";  break;
 		case 5:
-			bufS += "は毒、麻痺、放心、不治状態になった。";
+			bufS += "は毒、麻痺、不治になった。";
 			break;
 		default:
 			break;
@@ -798,11 +812,11 @@ void CCharacterBase::JoutaiIjou(Skill *atackSkill, int skillNum, CTextWindow *te
 		{
 		case 0:bufS += "は毒状態にならなかった。";  break;
 		case 1:bufS += "は麻痺状態にならなかった。";  break;
-		case 2:bufS += "は放心状態にならなかった。";  break;
+		//case 2:bufS += "は放心状態にならなかった。";  break;
 		case 3:bufS += "は不治状態になならなかった。";  break;
 		case 4:bufS += "はひるまなかった。";  break;
 		case 5:
-			bufS += "は毒、麻痺、放心、不治状態にならなかった。";
+			bufS += "は毒、麻痺、不治にならなかった。";
 			break;
 		default:
 			break;
@@ -825,6 +839,8 @@ void CCharacterBase::Tokusyu(CCharacterBase * atackChar, Skill * atackSkill, int
 	stringstream bufSS;
 	bufSS << name.c_str();
 	bufSS << "の";
+
+	int maisuu = atackSkill->power[skillNum];
 
 	switch (atackSkill->content[skillNum])
 	{
@@ -930,8 +946,12 @@ void CCharacterBase::Tokusyu(CCharacterBase * atackChar, Skill * atackSkill, int
 			jikiSkillCard[bufSyahhuru[i]]->cardNum = bufSyahhuru[i];
 
 		}
+		if (maisuu > 4) {
+			maisuu = 4;
+		}
+
 		bufSS << "スキルカードを";
-		bufSS << atackSkill->power[skillNum];
+		bufSS << maisuu;
 		bufSS << "枚シャッフルした。";
 		textWindow->PushText(bufSS.str().c_str());
 
@@ -1031,24 +1051,59 @@ void CCharacterBase::DethJudge(CTextWindow *textWindow)
 
 }
 
+void CCharacterBase::GiveDokuDamage(CTextWindow * textWindow,bool boss)
+{
+	stringstream bufSS;
+	int damage=0;
+	if (bigBoss && boss == true) {
+		damage = (float)MaxHP * 0.008;
+	}
+	else if(boss==true && enemyF==true){
+		damage = (float)MaxHP * 0.016;
+	}
+	else if (enemyF == true) {
+		damage = (float)MaxHP * 0.080;
+	}
+	else {
+		damage = (float)MaxHP * 0.040;
+	}
+
+	bufSS << name.c_str();
+	bufSS << "は毒によって";
+	bufSS << damage;
+	bufSS << "ダメージを受けた。";
+	textWindow->PushText(bufSS.str().c_str());
+	Status[0] -= damage;
+	if (Status[0] < 0) {
+		Status[0] = 0;
+	}
+	drawHP = Status[0];
+	displayDamage = damage;
+	damageDisplayTime = 0;
+
+	DethJudge(textWindow);
+
+}
+
 Skill CCharacterBase::returnSkill()
 {
 	int bufI = GetRand(9);
 	int buffI=0;
+	int totalChange=0;
 	
 	if (bigBoss == false) {
 		if (bufI < 4) {
 			buffI = 0;
 		}
-		else if(bufI<6)
+		else if (bufI < 6)
 		{
 			buffI = 1;
 		}
-		else if (bufI<8)
+		else if (bufI < 8)
 		{
 			buffI = 2;
 		}
-		else if (bufI<9)
+		else if (bufI < 9)
 		{
 			buffI = 3;
 		}
@@ -1056,17 +1111,92 @@ Skill CCharacterBase::returnSkill()
 		{
 			buffI = 4;
 		}
+
+
+		skill[buffI].speed = (float)Spd*(1 - GetRand(20)*0.01);
+		if (statusHenka[4] > 0) {
+			skill[buffI].speed *= (float)(10 + statusHenka[4] * 2) / 10;
+		}
+		if (statusHenka[4] < 0) {
+			skill[buffI].speed *= (float)(10 - statusHenka[4]) / 10;
+		}
+		return skill[buffI];
+
+	}
+	else {
+		if (skill50 == false && Status[0] <= (float)MaxHP*0.5) {
+			skill50 = true;
+			return skill[0];
+		}
+		if (skill30 == false && Status[0] <= (float)MaxHP*0.3) {
+			skill30 = true;
+			return skill[1];
+		}
+
+		if (doku || huchi || mahi) {
+			if (GetRand(9) < 2) {
+				return normalAtack;
+			}
+		}
+
+		for (int i = 0; i < 8; i++) {
+			if (statusHenka[i] < 0) {
+				totalChange += statusHenka[i] * -1;
+			}
+			else {
+				totalChange += statusHenka[i] /2;
+			}
+		}
+
+		if (totalChange * 5 >= GetRand(100)) {
+			return normalDefence;
+		}
+
+		if (bufI < 2) {
+			buffI = 2;
+			if (Status[0] <= (float)MaxHP*0.5) {
+				buffI = 8;
+			}
+		}
+		else if (bufI < 4)
+		{
+			buffI = 3;
+			if (Status[0] <= (float)MaxHP*0.3) {
+				buffI = 9;
+			}
+		}
+		else if (bufI < 6)
+		{
+			buffI = 4;
+		}
+		else if (bufI < 8)
+		{
+			buffI = 5;
+		}
+		else if(bufI<9)
+		{
+			buffI = 6;
+		}
+		else {
+			buffI = 7;
+		}
+
+		skill[buffI].speed = (float)Spd*(1 - GetRand(20)*0.01);
+		if (statusHenka[4] > 0) {
+			skill[buffI].speed *= (float)(10 + statusHenka[4] * 2) / 10;
+		}
+		if (statusHenka[4] < 0) {
+			skill[buffI].speed *= (float)(10 - statusHenka[4]) / 10;
+		}
+		return skill[buffI];
 	}
 
-	skill[buffI].speed = (float)Spd*(1 - GetRand(20)*0.01);
-	if (statusHenka[4] > 0) {
-		skill[buffI].speed *= (float)(10 + statusHenka[4] * 2) / 10;
-	}
-	if (statusHenka[4] < 0) {
-		skill[buffI].speed *= (float)(10 - statusHenka[4]) / 10;
-	}
-	return skill[buffI];
+}
 
+int CCharacterBase::returnSpead()
+{
+	int buf = (float)Spd*(1 - GetRand(20)*0.01);
+	return buf;
 }
 
 void CCharacterBase::SkillSpeadRand()
@@ -1108,8 +1238,16 @@ void CCharacterBase::skillHatudou(CCharacterBase *atackChar, Skill *atackSkill, 
 		if (atackSkill->hajime) {
 			atackSkill->hajime = false;
 			bufS = atackChar->name.c_str();
-			bufS += "の";
-			bufS += atackSkill->neme.c_str();
+			if (atackSkill->item) {
+				bufS += "は";
+				bufS += atackSkill->neme.c_str();
+				bufS += "を使った。";
+			}
+			else {
+				bufS += "の";
+				bufS += atackSkill->neme.c_str();
+			}
+			
 			textWindow->PushText(bufS.c_str());
 		}
 		else {
@@ -1163,18 +1301,18 @@ void CCharacterBase::skillHatudou(CCharacterBase *atackChar, Skill *atackSkill, 
 void CCharacterBase::DrawHPBar(int x, int y, bool onlyLive)
 {
 	if (onlyLive == false || live == true) {
-		int bufI = 124 * Status[0] / Status[15];
+		int bufI = 125 * Status[0] / Status[15];
 		HPBar.Draw(x, y);
 		if (Status[0] <= MaxHP*0.2) {
 
-			DrawBox(x + 50, y + 4, x + 50 + bufI, y + 19, RED_B, true);
+			DrawBox(x + 50, y + 4, x + 50 + bufI, y + 20, RED_B, true);
 		}
 		else if (Status[0] <= MaxHP*0.5) {
 
-			DrawBox(x + 50, y + 4, x + 50 + bufI, y + 19, YELLOW_B, true);
+			DrawBox(x + 50, y + 4, x + 50 + bufI, y + 20, YELLOW_B, true);
 		}
 		else {
-			DrawBox(x + 50, y + 4, x + 50 + bufI, y + 19, GREEN_B, true);
+			DrawBox(x + 50, y + 4, x + 50 + bufI, y + 20, GREEN_B, true);
 		}
 	}
 }
@@ -1182,17 +1320,17 @@ void CCharacterBase::DrawHPBar(int x, int y, bool onlyLive)
 void CCharacterBase::DrawMPBar(int x, int y, bool onlyLive)
 {
 	if (onlyLive == false || live == true) {
-		int bufI = 124 * Status[1] / Status[16];
+		int bufI = 125 * Status[1] / Status[16];
 		MPBar.Draw(x, y);
-		DrawBox(x + 50, y + 4, x + 50 + bufI, y + 19, BLUE_B, true);
+		DrawBox(x + 50, y + 4, x + 50 + bufI, y + 20, BLUE_B, true);
 	}
 }
 
 void CCharacterBase::DrawStatusWindow(int x, int y)
 {
 	string bufS="";
-	Window[0].DrawExtend(5, 5, 250, 420);
-	DrawFormatString(15, 10, BLACK, "ステータス");
+	Window[1].DrawExtend(x, y,  x + 200, y + 410);
+	DrawFormatString(x+10, y+10, BLACK, "%s",name.c_str());
 
 	for (int i = 0; i < 15; i++) {
 		switch (i)
@@ -1219,15 +1357,15 @@ void CCharacterBase::DrawStatusWindow(int x, int y)
 		}
 		
 		if (i == 0) {
-			DrawFormatString(15, 50 + 20 * i * 2, BLACK, "%s;%d / %d", bufS.c_str(), Status[i], Status[i + 15]);
-			DrawHPBar(15, 70 + 20 * i * 2,false);
+			DrawFormatString(x+10, y + 40, BLACK, "%s;%d / %d", bufS.c_str(), Status[i], Status[i + 15]);
+			DrawHPBar(x+10, y + 60 ,false);
 		}
 		else if (i == 1) {
-			DrawFormatString(15, 50 + 20 * i*2, BLACK, "%s;%d / %d", bufS.c_str(), Status[i],Status[i+15]);
-			DrawMPBar(15, 70 + 20 * i * 2,false);
+			DrawFormatString(x+10, y + 90, BLACK, "%s;%d / %d", bufS.c_str(), Status[i],Status[i+15]);
+			DrawMPBar(x+10, y + 110,false);
 		}
 		else {
-			DrawFormatString(15, 90 + 20 * i, BLACK, "%s;%d", bufS.c_str(), Status[i]);
+			DrawFormatString(x+10, y + 100 + 20 * i , BLACK, "%s;%d", bufS.c_str(), Status[i]);
 		}
 
 	}
@@ -1403,6 +1541,9 @@ CJiki::CJiki(CMySaveData *mySD)
 	int num = 0;
 	int buf = 0;
 	int Level=0;
+	enemyF = false;
+	bigBoss = false;
+
 	for (int i = 0; i < 17; i++) {
 		Status[i] = 0;
 	}
@@ -1643,9 +1784,9 @@ void CJiki::Draw(int x, int y)
 	}
 
 	DrawSmallHPBar(x , y + 35, false);
-	DrawFormatString(x + 124, y + 37, BLACKNESS, "%d / %d", drawHP, Status[15]);
+	DrawFormatString(x + 124, y + 37, BLACKNESS, "%d/%d", drawHP, Status[15]);
 	DrawSmallMPBar(x , y + 35 + 23, false);
-	DrawFormatString(x + 124, y + 37 + 23, BLACKNESS, "%d / %d", drawMP, Status[16]);
+	DrawFormatString(x + 124, y + 37 + 23, BLACKNESS, "%d/%d", drawMP, Status[16]);
 
 	if (doku) {
 		DrawFormatString(x, y + 81, RED, "毒");
@@ -1653,14 +1794,11 @@ void CJiki::Draw(int x, int y)
 	if (mahi) {
 		DrawFormatString(x + 22, y + 81, RED, "麻痺");
 	}
-	if (housin) {
-		DrawFormatString(x + 66, y + 81, RED, "放心");
-	}
 	if (huchi) {
-		DrawFormatString(x + 110, y + 81, RED, "不治");
+		DrawFormatString(x + 66, y + 81, RED, "不治");
 	}
 	if (hirumi) {
-		DrawFormatString(x + 144, y + 81, RED, "ひるみ");
+		DrawFormatString(x + 110, y + 81, RED, "ひるみ");
 	}
 }
 
@@ -1669,6 +1807,8 @@ CHaniwa::CHaniwa(CMySaveData * mySD,int kind)
 	mySaveData = mySD;
 	this->kind = kind;
 	Level = mySaveData->haniwaLevel[kind - 1];
+	enemyF = false;
+	bigBoss = false;
 
 	haniwaInfo = new CSV("zero/ZeroData/Haniwa.csv");
 	float bufFlo;
@@ -1895,9 +2035,9 @@ void CHaniwa::Draw(int x, int y)
 		tenmetsu++;
 	}
 	DrawSmallHPBar(x , y + 35, false);
-	DrawFormatString(x + 124, y +37, BLACKNESS, "%d / %d",drawHP,MaxHP);
+	DrawFormatString(x + 124, y +37, BLACKNESS, "%d/%d",drawHP,MaxHP);
 	DrawSmallMPBar(x, y + 35 + 23, false);
-	DrawFormatString(x + 124, y + 37 + 23, BLACKNESS, "%d / %d", drawMP, MaxMP);
+	DrawFormatString(x + 124, y + 37 + 23, BLACKNESS, "%d/%d", drawMP, MaxMP);
 
 	if (doku) {
 		DrawFormatString(x, y + 81, RED, "毒");
@@ -1905,14 +2045,11 @@ void CHaniwa::Draw(int x, int y)
 	if (mahi) {
 		DrawFormatString(x + 22, y + 81, RED, "麻痺");
 	}
-	if (housin) {
-		DrawFormatString(x + 66, y + 81, RED, "放心");
-	}
 	if (huchi) {
-		DrawFormatString(x + 110, y + 81, RED, "不治");
+		DrawFormatString(x + 66, y + 81, RED, "不治");
 	}
 	if (hirumi) {
-		DrawFormatString(x + 144, y + 81, RED, "ひるみ");
+		DrawFormatString(x + 110, y + 81, RED, "ひるみ");
 	}
 }
 
@@ -1922,12 +2059,16 @@ CEnemy::CEnemy(CMySaveData * mySD, int kind, bool bigBoss)
 	mySaveData = mySD;
 	this->kind = kind;
 	this->bigBoss = bigBoss;
-
-	enemyInfo = new CSV("zero/ZeroData/Enemy.csv");
 	float bufFlo;
 	int bufI;
 	string bufS;
 
+	if (bigBoss == false) {
+
+	enemyInfo = new CSV("zero/ZeroData/Enemy.csv");
+	
+
+	enemyF = true;
 
 	name = (*enemyInfo)[kind-1][1];
 	bufS = (*enemyInfo)[kind - 1][2];
@@ -2007,81 +2148,316 @@ CEnemy::CEnemy(CMySaveData * mySD, int kind, bool bigBoss)
 	Status[15] = MaxHP;
 	Status[16] = MaxMP;
 
-	for (int i = 0; i < 5; i++) {
-		skillNum[i]= (*enemyInfo)[kind - 1][17+i];
-	}
 	
-	for (int i = 0; i < 3; i++) {
 
-		bufI = GetRand(19);
-		if (bufI < 8) {
-			dropItem[i][0] = (*enemyInfo)[kind - 1][22 + 0 * 2];
-			dropItem[i][1] = (*enemyInfo)[kind - 1][23 + 0 * 2];
-		}
-		else if (bufI < 14) {
-			dropItem[i][0] = (*enemyInfo)[kind - 1][22 + 1 * 2];
-			dropItem[i][1] = (*enemyInfo)[kind - 1][23 + 1 * 2];
-		}
-		else if (bufI < 18) {
-			dropItem[i][0] = (*enemyInfo)[kind - 1][22 + 2 * 2];
-			dropItem[i][1] = (*enemyInfo)[kind - 1][23 + 2 * 2];
-		}
-		else {
-			dropItem[i][0] = (*enemyInfo)[kind - 1][22 + 3 * 2];
-			dropItem[i][1] = (*enemyInfo)[kind - 1][23 + 3 * 2];
-		}
-	}
-
-	delete enemyInfo;
-	enemyInfo = NULL;
-
-	for (int i = 0; i < 3; i++) {
-		switch (dropItem[i][0]) {
-		case 0:
-			itemInfo = new CSV("zero/ZeroData/Sorce.csv");
-			break;
-		case 1:
-			itemInfo = new CSV("zero/ZeroData/Tool.csv");
-			break;
-		case 2:
-			itemInfo = new CSV("zero/ZeroData/Food.csv");
-			break;
-
+		for (int i = 0; i < 5; i++) {
+			skillNum[i] = (*enemyInfo)[kind - 1][17 + i];
+			if (skillNum[i] <= 0) {
+				skillNum[i] = 1;
+			}
 		}
 
-		dropItemName[i] = (*itemInfo)[dropItem[i][1] - 1][1];
+		for (int i = 0; i < 5; i++) {
 
-		delete itemInfo;
-		itemInfo = NULL;
-	}
+			bufI = GetRand(19);
+			if (bufI < 8) {
+				dropItem[i][0] = (*enemyInfo)[kind - 1][22 + 0 * 2];
+				dropItem[i][1] = (*enemyInfo)[kind - 1][23 + 0 * 2];
+			}
+			else if (bufI < 14) {
+				dropItem[i][0] = (*enemyInfo)[kind - 1][22 + 1 * 2];
+				dropItem[i][1] = (*enemyInfo)[kind - 1][23 + 1 * 2];
+			}
+			else if (bufI < 18) {
+				dropItem[i][0] = (*enemyInfo)[kind - 1][22 + 2 * 2];
+				dropItem[i][1] = (*enemyInfo)[kind - 1][23 + 2 * 2];
+			}
+			else {
+				dropItem[i][0] = (*enemyInfo)[kind - 1][22 + 3 * 2];
+				dropItem[i][1] = (*enemyInfo)[kind - 1][23 + 3 * 2];
+			}
+		}
 
+		delete enemyInfo;
+		enemyInfo = NULL;
 
-	skillInfo = new CSV("zero/ZeroData/Skill.csv");
-	for (int i = 0; i < 5; i++) {
-		skill[i].ene = true;
+		for (int i = 0; i < 5; i++) {
+			switch (dropItem[i][0]) {
+			case 0:
+				itemInfo = new CSV("zero/ZeroData/Sorce.csv");
+				break;
+			case 1:
+				itemInfo = new CSV("zero/ZeroData/Tool.csv");
+				break;
+			case 2:
+				itemInfo = new CSV("zero/ZeroData/Food.csv");
+				break;
 
-		skill[i].num = skillNum[i];
-		if (skillNum[i] > 0) {
-			skill[i].neme = (*skillInfo)[skillNum[i] - 1][1];
-			skill[i].MP = (*skillInfo)[skillNum[i] - 1][2];
-			skill[i].element = (*skillInfo)[skillNum[i] - 1][3];
-			skill[i].PMode = (*skillInfo)[skillNum[i] - 1][4];
-			skill[i].times = (*skillInfo)[skillNum[i] - 1][5];
-			skill[i].classifyNum = (*skillInfo)[skillNum[i] - 1][6];
-			for (int j = 0; j < 3; j++) {
-
-				skill[i].target[j] = (*skillInfo)[skillNum[i] - 1][7 + j * 4];
-				skill[i].classify[j] = (*skillInfo)[skillNum[i] - 1][8 + j * 4];
-				skill[i].content[j] = (*skillInfo)[skillNum[i] - 1][9 + j * 4];
-				skill[i].power[j] = (*skillInfo)[skillNum[i] - 1][10 + j * 4];
 			}
 
-			skill[i].experience = (*skillInfo)[skillNum[i] - 1][19];
+			dropItemName[i] = (*itemInfo)[dropItem[i][1] - 1][1];
+
+			delete itemInfo;
+			itemInfo = NULL;
 		}
+
+
+		skillInfo = new CSV("zero/ZeroData/Skill.csv");
+		for (int i = 0; i < 5; i++) {
+			skill[i].ene = true;
+
+			skill[i].num = skillNum[i];
+			if (skillNum[i] > 0) {
+				skill[i].neme = (*skillInfo)[skillNum[i] - 1][1];
+				skill[i].MP = (*skillInfo)[skillNum[i] - 1][2];
+				skill[i].element = (*skillInfo)[skillNum[i] - 1][3];
+				skill[i].PMode = (*skillInfo)[skillNum[i] - 1][4];
+				skill[i].times = (*skillInfo)[skillNum[i] - 1][5];
+				skill[i].classifyNum = (*skillInfo)[skillNum[i] - 1][6];
+				for (int j = 0; j < 3; j++) {
+
+					skill[i].target[j] = (*skillInfo)[skillNum[i] - 1][7 + j * 4];
+					skill[i].classify[j] = (*skillInfo)[skillNum[i] - 1][8 + j * 4];
+					skill[i].content[j] = (*skillInfo)[skillNum[i] - 1][9 + j * 4];
+					skill[i].power[j] = (*skillInfo)[skillNum[i] - 1][10 + j * 4];
+				}
+
+				skill[i].experience = (*skillInfo)[skillNum[i] - 1][19];
+			}
+		}
+
+		delete skillInfo;
+		skillInfo = NULL;
+
+	}
+	else {
+
+		enemyInfo = new CSV("zero/ZeroData/BigBoss.csv");
+
+
+		enemyF = true;
+
+		name = (*enemyInfo)[kind - 1][1];
+		bufS = (*enemyInfo)[kind - 1][2];
+		charGraph = bufS.c_str();
+
+		for (int i = 0; i < 15; i++) {
+
+			bufI = (*enemyInfo)[kind - 1][3 + i];
+			switch (i)
+			{
+			case 0:
+				HP = bufI;
+				MaxHP = bufI;
+				break;
+			case 1:
+				Atc = bufI;
+				break;
+			case 2:
+				Def = bufI;
+				break;
+			case 3:
+				MAtc = bufI;
+				break;
+			case 4:
+				MDef = bufI;
+				break;
+			case 5:
+				Spd = bufI;
+				break;
+			case 6:
+				Hit = bufI;
+				break;
+			case 7:
+				Escape = bufI;
+				break;
+			case 8:
+				Luck = bufI;
+				break;
+			case 9:
+				FireDef = bufI;
+				break;
+			case 10:
+				WoodDef = bufI;
+				break;
+			case 11:
+				WaterDef = bufI;
+				break;
+			case 12:
+				LightDef = bufI;
+				break;
+			case 13:
+				DarkDef = bufI;
+				break;
+
+
+
+			default:
+				break;
+			}
+		}
+
+		Status[0] = HP;
+		Status[1] = MP;
+		Status[2] = Atc;
+		Status[3] = Def;
+		Status[4] = MAtc;
+		Status[5] = MDef;
+		Status[6] = Spd;
+		Status[7] = Hit;
+		Status[8] = Escape;
+		Status[9] = Luck;
+		Status[10] = FireDef;
+		Status[11] = WoodDef;
+		Status[12] = WaterDef;
+		Status[13] = LightDef;
+		Status[14] = DarkDef;
+		Status[15] = MaxHP;
+		Status[16] = MaxMP;
+
+
+		actTimes=(*enemyInfo)[kind - 1][17];
+		for (int i = 0; i <10; i++) {
+			skillNum[i] = (*enemyInfo)[kind - 1][18 + i];
+			if (skillNum[i] <= 0) {
+				skillNum[i] = 1;
+			}
+
+		}
+		
+
+
+
+		for (int i = 0; i < 6; i++) {
+
+			bufI = GetRand(19);
+			if (bufI < 5) {
+				dropItem[i][0] = (*enemyInfo)[kind - 1][28 + 0 * 2];
+				dropItem[i][1] = (*enemyInfo)[kind - 1][29 + 0 * 2];
+			}
+			else if (bufI < 9) {
+				dropItem[i][0] = (*enemyInfo)[kind - 1][28 + 1 * 2];
+				dropItem[i][1] = (*enemyInfo)[kind - 1][29 + 1 * 2];
+			}
+			else if (bufI < 11) {
+				dropItem[i][0] = (*enemyInfo)[kind - 1][28 + 2 * 2];
+				dropItem[i][1] = (*enemyInfo)[kind - 1][29 + 2 * 2];
+			}
+			else if (bufI < 13) {
+				dropItem[i][0] = (*enemyInfo)[kind - 1][28 + 3 * 2];
+				dropItem[i][1] = (*enemyInfo)[kind - 1][29 + 3 * 2];
+			}
+			else if (bufI < 15) {
+				dropItem[i][0] = (*enemyInfo)[kind - 1][28 + 4 * 2];
+				dropItem[i][1] = (*enemyInfo)[kind - 1][29 + 4 * 2];
+			}
+			else if (bufI < 17) {
+				dropItem[i][0] = (*enemyInfo)[kind - 1][28 + 5 * 2];
+				dropItem[i][1] = (*enemyInfo)[kind - 1][29 + 5 * 2];
+			}
+			else if (bufI < 19) {
+				dropItem[i][0] = (*enemyInfo)[kind - 1][28 + 6 * 2];
+				dropItem[i][1] = (*enemyInfo)[kind - 1][29 + 6 * 2];
+			}
+			else{
+				dropItem[i][0] = (*enemyInfo)[kind - 1][28 + 7 * 2];
+				dropItem[i][1] = (*enemyInfo)[kind - 1][29 + 7 * 2];
+			}
+		}
+
+
+		delete enemyInfo;
+		enemyInfo = NULL;
+
+		for (int i = 0; i < 6; i++) {
+			switch (dropItem[i][0]) {
+			case 0:
+				itemInfo = new CSV("zero/ZeroData/Sorce.csv");
+				break;
+			case 1:
+				itemInfo = new CSV("zero/ZeroData/Tool.csv");
+				break;
+			case 2:
+				itemInfo = new CSV("zero/ZeroData/Food.csv");
+				break;
+
+			}
+
+			dropItemName[i] = (*itemInfo)[dropItem[i][1] - 1][1];
+
+			delete itemInfo;
+			itemInfo = NULL;
+		}
+
+
+		skillInfo = new CSV("zero/ZeroData/Skill.csv");
+		for (int i = 0; i < 10; i++) {
+			skill[i].ene = true;
+
+			skill[i].num = skillNum[i];
+			if (skillNum[i] > 0) {
+				skill[i].neme = (*skillInfo)[skillNum[i] - 1][1];
+				skill[i].MP = (*skillInfo)[skillNum[i] - 1][2];
+				skill[i].element = (*skillInfo)[skillNum[i] - 1][3];
+				skill[i].PMode = (*skillInfo)[skillNum[i] - 1][4];
+				skill[i].times = (*skillInfo)[skillNum[i] - 1][5];
+				skill[i].classifyNum = (*skillInfo)[skillNum[i] - 1][6];
+				for (int j = 0; j < 3; j++) {
+
+					skill[i].target[j] = (*skillInfo)[skillNum[i] - 1][7 + j * 4];
+					skill[i].classify[j] = (*skillInfo)[skillNum[i] - 1][8 + j * 4];
+					skill[i].content[j] = (*skillInfo)[skillNum[i] - 1][9 + j * 4];
+					skill[i].power[j] = (*skillInfo)[skillNum[i] - 1][10 + j * 4];
+				}
+
+				skill[i].experience = (*skillInfo)[skillNum[i] - 1][19];
+			}
+		}
+
+		normalAtack.ene = true;
+
+		normalAtack.num = 14;
+		normalAtack.neme = (*skillInfo)[14 - 1][1];
+		normalAtack.MP = (*skillInfo)[14 - 1][2];
+		normalAtack.element = (*skillInfo)[14 - 1][3];
+		normalAtack.PMode = (*skillInfo)[14 - 1][4];
+		normalAtack.times = (*skillInfo)[14 - 1][5];
+		normalAtack.classifyNum = (*skillInfo)[14 - 1][6];
+		for (int j = 0; j < 3; j++) {
+
+			normalAtack.target[j] = (*skillInfo)[14 - 1][7 + j * 4];
+			normalAtack.classify[j] = (*skillInfo)[14 - 1][8 + j * 4];
+			normalAtack.content[j] = (*skillInfo)[14 - 1][9 + j * 4];
+			normalAtack.power[j] = (*skillInfo)[14 - 1][10 + j * 4];
+		}
+
+		normalAtack.experience = (*skillInfo)[14 - 1][19];
+
+		normalDefence.ene = true;
+
+		normalDefence.num = 15;
+		normalDefence.neme = (*skillInfo)[15 - 1][1];
+		normalDefence.MP = (*skillInfo)[15 - 1][2];
+		normalDefence.element = (*skillInfo)[15 - 1][3];
+		normalDefence.PMode = (*skillInfo)[15 - 1][4];
+		normalDefence.times = (*skillInfo)[15 - 1][5];
+		normalDefence.classifyNum = (*skillInfo)[15 - 1][6];
+		for (int j = 0; j < 3; j++) {
+
+			normalDefence.target[j] = (*skillInfo)[15 - 1][7 + j * 4];
+			normalDefence.classify[j] = (*skillInfo)[15 - 1][8 + j * 4];
+			normalDefence.content[j] = (*skillInfo)[15 - 1][9 + j * 4];
+			normalDefence.power[j] = (*skillInfo)[15 - 1][10 + j * 4];
+		}
+
+		normalDefence.experience = (*skillInfo)[15 - 1][19];
+
+
+		delete skillInfo;
+		skillInfo = NULL;
+
 	}
 
-	delete skillInfo;
-	skillInfo = NULL;
 
 	tenmetsu = 121;
 
@@ -2098,12 +2474,12 @@ CEnemy::~CEnemy()
 
 void CEnemy::Draw(int x, int y, bool nameZurasi)
 {
-	this->x = x;
-	this->y = y;
+	this->x = x+60;
+	this->y = y+60;
 
 	if (live == true || damageDisplayTime<=0 ||cureDisplayTime<=0 || damageMPDisplayTime<=0 || cureMPDisplayTime<=0) {
 		if (tenmetsu > 90 || tenmetsu % 30 <= 15 || tenmetsu<0) {
-			charGraph.Draw(x, y);
+			charGraph.DrawRota(this->x,this->y,1.00,0);
 		}
 		if (tenmetsu < 110) {
 			tenmetsu++;
@@ -2126,11 +2502,8 @@ void CEnemy::Draw(int x, int y, bool nameZurasi)
 		if (mahi) {
 			DrawFormatString(x + 14, y - 84, RED, "麻痺");
 		}
-		if (housin) {
-			DrawFormatString(x + 54, y - 84, RED, "放心");
-		}
 		if (huchi) {
-			DrawFormatString(x + 94, y - 84, RED, "不治");
+			DrawFormatString(x + 54, y - 84, RED, "不治");
 		}
 		if (hirumi) {
 			DrawFormatString(x -6, y -105 , RED, "ひるみ");

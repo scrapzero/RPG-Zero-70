@@ -389,6 +389,11 @@ void CItemManager::Sell(int amount)
 
 	default:break;
 	}
+
+	if (savedata->money>99999999) {
+		savedata->money = 99999999;
+	}
+
 }
 
 int CItemManager::GetAmount(int kind, int num)

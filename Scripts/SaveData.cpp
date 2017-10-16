@@ -19,6 +19,7 @@ const std::string NbringHaniwaKind[2] = {"adfvafba","svsvsfb"};
 const std::string NRank = "sqqrvw";
 const std::string NQuestClear[120] = { "oao[0]d1","oao[0]d2","oao[0]d3","oao[0]d4","oao[0]d5","oao[0]d6","oao[0]d7","oao[0]d8","oao[0]d9","oao[0]d10","oao[0]d11","oao[0]d12","oao[0]d13","oao[0]d14","oao[0]d15","oao[0]d16","oao[0]d17","oao[0]d18","oao[0]d19","oao[0]d20","oao[0]d21","oao[0]d22","oao[0]d23","oao[0]d24","oao[0]d25","oao[0]d26","oao[0]d27","oao[0]d28","oao[0]d29","oao[0]d30","oao[0]d31","oao[0]d32","oao[0]d33","oao[0]d34","oao[0]d35","oao[0]d36","oao[0]d37","oao[0]d38","oao[0]d39","oao[0]d40","oao[0]d41","oao[0]d42","oao[0]d43","oao[0]d44","oao[0]d45","oao[0]d46","oao[0]d47","oao[0]d48","oao[0]d49","oao[0]d50","oao[0]d51","oao[0]d52","oao[0]d53","oao[0]d54","oao[0]d55","oao[0]d56","oao[0]d57","oao[0]d58","oao[0]d59","oao[0]d60","oao[0]d61","oao[0]d62","oao[0]d63","oao[0]d64","oao[0]d65","oao[0]d66","oao[0]d67","oao[0]d68","oao[0]d69","oao[0]d70","oao[0]d71","oao[0]d72","oao[0]d73","oao[0]d74","oao[0]d75","oao[0]d76","oao[0]d77","oao[0]d78","oao[0]d79","oao[0]d80","oao[0]d81","oao[0]d82","oao[0]d83","oao[0]d84","oao[0]d85","oao[0]d86","oao[0]d87","oao[0]d88","oao[0]d89","oao[0]d90","oao[0]d91","oao[0]d92","oao[0]d93","oao[0]d94","oao[0]d95","oao[0]d96","oao[0]d97","oao[0]d98","oao[0]d99","oao[0]d100","oao[0]d101","oao[0]d102","oao[0]d103","oao[0]d104","oao[0]d105","oao[0]d106","oao[0]d107","oao[0]d108","oao[0]d109","oao[0]d110","oao[0]d111","oao[0]d112","oao[0]d113","oao[0]d114","oao[0]d115","oao[0]d116","oao[0]d117","oao[0]d118","oao[0]d119","oao[0]d120"};
 const std::string NClearAmount[3][7] = { "eedppap1","eedppap2","eedppap3","eedppap4","eedppap5","eedppap6","eedppap7","eedppap8","eedppap9","eedppap10","eedppap11","eedppap12","eedppap13","eedppap14","eedppap15","eedppap16","eedppap17","eedppap18","eedppap19","eedppap20","eedppap21" };
+const std::string NRankUpQuest[3][7] = { "we1","we2","we3","we4","we5","we6","we7","we8","we9","we10","we11","we12","we13","we14","we15","we16","we17","we18","we19","we20","we21" };
 
 
 CMySaveData::CMySaveData(bool kari) {
@@ -83,6 +84,7 @@ CMySaveData::CMySaveData(bool kari) {
 	for (int i = 0; i < 3; i++) {
 		for (int j = 0; j < 7; j++) {
 			clearAmount[i][j] = data->GetInt(NClearAmount[i][j]);
+			rankUpQuest[i][j] = data->GetInt(NRankUpQuest[i][j]);
 		}
 	}
 
@@ -127,7 +129,7 @@ CMySaveData::CMySaveData(bool kari) {
 	
 		for (int i = 0; i < 10; i++) {
 			for (int j = 0; j < 10; j++) {
-				itemSet[i][j].first = 0;
+				itemSet[i][j].first = 1;
 				itemSet[i][j].second = 0;
 			}
 		}
@@ -150,6 +152,7 @@ CMySaveData::CMySaveData(bool kari) {
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 7; j++) {
 				clearAmount[i][j] = 0;
+				rankUpQuest[i][j] = false;
 			}
 		}
 
@@ -213,7 +216,8 @@ void CMySaveData::WriteSaveData() {
 
 	for (int i = 0; i < 3; i++) {
 		for (int j = 0; j < 7; j++) {
-			data->Set(NClearAmount[i][j], NClearAmount[i][j]);
+			data->Set(NClearAmount[i][j], clearAmount[i][j]);
+			data->Set(NRankUpQuest[i][j], rankUpQuest[i][j]);
 		}
 	}
 
@@ -275,7 +279,8 @@ void CMySaveData::WriteSaveDataToOther() {
 
 	for (int i = 0; i < 3; i++) {
 		for (int j = 0; j < 7; j++) {
-			otherData->Set(NClearAmount[i][j], NClearAmount[i][j]);
+			otherData->Set(NClearAmount[i][j], clearAmount[i][j]);
+			otherData->Set(NRankUpQuest[i][j], rankUpQuest[i][j]);
 		}
 	}
 

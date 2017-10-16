@@ -255,14 +255,15 @@ void CTextWindow::Loop() {
 		}
 		else if (texts.empty()) {
 			display.clear();
+			endDisplay = false;
 		}
-		//else if (endDisplay == true ) {
-		else
-		{
+		else if (endDisplay == true ) {
+		//else{
 			display.pop_front();
 			display.push_back(texts.front());
 			texts.pop();
 			wordAmount = 0;
+			endDisplay = false;
 		}
 	}
 
@@ -297,11 +298,14 @@ void CTextWindow::Draw() {
 
 
 
-	for (auto i = display.begin(); i != display.end();i++) {
+	for (auto i = display.begin(); i != display.end(); i++) {
 		repeat++;
-		kariS[repeat-1] = *i;
+		kariS[repeat - 1] = *i;
+		if (repeat > 10) {
+			break;
+		}
 
-		if (repeat ==display.size()) {
+		if (repeat == display.size()) {
 			if (wordAmount >= kariS[repeat - 1].size()) {
 				wordAmount = kariS[repeat - 1].size();
 				endDisplay = true;
@@ -309,21 +313,23 @@ void CTextWindow::Draw() {
 
 			for (int k = 0; k < wordAmount; k++) {
 				if (IsDBCSLeadByte(kariS[repeat - 1][k]) != 0) {
-					S[repeat-1] += kariS[repeat - 1][k];
-					S[repeat-1] += kariS[repeat - 1][k+1];
-					k++;
+					S[repeat - 1] += kariS[repeat - 1][k];
+					if (k + 1 < wordAmount) {
+						S[repeat - 1] += kariS[repeat - 1][k + 1];
+						k++;
+					}
 				}
 				else {
-					S[repeat-1] += kariS[repeat - 1][k];
+					S[repeat - 1] += kariS[repeat - 1][k];
 				}
 			}
 		}
 		else {
-			S[repeat-1] = kariS[repeat - 1];
+			S[repeat - 1] = kariS[repeat - 1];
 		}
 
-
 	}
+	
 
 
 
@@ -1188,6 +1194,23 @@ void CHaniwaSkillWindow::Draw(int y)
 void CHaniwaSkillWindow::ChangeNum(int num)
 {
 	this->num = num;
+}
+
+void CHaniwaSkillWindow::ChangeLevel(int level)
+{
+	this->haniLevel = level;
+	if (haniLevel < 30) {
+		lvChange = 0;
+	}
+	else if (haniLevel < 50) {
+		lvChange = 1;
+	}
+	else if (haniLevel < 70) {
+		lvChange = 2;
+	}
+	else {
+		lvChange = 3;
+	}
 }
 
 

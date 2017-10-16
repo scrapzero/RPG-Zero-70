@@ -193,6 +193,7 @@ public:
 	void Draw();
 	void Draw(int y);
 	void ChangeNum(int num);
+	void ChangeLevel(int level);
 
 
 };

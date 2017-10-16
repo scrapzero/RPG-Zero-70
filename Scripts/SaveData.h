@@ -9,14 +9,14 @@ using namespace std;
 class CMySaveData {
 private:
 	CData *data,*otherData;
-	int EquipmentAmount,haveEquipmentKindLevel[400][3];//武器種、種類番号、Level
+
+public:
+
+	int EquipmentAmount, haveEquipmentKindLevel[400][3];//武器種、種類番号、Level
 	int test;
 	int recipeStep[10];
 	typedef pair<int, int> intP;
 	intP itemSet[10][10];
-
-public:
-
 	int sorce[200], tool[60], food[100];
 	char bringItemSet;
 	int wearEquipmentLocate[5][2];
@@ -25,6 +25,7 @@ public:
 	int bringHaniwaKind[2];
 	bool questClear[120];
 	int clearAmount[3][7];
+	bool rankUpQuest[3][7];
 
 	CMySaveData(bool kari);
 	void WriteSaveData();

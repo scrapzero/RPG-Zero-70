@@ -57,6 +57,7 @@ struct Skill
 	int targetNum;
 	bool ene;
 	bool item;
+	int itemKind, itemNum;
 
 	string experience;
 
@@ -104,7 +105,10 @@ public:
 	void Tokusyu(CCharacterBase *atackChar, Skill *atackSkill, int skillNum, CTextWindow *textWindow);
 	void DethJudge(CTextWindow *textWindow);
 
+	void GiveDokuDamage(CTextWindow *textWindow, bool boss);
+
 	Skill returnSkill();
+	int returnSpead();
 	void SkillSpeadRand();
 	void skillHatudou(CCharacterBase *atackChar, Skill *atackSkill, int skillNum, CTextWindow *textWindow,bool *oneMore,bool *hazureta);
 
@@ -130,6 +134,8 @@ public:
 	int DarkDef;
 	int Status[17];
 
+	int Level;
+
 	int drawHP;
 	int drawMP;
 
@@ -137,11 +143,12 @@ public:
 	int Element;//0Ç©ÇÁèáÇ…Å@ñ≥âŒñÿêÖåıà≈
 	int damageCut[2];
 
-	bool live,bigBoss;
+	bool live,bigBoss,enemyF;
 	int tenmetsu;
 	int buturiDamageCut;
 	int maHouDamageCut;
 	bool doku, mahi, housin, huchi, hirumi;
+	bool skill30, skill50;
 
 	int element;
 	int damageDisplayTime;
@@ -154,13 +161,14 @@ public:
 	int displayCureMP;
 	int statusChangeDisplayTime;
 	int displayStatusChange;
+	int actTimes;
 
 
 	int statusHenka[8];
 
 
-	int dropItem[3][2];
-	string dropItemName[3];
+	int dropItem[6][2];
+	string dropItemName[6];
 
 	
 	Graph charGraph;
@@ -205,7 +213,7 @@ private:
 	CSV * skillInfo;
 
 	int wearWeaponNumLevel[5][3];
-	int kind, Level;
+	int kind;
 	int skillNum[4];
 
 
@@ -223,9 +231,8 @@ private:
 	CSV *skillInfo;
 	CSV *itemInfo;
 
-	int wearWeaponNumLevel[5][3];
 	int kind;
-	int skillNum[5];
+	int skillNum[10];
 
 
 public:
