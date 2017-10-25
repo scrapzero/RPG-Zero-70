@@ -74,7 +74,7 @@ CEquipmentManager::~CEquipmentManager() {
 				buf++;
 		}
 	}
-	savedata->WriteSaveData();
+	//savedata->WriteSaveData();
 
 	delete equipmentWindow;
 	equipmentWindow = NULL;

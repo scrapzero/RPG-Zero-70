@@ -72,6 +72,10 @@ void CEffect1::DrawEffect()
 CCharacterBase::CCharacterBase()
 {
 	live = true;
+	yuusya = false;
+	enemyF = false;
+	nusunda = false;
+	PDamageCut = 0;
 	HPBar = "zero/HPBar.png";
 	MPBar = "zero/MPBar.png";
 	smallHPBar = "zero/SmallHPBar.png";
@@ -243,7 +247,7 @@ void CCharacterBase::GiveButuriDamge(CCharacterBase *atackChar, Skill *atackSkil
 	int buffI = 1;
 	stringstream bufSS;
 	string bufS;
-	bufI = (float)Status[8] * 250/ atackChar->Status[7] /25;
+	bufI = (float)Status[8] * 250/ atackChar->Status[7] /33;
 	if (atackChar->statusHenka[5] > 0) {
 		bufI *= (float)(10 - statusHenka[5]) / 10;
 	}
@@ -265,6 +269,9 @@ void CCharacterBase::GiveButuriDamge(CCharacterBase *atackChar, Skill *atackSkil
 		damage = (float)atackSkill->power[skillNum] * atackChar->Atc * atackChar->Atc / Def / 100;
 		if (atackSkill->content[skillNum] == 1) {
 			damage = (float)atackSkill->power[skillNum] * atackChar->MAtc * atackChar->Atc / Def / 100;
+		}
+		if (atackSkill->content[skillNum] == 2) {
+			damage = (float)atackSkill->power[skillNum] * atackChar->Spd * atackChar->Atc / Def / 100;
 		}
 		
 
@@ -296,10 +303,10 @@ void CCharacterBase::GiveButuriDamge(CCharacterBase *atackChar, Skill *atackSkil
 		}
 		buffI = 1;
 		if (atackSkill->content[skillNum] == 3) {
-			buffI = 7;
+			buffI = 8;
 		}
-		if ((float)GetRand(250) < (float)buffI *(10 + bufI) / 2) {
-			damage *= 2.5;
+		if ((float)GetRand(100) < (float)buffI *(10 + bufI) / 15) {
+			damage *= 2.8;
 			textWindow->PushText("クリティカルヒット！");
 		}
 
@@ -331,6 +338,15 @@ void CCharacterBase::GiveButuriDamge(CCharacterBase *atackChar, Skill *atackSkil
 		if (atackSkill->PMode == 0) {
 			damage *= (float)(20+atackSkill->Point)/20;
 			//damage /= 20;
+		}
+
+		if (yuusya == true) {
+			damage *= (float)(100 - PDamageCut*2) / 100;
+		}
+
+		if (atackSkill->PMode == 15 && atackSkill->Point >= 10) {
+			damage *= 2.8;
+			textWindow->PushText("渾身の一撃！");
 		}
 
 		if (damage <= 0) {
@@ -385,7 +401,7 @@ void CCharacterBase::GiveMahouDamge(CCharacterBase * atackChar, Skill * atackSki
 	int buffI = 1;
 	stringstream bufSS;
 	string bufS;
-	bufI = (float)Status[8] * 250 / atackChar->Status[7] / 25;
+	bufI = (float)Status[8] * 250 / atackChar->Status[7] / 33;
 	if (atackChar->statusHenka[5] > 0) {
 		bufI *= (float)(10 - statusHenka[5]) / 10;
 	}
@@ -408,7 +424,9 @@ void CCharacterBase::GiveMahouDamge(CCharacterBase * atackChar, Skill * atackSki
 		if (atackSkill->content[skillNum] == 1) {
 			damage = (float)atackSkill->power[skillNum] * atackChar->Atc * atackChar->MAtc / MDef / 100;
 		}
-
+		if (atackSkill->content[skillNum] == 2) {
+			damage = (float)atackSkill->power[skillNum] * atackChar->Atc * atackChar->Spd / MDef / 100;
+		}
 		
 		switch (atackSkill->element)
 		{
@@ -439,11 +457,11 @@ void CCharacterBase::GiveMahouDamge(CCharacterBase * atackChar, Skill * atackSki
 
 		buffI = 1;
 		if (atackSkill->content[skillNum] == 3) {
-			buffI = 7;
+			buffI = 8;
 		}
 
-		if ((float)GetRand(250) < (float)buffI * (10 + bufI) / 2) {
-			damage *= 2.5;
+		if ((float)GetRand(100) < (float)buffI * (10 + bufI) / 15) {
+			damage *= 2.8;
 			textWindow->PushText("クリティカルヒット！");
 		}
 
@@ -474,6 +492,15 @@ void CCharacterBase::GiveMahouDamge(CCharacterBase * atackChar, Skill * atackSki
 		if (atackSkill->PMode == 0) {
 			damage *= (20+atackSkill->Point);
 			damage /= 20;
+		}
+
+		if (yuusya == true) {
+			damage *= (float)(100 - PDamageCut * 2) / 100;
+		}
+
+		if (atackSkill->PMode == 15 && atackSkill->Point>=10) {
+			textWindow->PushText("渾身の一撃！");
+			damage *= 2.8;
 		}
 
 
@@ -530,6 +557,10 @@ void CCharacterBase::Cure(Skill * atackSkill, int skillNum, CTextWindow * textWi
 	stringstream bufSS;
 	bufSS << name.c_str();
 	bufSS << "の";
+	float bufF = 1.000;
+	if (atackSkill->useChar->yuusya == true &&atackSkill->PMode==10) {
+		bufF = (float)(30 + atackSkill->Point)/30;
+	}
 
 	if (atackSkill->content[skillNum] <= 1 && huchi) {
 		bufS = name.c_str();
@@ -542,28 +573,28 @@ void CCharacterBase::Cure(Skill * atackSkill, int skillNum, CTextWindow * textWi
 		{
 		case 0:
 			bufI = Status[0];
-			GiveCureHP(MaxHP*atackSkill->power[skillNum] / 100, textWindow);
+			GiveCureHP(bufF * MaxHP*atackSkill->power[skillNum] / 100, textWindow);
 			bufSS << "HPが";
 			bufSS << (Status[0] - bufI);
 			bufSS << "回復した。";
 			break;
 		case 1:
 			bufI = Status[0];
-			GiveCureHP(atackSkill->power[skillNum], textWindow);
+			GiveCureHP(bufF * atackSkill->power[skillNum], textWindow);
 			bufSS << "HPが";
 			bufSS << (Status[0] - bufI);
 			bufSS << "回復した。";
 			break;
 		case 2:
 			bufI = Status[1];
-			GiveCureMP(MaxMP*atackSkill->power[skillNum] / 100, textWindow);
+			GiveCureMP(bufF * MaxMP*atackSkill->power[skillNum] / 100, textWindow);
 			bufSS << "MPが";
 			bufSS << (Status[1] - bufI);
 			bufSS << "回復した。";
 			break;
 		case 3:
 			bufI = Status[1];
-			GiveCureMP(atackSkill->power[skillNum], textWindow);
+			GiveCureMP(bufF * atackSkill->power[skillNum], textWindow);
 			bufSS << "MPが";
 			bufSS << (Status[1] - bufI);
 			bufSS << "回復した。";
@@ -773,6 +804,12 @@ void CCharacterBase::JoutaiIjou(Skill *atackSkill, int skillNum, CTextWindow *te
 
 	string bufS=name.c_str();
 	int bufI =atackSkill->power[skillNum] * 255 / 100;
+	float bufF = 0;
+
+	if (atackSkill->useChar->yuusya == true && atackSkill->PMode == 13) {
+		bufF = (float)(30 + atackSkill->Point) / 30;
+		bufI *= bufF;
+	}
 
 	if (bufI >= GetRand(255)) {
 		switch (atackSkill->content[skillNum])
@@ -1031,8 +1068,63 @@ void CCharacterBase::Tokusyu(CCharacterBase * atackChar, Skill * atackSkill, int
 		bufS += "へのダメージが減っている。";
 		textWindow->PushText(bufS.c_str());
 		break;
+	case 10:
+		if (enemyF == true) {
+			bufS = name.c_str();
+			if (nusunda == false) {
+				if (atackSkill->power[skillNum] > GetRand(99)) {
+					bufS += "から";
+					bufS += dropItemName[6].c_str();
+					bufS += "を盗んだ。";
+					nusunda = true;
+					switch (dropItem[6][0])
+					{
+					case 0:
+						mySaveData->sorce[dropItem[6][1]]++;
+						if (mySaveData->sorce[dropItem[6][1]] > 9999) {
+							mySaveData->sorce[dropItem[6][1]] = 9999;
+						}
+						break;
+					case 1:
+						mySaveData->tool[dropItem[6][1]]++;
+						if (mySaveData->tool[dropItem[6][1]] > 9999) {
+							mySaveData->tool[dropItem[6][1]] = 9999;
+						}
+						break;
+					case 2:
+						mySaveData->food[dropItem[6][1]]++;
+						if (mySaveData->food[dropItem[6][1]] > 9999) {
+							mySaveData->food[dropItem[6][1]] = 9999;
+						}
+						break;
+					default:
+						break;
+					}
+
+				}
+				else {
+					bufS += "から物を盗めなかった。";
+				}
+				
+			}
+			else {
+				bufS += "からはもう盗む物がない！";
+			}
+
+			textWindow->PushText(bufS.c_str());
+
+		}
+		break;
+	case 11:
+		bufS = "このターン";
+		bufS += name.c_str();
+		bufS += "は仲間をかばっている。";
+		textWindow->PushText(bufS.c_str());
+		break;
+
 	}
 
+	
 
 }
 
@@ -1048,6 +1140,88 @@ void CCharacterBase::DethJudge(CTextWindow *textWindow)
 		Reset();
 	}
 
+
+}
+
+void CCharacterBase::PStatusUp(int pKind, CTextWindow *txWindo)
+{
+	effect1.PushEffect(this, this);
+
+	int bufI = statusHenka[pKind-2];
+	int buffI = 0;
+	char koreijou = 0;
+	stringstream bufSS;
+
+
+
+	if (statusHenka[pKind-2] >= 5) {
+		koreijou = 1;
+	}
+
+	if (statusHenka[pKind-2] <= -5) {
+		koreijou = 2;
+	}
+
+	statusHenka[pKind-2]++;
+	if (statusHenka[pKind-2] >= 5) {
+		statusHenka[pKind-2] = 5;
+	}
+
+	if (statusHenka[pKind-2] <= -5) {
+		statusHenka[pKind-2] = -5;
+	}
+
+	buffI = statusHenka[pKind-2] - bufI;
+	txWindo->PushText("スキルポイントの効果！");
+	bufSS << name.c_str();
+	bufSS << "の";
+
+	switch (pKind-2)
+	{
+	case 0: bufSS << "物攻"; break;
+	case 1: bufSS << "物防"; break;
+	case 2: bufSS << "魔攻"; break;
+	case 3: bufSS << "魔防"; break;
+	case 4: bufSS << "速さ"; break;
+	case 5: bufSS << "命中"; break;
+	case 6: bufSS << "回避"; break;
+	case 7: bufSS << "運"; break;
+	default:
+		break;
+	}
+	if (koreijou == 1) {
+		bufSS << "はこれ以上上がらない。";
+	}
+	else if (koreijou == 2) {
+		bufSS << "はこれ以上下がらない。";
+	}
+	else if (buffI > 0) {
+		statusChangeDisplayTime = 0;
+		displayStatusChange = bufI;
+		bufSS << "が";
+		bufSS << buffI;
+		bufSS << "上がった。";
+
+		displayStatusChange = buffI;
+		statusChangeDisplayTime = 0;
+	}
+	else if (buffI < 0)
+	{
+		displayStatusChange = bufI;
+		buffI *= -1;
+		statusChangeDisplayTime = 0;
+		bufSS << "が";
+		bufSS << buffI;
+		bufSS << "下がった。";
+		buffI *= -1;
+		displayStatusChange = buffI;
+		statusChangeDisplayTime = 0;
+	}
+	else {
+		bufSS << "が変化しなった。";
+	}
+
+	txWindo->PushText(bufSS.str().c_str());
 
 }
 
@@ -1134,7 +1308,7 @@ Skill CCharacterBase::returnSkill()
 		}
 
 		if (doku || huchi || mahi) {
-			if (GetRand(9) < 2) {
+			if (GetRand(19) < 3) {
 				return normalAtack;
 			}
 		}
@@ -1148,7 +1322,7 @@ Skill CCharacterBase::returnSkill()
 			}
 		}
 
-		if (totalChange * 5 >= GetRand(100)) {
+		if (totalChange * 4 >= GetRand(100)) {
 			return normalDefence;
 		}
 
@@ -1498,7 +1672,10 @@ void CCharacterBase::DrawDamageAndCure()
 void CCharacterBase::DrawStatusHenkaWindow(int x, int y)
 {
 	string bufS = "";
-
+	if (enemyF == true) {
+		x -= 60;
+		y -= 60;
+	}
 	Window[0].DrawExtend(x, y, x + 136, y + 120);
 	for (int i = 0; i < 8;i++) {
 		switch (i)
@@ -1534,6 +1711,8 @@ void CCharacterBase::DrawStatusHenkaWindow(int x, int y)
 
 CJiki::CJiki(CMySaveData *mySD)
 {
+
+	mySaveData = mySD;
 	name = "勇者";
 	charGraph = "zero/jiki1.png";
 
@@ -1677,7 +1856,7 @@ CJiki::CJiki(CMySaveData *mySD)
 	skillInfo = new CSV("zero/ZeroData/Skill.csv");
 	for (int i = 0; i < 6; i++) {
 		skill[i].ene = false;
-
+		skill[i].useChar = this;
 		skill[i].num = skillNum[i];
 		skill[i].neme = (*skillInfo)[skillNum[i] - 1][1];
 		skill[i].MP = (*skillInfo)[skillNum[i] - 1][2];
@@ -1721,6 +1900,7 @@ CJiki::CJiki(CMySaveData *mySD)
 	}
 	else {
 		normalAtack.num = Element + 7;
+		normalAtack.useChar = this;
 		normalAtack.neme = (*skillInfo)[normalAtack.num - 1][1];
 		normalAtack.MP = (*skillInfo)[normalAtack.num - 1][2];
 		normalAtack.element = (*skillInfo)[normalAtack.num - 1][3];
@@ -1740,6 +1920,7 @@ CJiki::CJiki(CMySaveData *mySD)
 	}
 
 	normalDefence.num = 13;
+	normalDefence.useChar = this;
 	normalDefence.neme = (*skillInfo)[normalDefence.num - 1][1];
 	normalDefence.MP = (*skillInfo)[normalDefence.num - 1][2];
 	normalDefence.element = (*skillInfo)[normalDefence.num - 1][3];
@@ -1755,6 +1936,9 @@ CJiki::CJiki(CMySaveData *mySD)
 	}
 
 	normalDefence.experience = (*skillInfo)[normalDefence.num - 1][19];
+
+	PDamageCut = 0;
+	yuusya = true;
 
 	delete skillInfo;
 	skillInfo = NULL;
@@ -1828,36 +2012,36 @@ CHaniwa::CHaniwa(CMySaveData * mySD,int kind)
 		switch (i)
 		{
 		case 0:
-			HP = bufI + bufFlo*Level;
-			MaxHP = bufI + bufFlo*Level;
+			HP = bufI + bufFlo*Level + mySaveData->haniStatusPlus[kind - 1][0];
+			MaxHP = bufI + bufFlo*Level + mySaveData->haniStatusPlus[kind-1][0];
 			break;
 		case 1:
-			MP = bufI + bufFlo*Level;
-			MaxMP = bufI + bufFlo*Level;
+			MP = bufI + bufFlo*Level + mySaveData->haniStatusPlus[kind - 1][1];
+			MaxMP = bufI + bufFlo*Level + mySaveData->haniStatusPlus[kind - 1][1];
 			break;
 		case 2:
-			Atc = bufI + bufFlo*Level;
+			Atc = bufI + bufFlo*Level + mySaveData->haniStatusPlus[kind - 1][2];
 			break;
 		case 3:
-			Def = bufI + bufFlo*Level;
+			Def = bufI + bufFlo*Level + mySaveData->haniStatusPlus[kind - 1][3];
 			break;
 		case 4:
-			MAtc = bufI + bufFlo*Level;
+			MAtc = bufI + bufFlo*Level + mySaveData->haniStatusPlus[kind - 1][4];
 			break;
 		case 5:
-			MDef = bufI + bufFlo*Level;
+			MDef = bufI + bufFlo*Level + mySaveData->haniStatusPlus[kind - 1][5];
 			break;
 		case 6:
-			Spd = bufI + bufFlo*Level;
+			Spd = bufI + bufFlo*Level + mySaveData->haniStatusPlus[kind - 1][6];
 			break;
 		case 7:
-			Hit = bufI + bufFlo*Level;
+			Hit = bufI + bufFlo*Level  + mySaveData->haniStatusPlus[kind - 1][7];
 			break;
 		case 8:
-			Escape = bufI + bufFlo*Level;
+			Escape = bufI + bufFlo*Level + mySaveData->haniStatusPlus[kind - 1][8];
 			break;
 		case 9:
-			Luck = bufI + bufFlo*Level;
+			Luck = bufI + bufFlo*Level + mySaveData->haniStatusPlus[kind - 1][9];
 			break;
 		case 10:
 			FireDef = bufI + bufFlo*Level;
@@ -1911,7 +2095,7 @@ CHaniwa::CHaniwa(CMySaveData * mySD,int kind)
 	for (int i = 0; i < 4; i++) {
 
 		skill[i].ene = false;
-
+		skill[i].useChar = this;
 		skill[i].num = skillNum[i];
 		skill[i].neme = (*haniwaSkillInfo)[skillNum[i] - 1][1];
 		if (Level < 30) {
@@ -1979,6 +2163,7 @@ CHaniwa::CHaniwa(CMySaveData * mySD,int kind)
 	normalAtack.element = (*skillInfo)[normalAtack.num - 1][3];
 	normalAtack.times = (*skillInfo)[normalAtack.num - 1][5];
 	normalAtack.classifyNum = (*skillInfo)[normalAtack.num - 1][6];
+	normalAtack.useChar = this;
 	for (int j = 0; j < 3; j++) {
 
 		normalAtack.target[j] = (*skillInfo)[normalAtack.num - 1][7 + j * 4];
@@ -1998,6 +2183,7 @@ CHaniwa::CHaniwa(CMySaveData * mySD,int kind)
 	normalDefence.element = (*skillInfo)[normalDefence.num - 1][3];
 	normalDefence.times = (*skillInfo)[normalDefence.num - 1][5];
 	normalDefence.classifyNum = (*skillInfo)[normalDefence.num - 1][6];
+	normalDefence.useChar = this;
 	for (int j = 0; j < 3; j++) {
 
 		normalDefence.target[j] = (*skillInfo)[normalDefence.num - 1][7 + j * 4];
@@ -2157,7 +2343,7 @@ CEnemy::CEnemy(CMySaveData * mySD, int kind, bool bigBoss)
 			}
 		}
 
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < 7; i++) {
 
 			bufI = GetRand(19);
 			if (bufI < 8) {
@@ -2181,7 +2367,7 @@ CEnemy::CEnemy(CMySaveData * mySD, int kind, bool bigBoss)
 		delete enemyInfo;
 		enemyInfo = NULL;
 
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < 7; i++) {
 			switch (dropItem[i][0]) {
 			case 0:
 				itemInfo = new CSV("zero/ZeroData/Sorce.csv");
@@ -2205,7 +2391,7 @@ CEnemy::CEnemy(CMySaveData * mySD, int kind, bool bigBoss)
 		skillInfo = new CSV("zero/ZeroData/Skill.csv");
 		for (int i = 0; i < 5; i++) {
 			skill[i].ene = true;
-
+			skill[i].useChar = this;
 			skill[i].num = skillNum[i];
 			if (skillNum[i] > 0) {
 				skill[i].neme = (*skillInfo)[skillNum[i] - 1][1];
@@ -2328,7 +2514,7 @@ CEnemy::CEnemy(CMySaveData * mySD, int kind, bool bigBoss)
 
 
 
-		for (int i = 0; i < 6; i++) {
+		for (int i = 0; i < 7; i++) {
 
 			bufI = GetRand(19);
 			if (bufI < 5) {
@@ -2369,7 +2555,7 @@ CEnemy::CEnemy(CMySaveData * mySD, int kind, bool bigBoss)
 		delete enemyInfo;
 		enemyInfo = NULL;
 
-		for (int i = 0; i < 6; i++) {
+		for (int i = 0; i < 7; i++) {
 			switch (dropItem[i][0]) {
 			case 0:
 				itemInfo = new CSV("zero/ZeroData/Sorce.csv");
@@ -2393,7 +2579,7 @@ CEnemy::CEnemy(CMySaveData * mySD, int kind, bool bigBoss)
 		skillInfo = new CSV("zero/ZeroData/Skill.csv");
 		for (int i = 0; i < 10; i++) {
 			skill[i].ene = true;
-
+			skill[i].useChar = this;
 			skill[i].num = skillNum[i];
 			if (skillNum[i] > 0) {
 				skill[i].neme = (*skillInfo)[skillNum[i] - 1][1];
@@ -2415,7 +2601,7 @@ CEnemy::CEnemy(CMySaveData * mySD, int kind, bool bigBoss)
 		}
 
 		normalAtack.ene = true;
-
+		normalAtack.useChar = this;
 		normalAtack.num = 14;
 		normalAtack.neme = (*skillInfo)[14 - 1][1];
 		normalAtack.MP = (*skillInfo)[14 - 1][2];
@@ -2434,7 +2620,7 @@ CEnemy::CEnemy(CMySaveData * mySD, int kind, bool bigBoss)
 		normalAtack.experience = (*skillInfo)[14 - 1][19];
 
 		normalDefence.ene = true;
-
+		normalDefence.useChar = this;
 		normalDefence.num = 15;
 		normalDefence.neme = (*skillInfo)[15 - 1][1];
 		normalDefence.MP = (*skillInfo)[15 - 1][2];
@@ -2464,6 +2650,8 @@ CEnemy::CEnemy(CMySaveData * mySD, int kind, bool bigBoss)
 
 	drawHP = MaxHP;
 	drawMP = MaxMP;
+
+	nusunda = false;
 
 
 }

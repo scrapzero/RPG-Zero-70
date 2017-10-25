@@ -14,6 +14,7 @@ CSQuestBase::CSQuestBase(int mapNum,Squest* bufVQ, vector<SItem> *vItemSet)
 
 
 	mySaveData = new CMySaveData(true);
+	
 	this->mapNum = mapNum;
 	vq = new Squest(*bufVQ);
 	this->vItemSet = vItemSet;
@@ -30,6 +31,7 @@ CSQuestBase::CSQuestBase(int mapNum,Squest* bufVQ, vector<SItem> *vItemSet)
 		(*this->vItemSet)[i].skill.ene = false;
 		(*this->vItemSet)[i].skill.MP = 0;
 		(*this->vItemSet)[i].skill.useChar= character[0];
+		(*this->vItemSet)[i].skill.UseNum = 0;
 	}
 
 	mode[0] = 0;
@@ -55,7 +57,7 @@ CSQuestBase::CSQuestBase(int mapNum,Squest* bufVQ, vector<SItem> *vItemSet)
 	textWindow = new CTextWindow("クエスト開始");
 
 
-	startAppearEn =18;
+	startAppearEn =-10;
 	bossN = 1;
 
 
@@ -162,7 +164,7 @@ void CSQuestBase::Loop()
 				
 			}
 			mySaveData->WriteSaveData();
-			Game.FlipScene(new CSTown(40, 3,1), Flip::FADE_OUT_IN);
+			Game.FlipScene(new CSTown(40, 3,1), Flip::FADE_OUT_IN,4);
 			
 			break;
 		case 1:
@@ -201,12 +203,12 @@ void CSQuestBase::Loop()
 					if (mySaveData->Rank == 11) {
 
 						mySaveData->WriteSaveData();
-						Game.FlipScene(new CSTown(40, 3, 5), Flip::DOOR_COME_HORIZONTAL);
+						Game.FlipScene(new CSTown(40, 3, 5), Flip::DOOR_COME_HORIZONTAL,8);
 					}
 					else {
 
 						mySaveData->WriteSaveData();
-						Game.FlipScene(new CSTown(40, 3, 4), Flip::DOOR_COME_HORIZONTAL);
+						Game.FlipScene(new CSTown(40, 3, 4), Flip::DOOR_COME_HORIZONTAL,8);
 					}
 
 				}
@@ -215,16 +217,16 @@ void CSQuestBase::Loop()
 					if (vq->qLevel / 10 == 0 && mySaveData->clearAmount[vq->qLevel / 10][(vq->qLevel % 10) - 1] >= 3 && mySaveData->rankUpQuest[vq->qLevel / 10][(vq->qLevel % 10) - 1] == false) {
 						mySaveData->rankUpQuest[vq->qLevel / 10][(vq->qLevel % 10) - 1] = true;
 						mySaveData->WriteSaveData();
-						Game.FlipScene(new CSTown(40, 3, 3), Flip::DOOR_COME_HORIZONTAL);
+						Game.FlipScene(new CSTown(40, 3, 3), Flip::DOOR_COME_HORIZONTAL,8);
 					}
 					else if (vq->qLevel / 10 == 1 && mySaveData->clearAmount[vq->qLevel / 10][(vq->qLevel % 10) - 1] >= 4 && mySaveData->rankUpQuest[vq->qLevel / 10][(vq->qLevel % 10) - 1] == false) {
 						mySaveData->rankUpQuest[vq->qLevel / 10][(vq->qLevel % 10) -1] = true;
 						mySaveData->WriteSaveData();
-						Game.FlipScene(new CSTown(40, 3, 3), Flip::DOOR_COME_HORIZONTAL);
+						Game.FlipScene(new CSTown(40, 3, 3), Flip::DOOR_COME_HORIZONTAL,8);
 					}
 					else {
 						mySaveData->WriteSaveData();
-						Game.FlipScene(new CSTown(40, 3, 2), Flip::DOOR_COME_HORIZONTAL);
+						Game.FlipScene(new CSTown(40, 3, 2), Flip::DOOR_COME_HORIZONTAL,8);
 					}
 
 				}
@@ -233,7 +235,7 @@ void CSQuestBase::Loop()
 			}
 			else {
 				mySaveData->WriteSaveData();
-				Game.FlipScene(new CSTown(40, 3, 2), Flip::DOOR_COME_HORIZONTAL);
+				Game.FlipScene(new CSTown(40, 3, 2), Flip::DOOR_COME_HORIZONTAL,8);
 			}
 			break;
 
@@ -263,9 +265,13 @@ CSQuestBase::CSMap::CSMap(CSQuestBase & csQuestBase) :csQuestBase(csQuestBase)
 	bool bufF = false;
 	int bufI = 13;
 
+	endS = false;
 
-	LoadDivGraph("zero/MyMapChip2.png", 156, 26, 6, 32, 32, mapChip);
+	LoadDivGraph("zero/MyMapChip1.png", 156, 26, 6, 32, 32, mapChip);
 	bossMapChip = "zero/bossMapChip.png";
+
+	Music.Load(0, "zero/Music/map1.mp3");
+	Music.PlayLoop(0);
 
 	bufSS << "zero/MCE/Map";
 	bufSS << csQuestBase.mapNum;
@@ -371,6 +377,8 @@ CSQuestBase::CSMap::~CSMap()
 	for (int i = 0; i < 100; i++) {
 		Music.StopLoop(i);
 		SoundEffect.StopLoop(i);
+		Music.Delete(i);
+		SoundEffect.Delete(i);
 	}
 }
 
@@ -435,88 +443,83 @@ void CSQuestBase::CSMap::takaraGet( int reado)
 
 void CSQuestBase::CSMap::Loop()
 {
-	bool bufF=false;
-	string bufS = "";
-	int bufI=0;
+	if (endS == false) {
 
-	int HitKeyNum = 0;
-	canMoveDown = true;
-	canMoveLeft = true;
-	canMoveRight = true;
-	canMoveUp = true;
-	int checkAround[3] = {};
-	int jikiStandChip[3] = { QuestMap.Get(QuestMap.layer.C, jikiMapX, jikiMapY) - 1, QuestMap.Get(QuestMap.layer.B, jikiMapX, jikiMapY) - 1 , QuestMap.Get(QuestMap.layer.A, jikiMapX, jikiMapY) - 1 };
+		bool bufF = false;
+		string bufS = "";
+		int bufI = 0;
 
-	if (csQuestBase.retire == true) {
-		csQuestBase.textWindow->Loop();
-		if (csQuestBase.textWindow->GetTextEmpty() && csQuestBase.textWindow->GetWaitTextEmpty()) {
-			csQuestBase.mode[0] = 2;
-			csQuestBase.mode[1] = 0;
-			csQuestBase.RemoveScene(Flip::FADE_OUT_IN, 3);
-		}
-	}
-	else if (csQuestBase.textWindow->GetTextEmpty() && csQuestBase.textWindow->GetWaitTextEmpty()) {
-		if (Input.GetKeyEnter(Input.key.SPACE)) {
-			FlipScene(new CSMenueWindow(*this), Flip::SLIDE_UP, 10);
-		}
-		
-		if (Input.GetKeyDown(Input.key.RIGHT) && bufF == false) {
-			if (jikiStandChip[2] == 0 || jikiStandChip[2] == 4) {
-				if (jikiX % 32 == 0) {
-					csQuestBase.mode[1] = 0;
-					csQuestBase.mapLocateX++;
-					csQuestBase.RemoveScene(Flip::CROSS_FADE, 8);
-					bufF = true;
-				}
+		int HitKeyNum = 0;
+		canMoveDown = true;
+		canMoveLeft = true;
+		canMoveRight = true;
+		canMoveUp = true;
+		int checkAround[3] = {};
+		int jikiStandChip[3] = { QuestMap.Get(QuestMap.layer.C, jikiMapX, jikiMapY) - 1, QuestMap.Get(QuestMap.layer.B, jikiMapX, jikiMapY) - 1 , QuestMap.Get(QuestMap.layer.A, jikiMapX, jikiMapY) - 1 };
+
+		if (csQuestBase.retire == true) {
+			csQuestBase.textWindow->Loop();
+			if (csQuestBase.textWindow->GetTextEmpty() && csQuestBase.textWindow->GetWaitTextEmpty()) {
+				csQuestBase.mode[0] = 2;
+				csQuestBase.mode[1] = 0;
+				endS = true;
+				csQuestBase.RemoveScene(Flip::FADE_OUT_IN, 3);
 			}
 		}
-		if (Input.GetKeyDown(Input.key.LEFT) && bufF == false) {
-			if (jikiStandChip[2] == 1 || jikiStandChip[2] == 5) {
-				if (jikiX % 32 == 0) {
-					csQuestBase.mode[1] = 1;
-					csQuestBase.mapLocateX--;
-					csQuestBase.RemoveScene(Flip::CROSS_FADE, 8);
-					bufF = true;
-				}
+		else if (csQuestBase.textWindow->GetTextEmpty() && csQuestBase.textWindow->GetWaitTextEmpty()) {
+			if (Input.GetKeyEnter(Input.key.SPACE)) {
+				FlipScene(new CSMenueWindow(*this), Flip::SLIDE_UP, 10);
 			}
-		}
-		if (Input.GetKeyDown(Input.key.UP) && bufF == false) {
-			if (jikiStandChip[2] == 2 || jikiStandChip[2] == 6) {
-				if (jikiY % 32 == 0) {
-					csQuestBase.mode[1] = 2;
-					csQuestBase.mapLocateY--;
-					csQuestBase.RemoveScene(Flip::CROSS_FADE, 8);
-					bufF = true;
-				}
-			}
-		}
-		if (Input.GetKeyDown(Input.key.DOWN) && bufF == false) {
-			if (jikiStandChip[2] == 3 || jikiStandChip[2] == 7) {
-				if (jikiY % 32 == 0) {
-					csQuestBase.mode[1] = 3;
-					csQuestBase.mapLocateY++;
-					csQuestBase.RemoveScene(Flip::CROSS_FADE, 8);
-					bufF = true;
-				}
-			}
-		}
 
-		if (bufF == false) {
-			if (jikiMapX > 0) {
-				checkAround[0] = QuestMap.Get(QuestMap.layer.C, jikiMapX - 1, jikiMapY) - 1;
-				checkAround[1] = QuestMap.Get(QuestMap.layer.B, jikiMapX - 1, jikiMapY) - 1;
-				checkAround[2] = QuestMap.Get(QuestMap.layer.A, jikiMapX - 1, jikiMapY) - 1;
-
-				if (jikiStandChip[0] < 26 || jikiStandChip[0] % 26 >= 20) {
-					if (checkAround[0] >= 26 && checkAround[0] % 26 < 20) {
-						canMoveLeft = false;
-					}
-					if (checkAround[1] >= 26 && checkAround[1] % 26 < 20) {
-						canMoveLeft = false;
+			if (Input.GetKeyDown(Input.key.RIGHT) && bufF == false) {
+				if (jikiStandChip[2] == 0 || jikiStandChip[2] == 4) {
+					if (jikiX % 32 == 0) {
+						csQuestBase.mode[1] = 0;
+						csQuestBase.mapLocateX++;
+						csQuestBase.RemoveScene(Flip::CROSS_FADE, 8);
+						bufF = true;
 					}
 				}
-				if (jikiStandChip[1] < 26 || jikiStandChip[1] % 26 >= 20) {
-					if (jikiStandChip[1] >= 0 && jikiStandChip[1] % 26 != 25) {
+			}
+			if (Input.GetKeyDown(Input.key.LEFT) && bufF == false) {
+				if (jikiStandChip[2] == 1 || jikiStandChip[2] == 5) {
+					if (jikiX % 32 == 0) {
+						csQuestBase.mode[1] = 1;
+						csQuestBase.mapLocateX--;
+						csQuestBase.RemoveScene(Flip::CROSS_FADE, 8);
+						bufF = true;
+					}
+				}
+			}
+			if (Input.GetKeyDown(Input.key.UP) && bufF == false) {
+				if (jikiStandChip[2] == 2 || jikiStandChip[2] == 6) {
+					if (jikiY % 32 == 0) {
+						csQuestBase.mode[1] = 2;
+						csQuestBase.mapLocateY--;
+						csQuestBase.RemoveScene(Flip::CROSS_FADE, 8);
+						bufF = true;
+					}
+				}
+			}
+			if (Input.GetKeyDown(Input.key.DOWN) && bufF == false) {
+				if (jikiStandChip[2] == 3 || jikiStandChip[2] == 7) {
+					if (jikiY % 32 == 0) {
+						csQuestBase.mode[1] = 3;
+						csQuestBase.mapLocateY++;
+						endS = true;
+						csQuestBase.RemoveScene(Flip::CROSS_FADE, 8);
+						bufF = true;
+					}
+				}
+			}
+
+			if (bufF == false) {
+				if (jikiMapX > 0) {
+					checkAround[0] = QuestMap.Get(QuestMap.layer.C, jikiMapX - 1, jikiMapY) - 1;
+					checkAround[1] = QuestMap.Get(QuestMap.layer.B, jikiMapX - 1, jikiMapY) - 1;
+					checkAround[2] = QuestMap.Get(QuestMap.layer.A, jikiMapX - 1, jikiMapY) - 1;
+
+					if (jikiStandChip[0] < 26 || jikiStandChip[0] % 26 >= 20) {
 						if (checkAround[0] >= 26 && checkAround[0] % 26 < 20) {
 							canMoveLeft = false;
 						}
@@ -524,67 +527,67 @@ void CSQuestBase::CSMap::Loop()
 							canMoveLeft = false;
 						}
 					}
-				}
-
-				if (jikiStandChip[0] >= 27 && jikiStandChip[0] < 40) {
-					if (checkAround[0] < 27 || checkAround[0] >= 40) {
-						if (checkAround[0] >= 0) {
-							canMoveLeft = false;
+					if (jikiStandChip[1] < 26 || jikiStandChip[1] % 26 >= 20) {
+						if (jikiStandChip[1] >= 0 && jikiStandChip[1] % 26 != 25) {
+							if (checkAround[0] >= 26 && checkAround[0] % 26 < 20) {
+								canMoveLeft = false;
+							}
+							if (checkAround[1] >= 26 && checkAround[1] % 26 < 20) {
+								canMoveLeft = false;
+							}
 						}
 					}
-					if (checkAround[1] < 27 || checkAround[1] >= 40) {
-						if (checkAround[1] >= 0) {
-							canMoveLeft = false;
+
+					if (jikiStandChip[0] >= 27 && jikiStandChip[0] < 40) {
+						if (checkAround[0] < 27 || checkAround[0] >= 40) {
+							if (checkAround[0] >= 0) {
+								canMoveLeft = false;
+							}
+						}
+						if (checkAround[1] < 27 || checkAround[1] >= 40) {
+							if (checkAround[1] >= 0) {
+								canMoveLeft = false;
+							}
 						}
 					}
-				}
 
-				if (jikiStandChip[1] % 26 == 25) {
-					if (checkAround[0] <= 26 || checkAround[0] >= 40) {
-						if (checkAround[0] >= 0) {
-							canMoveLeft = false;
+					if (jikiStandChip[1] % 26 == 25) {
+						if (checkAround[0] <= 26 || checkAround[0] >= 40) {
+							if (checkAround[0] >= 0) {
+								canMoveLeft = false;
+							}
+							else {
+								canMoveLeft = true;
+							}
 						}
 						else {
 							canMoveLeft = true;
 						}
 					}
-					else {
-						canMoveLeft = true;
-					}
-				}
 
-				if (checkAround[1] % 26 == 25 || jikiStandChip[1] % 26 == 25) {
-					if (jikiStandChip[0] >= 27 && jikiStandChip[0] < 40) {
-						if (checkAround[0] >= 27 && checkAround[0] < 40) {
+					if (checkAround[1] % 26 == 25 || jikiStandChip[1] % 26 == 25) {
+						if (jikiStandChip[0] >= 27 && jikiStandChip[0] < 40) {
+							if (checkAround[0] >= 27 && checkAround[0] < 40) {
 
-							canMoveLeft = true;
+								canMoveLeft = true;
+							}
 						}
 					}
+
+					if (8 <= checkAround[2] && checkAround[2] <= 10) {
+						if (csQuestBase.bossLive[checkAround[2] - 8] == true) {
+							canMoveLeft = false;
+						}
+					}
+
 				}
 
-				if (8 <= checkAround[2] && checkAround[2] <= 10) {
-					if (csQuestBase.bossLive[checkAround[2] - 8] == true) {
-						canMoveLeft = false;
-					}
-				}
+				if (jikiMapY > 0) {
+					checkAround[0] = QuestMap.Get(QuestMap.layer.C, jikiMapX, jikiMapY - 1) - 1;
+					checkAround[1] = QuestMap.Get(QuestMap.layer.B, jikiMapX, jikiMapY - 1) - 1;
+					checkAround[2] = QuestMap.Get(QuestMap.layer.A, jikiMapX, jikiMapY - 1) - 1;
 
-			}
-
-			if (jikiMapY > 0) {
-				checkAround[0] = QuestMap.Get(QuestMap.layer.C, jikiMapX, jikiMapY - 1) - 1;
-				checkAround[1] = QuestMap.Get(QuestMap.layer.B, jikiMapX, jikiMapY - 1) - 1;
-				checkAround[2] = QuestMap.Get(QuestMap.layer.A, jikiMapX, jikiMapY - 1) - 1;
-
-				if (jikiStandChip[0] < 26 || jikiStandChip[0] % 26 >= 20) {
-					if (checkAround[0] >= 26 && checkAround[0] % 26 < 20) {
-						canMoveUp = false;
-					}
-					if (checkAround[1] >= 26 && checkAround[1] % 26 < 20) {
-						canMoveUp = false;
-					}
-				}
-				if (jikiStandChip[1] < 26 || jikiStandChip[1] % 26 >= 20) {
-					if (jikiStandChip[1] >= 0) {
+					if (jikiStandChip[0] < 26 || jikiStandChip[0] % 26 >= 20) {
 						if (checkAround[0] >= 26 && checkAround[0] % 26 < 20) {
 							canMoveUp = false;
 						}
@@ -592,62 +595,62 @@ void CSQuestBase::CSMap::Loop()
 							canMoveUp = false;
 						}
 					}
-				}
-
-				if (jikiStandChip[0] >= 27 && jikiStandChip[0] < 40) {
-					if (checkAround[0] < 27 || checkAround[0] >= 40) {
-						if (checkAround[0] >= 0) {
-							canMoveUp = false;
+					if (jikiStandChip[1] < 26 || jikiStandChip[1] % 26 >= 20) {
+						if (jikiStandChip[1] >= 0) {
+							if (checkAround[0] >= 26 && checkAround[0] % 26 < 20) {
+								canMoveUp = false;
+							}
+							if (checkAround[1] >= 26 && checkAround[1] % 26 < 20) {
+								canMoveUp = false;
+							}
 						}
 					}
-					if (checkAround[1] < 27 || checkAround[1] >= 40) {
-						if (checkAround[1] >= 0) {
-							canMoveUp = false;
+
+					if (jikiStandChip[0] >= 27 && jikiStandChip[0] < 40) {
+						if (checkAround[0] < 27 || checkAround[0] >= 40) {
+							if (checkAround[0] >= 0) {
+								canMoveUp = false;
+							}
+						}
+						if (checkAround[1] < 27 || checkAround[1] >= 40) {
+							if (checkAround[1] >= 0) {
+								canMoveUp = false;
+							}
 						}
 					}
-				}
 
-				if (jikiStandChip[1] % 26 == 25) {
-					if (checkAround[0] == 26 || checkAround[0] >= 40) {
-						if (checkAround[0] % 26 < 20) {
-							canMoveUp = false;
+					if (jikiStandChip[1] % 26 == 25) {
+						if (checkAround[0] == 26 || checkAround[0] >= 40) {
+							if (checkAround[0] % 26 < 20) {
+								canMoveUp = false;
+							}
+							else {
+								canMoveUp = true;
+							}
 						}
 						else {
 							canMoveUp = true;
 						}
 					}
-					else {
+
+					if (checkAround[1] % 26 == 25) {
 						canMoveUp = true;
 					}
-				}
 
-				if (checkAround[1] % 26 == 25) {
-					canMoveUp = true;
-				}
-
-				if (8 <= checkAround[2] && checkAround[2] <= 10) {
-					if (csQuestBase.bossLive[checkAround[2] - 8] == true) {
-						canMoveUp = false;
+					if (8 <= checkAround[2] && checkAround[2] <= 10) {
+						if (csQuestBase.bossLive[checkAround[2] - 8] == true) {
+							canMoveUp = false;
+						}
 					}
+
 				}
 
-			}
+				if (jikiMapX + 1 < mapWidth) {
+					checkAround[0] = QuestMap.Get(QuestMap.layer.C, jikiMapX + 1, jikiMapY) - 1;
+					checkAround[1] = QuestMap.Get(QuestMap.layer.B, jikiMapX + 1, jikiMapY) - 1;
+					checkAround[2] = QuestMap.Get(QuestMap.layer.A, jikiMapX + 1, jikiMapY) - 1;
 
-			if (jikiMapX + 1 < mapWidth) {
-				checkAround[0] = QuestMap.Get(QuestMap.layer.C, jikiMapX + 1, jikiMapY) - 1;
-				checkAround[1] = QuestMap.Get(QuestMap.layer.B, jikiMapX + 1, jikiMapY) - 1;
-				checkAround[2] = QuestMap.Get(QuestMap.layer.A, jikiMapX + 1, jikiMapY) - 1;
-
-				if (jikiStandChip[0] < 26 || jikiStandChip[0] % 26 >= 20) {
-					if (checkAround[0] >= 26 && checkAround[0] % 26 < 20) {
-						canMoveRight = false;
-					}
-					if (checkAround[1] >= 26 && checkAround[1] % 26 < 20) {
-						canMoveRight = false;
-					}
-				}
-				if (jikiStandChip[1] < 26 || jikiStandChip[1] % 26 >= 20) {
-					if (jikiStandChip[1] >= 0 && jikiStandChip[1] % 26 != 25) {
+					if (jikiStandChip[0] < 26 || jikiStandChip[0] % 26 >= 20) {
 						if (checkAround[0] >= 26 && checkAround[0] % 26 < 20) {
 							canMoveRight = false;
 						}
@@ -655,67 +658,67 @@ void CSQuestBase::CSMap::Loop()
 							canMoveRight = false;
 						}
 					}
-				}
-
-				if (jikiStandChip[0] >= 27 && jikiStandChip[0] < 40) {
-					if (checkAround[0] < 27 || checkAround[0] >= 40) {
-						if (checkAround[0] >= 0) {
-							canMoveRight = false;
+					if (jikiStandChip[1] < 26 || jikiStandChip[1] % 26 >= 20) {
+						if (jikiStandChip[1] >= 0 && jikiStandChip[1] % 26 != 25) {
+							if (checkAround[0] >= 26 && checkAround[0] % 26 < 20) {
+								canMoveRight = false;
+							}
+							if (checkAround[1] >= 26 && checkAround[1] % 26 < 20) {
+								canMoveRight = false;
+							}
 						}
 					}
-					if (checkAround[1] < 27 || checkAround[1] >= 40) {
-						if (checkAround[1] >= 0) {
-							canMoveRight = false;
+
+					if (jikiStandChip[0] >= 27 && jikiStandChip[0] < 40) {
+						if (checkAround[0] < 27 || checkAround[0] >= 40) {
+							if (checkAround[0] >= 0) {
+								canMoveRight = false;
+							}
+						}
+						if (checkAround[1] < 27 || checkAround[1] >= 40) {
+							if (checkAround[1] >= 0) {
+								canMoveRight = false;
+							}
 						}
 					}
-				}
 
-				if (jikiStandChip[1] % 26 == 25) {
-					if (checkAround[0] <= 26 || checkAround[0] >= 40) {
-						if (checkAround[0] >= 0) {
-							canMoveRight = false;
+					if (jikiStandChip[1] % 26 == 25) {
+						if (checkAround[0] <= 26 || checkAround[0] >= 40) {
+							if (checkAround[0] >= 0) {
+								canMoveRight = false;
+							}
+							else {
+								canMoveRight = true;
+							}
 						}
 						else {
 							canMoveRight = true;
 						}
 					}
-					else {
-						canMoveRight = true;
-					}
-				}
 
-				if (checkAround[1] % 26 == 25 || jikiStandChip[1] % 26 == 25) {
-					if (jikiStandChip[0] >= 27 && jikiStandChip[0] < 40) {
-						if (checkAround[0] >= 27 && checkAround[0] < 40) {
+					if (checkAround[1] % 26 == 25 || jikiStandChip[1] % 26 == 25) {
+						if (jikiStandChip[0] >= 27 && jikiStandChip[0] < 40) {
+							if (checkAround[0] >= 27 && checkAround[0] < 40) {
 
-							canMoveRight = true;
+								canMoveRight = true;
+							}
 						}
 					}
+
+					if (8 <= checkAround[2] && checkAround[2] <= 10) {
+						if (csQuestBase.bossLive[checkAround[2] - 8] == true) {
+							canMoveRight = false;
+						}
+					}
+
 				}
 
-				if (8 <= checkAround[2] && checkAround[2] <= 10) {
-					if (csQuestBase.bossLive[checkAround[2] - 8] == true) {
-						canMoveRight = false;
-					}
-				}
+				if (jikiMapY + 1 < mapHeight) {
+					checkAround[0] = QuestMap.Get(QuestMap.layer.C, jikiMapX, jikiMapY + 1) - 1;
+					checkAround[1] = QuestMap.Get(QuestMap.layer.B, jikiMapX, jikiMapY + 1) - 1;
+					checkAround[2] = QuestMap.Get(QuestMap.layer.A, jikiMapX, jikiMapY + 1) - 1;
 
-			}
-
-			if (jikiMapY + 1 < mapHeight) {
-				checkAround[0] = QuestMap.Get(QuestMap.layer.C, jikiMapX, jikiMapY + 1) - 1;
-				checkAround[1] = QuestMap.Get(QuestMap.layer.B, jikiMapX, jikiMapY + 1) - 1;
-				checkAround[2] = QuestMap.Get(QuestMap.layer.A, jikiMapX, jikiMapY + 1) - 1;
-
-				if (jikiStandChip[0] < 26 || jikiStandChip[0] % 26 >= 20) {
-					if (checkAround[0] >= 26 && checkAround[0] % 26 < 20) {
-						canMoveDown = false;
-					}
-					if (checkAround[1] >= 26 && checkAround[1] % 26 < 20) {
-						canMoveDown = false;
-					}
-				}
-				if (jikiStandChip[1] < 26 || jikiStandChip[1] % 26 >= 20) {
-					if (jikiStandChip[1] >= 0) {
+					if (jikiStandChip[0] < 26 || jikiStandChip[0] % 26 >= 20) {
 						if (checkAround[0] >= 26 && checkAround[0] % 26 < 20) {
 							canMoveDown = false;
 						}
@@ -723,411 +726,429 @@ void CSQuestBase::CSMap::Loop()
 							canMoveDown = false;
 						}
 					}
-				}
-
-				if (jikiStandChip[0] >= 27 && jikiStandChip[0] < 40) {
-					if (checkAround[0] < 27 || checkAround[0] >= 40) {
-						if (checkAround[0] >= 0) {
-							canMoveDown = false;
+					if (jikiStandChip[1] < 26 || jikiStandChip[1] % 26 >= 20) {
+						if (jikiStandChip[1] >= 0) {
+							if (checkAround[0] >= 26 && checkAround[0] % 26 < 20) {
+								canMoveDown = false;
+							}
+							if (checkAround[1] >= 26 && checkAround[1] % 26 < 20) {
+								canMoveDown = false;
+							}
 						}
 					}
-					if (checkAround[1] < 27 || checkAround[1] >= 40) {
-						if (checkAround[1] >= 0) {
-							canMoveDown = false;
+
+					if (jikiStandChip[0] >= 27 && jikiStandChip[0] < 40) {
+						if (checkAround[0] < 27 || checkAround[0] >= 40) {
+							if (checkAround[0] >= 0) {
+								canMoveDown = false;
+							}
+						}
+						if (checkAround[1] < 27 || checkAround[1] >= 40) {
+							if (checkAround[1] >= 0) {
+								canMoveDown = false;
+							}
 						}
 					}
-				}
 
-				if (jikiStandChip[1] % 26 == 25) {
-					if (checkAround[0] == 26 || checkAround[0] >= 40) {
-						if (checkAround[0] % 26 < 20) {
-							canMoveDown = false;
+					if (jikiStandChip[1] % 26 == 25) {
+						if (checkAround[0] == 26 || checkAround[0] >= 40) {
+							if (checkAround[0] % 26 < 20) {
+								canMoveDown = false;
+							}
+							else {
+								canMoveDown = true;
+							}
 						}
 						else {
 							canMoveDown = true;
 						}
 					}
-					else {
+
+					if (checkAround[1] % 26 == 25) {
 						canMoveDown = true;
 					}
+
+					if (8 <= checkAround[2] && checkAround[2] <= 10) {
+						if (csQuestBase.bossLive[checkAround[2] - 8] == true) {
+							canMoveDown = false;
+						}
+					}
+
 				}
 
-				if (checkAround[1] % 26 == 25) {
-					canMoveDown = true;
-				}
-
-				if (8 <= checkAround[2] && checkAround[2] <= 10) {
-					if (csQuestBase.bossLive[checkAround[2] - 8] == true) {
-						canMoveDown = false;
-					}
-				}
-
-			}
-
-			if (Input.GetKeyDown(Input.key.DOWN)) {
-				HitKeyNum++;
-			}
-			if (Input.GetKeyDown(Input.key.LEFT)) {
-				HitKeyNum++;
-			}
-			if (Input.GetKeyDown(Input.key.RIGHT)) {
-				HitKeyNum++;
-			}
-			if (Input.GetKeyDown(Input.key.UP)) {
-				HitKeyNum++;
-			}
-
-			if (Input.GetKeyDown(Input.key.DOWN) && moveF == false && canMoveDown == true) {
-				if (HitKeyNum <= 1 || moveDirect != 0) {
-					moveF = true;
-					moveDirect = 0;
-					graphDirect = 0;
-				}
-			}
-			if (Input.GetKeyDown(Input.key.LEFT) && moveF == false && canMoveLeft == true) {
-				if (HitKeyNum <= 1 || moveDirect != 1) {
-					moveF = true;
-					moveDirect = 1;
-					graphDirect = 1;
-				}
-			}
-			if (Input.GetKeyDown(Input.key.RIGHT) && moveF == false && canMoveRight == true) {
-				if (HitKeyNum <= 1 || moveDirect != 2) {
-					moveF = true;
-					moveDirect = 2;
-					graphDirect = 2;
-				}
-			}
-			if (Input.GetKeyDown(Input.key.UP) && moveF == false && canMoveUp == true) {
-				if (HitKeyNum <= 1 || moveDirect != 3) {
-					moveF = true;
-					moveDirect = 3;
-					graphDirect = 3;
-				}
-			}
-
-			if (moveF == true) {
-				switch (moveDirect) {
-				case 0:
-					if (jikiY == 320 && mapHeight > jikiMapY + 8) {
-						scrollY += walkSpeed;
-
-					}
-					else {
-						jikiY += walkSpeed;
-					}
-					break;
-				case 1:
-					if (jikiX == 352 && scrollX > 0) {
-						scrollX -= walkSpeed;
-
-					}
-					else {
-						jikiX -= walkSpeed;
-					}
-					break;
-				case 2:
-					if (jikiX == 352 && mapWidth > jikiMapX + 11) {
-						scrollX += walkSpeed;
-
-					}
-					else {
-						jikiX += walkSpeed;
-					}
-					break;
-				case 3:
-					if (jikiY == 320 && scrollY > 0) {
-						scrollY -= walkSpeed;
-
-					}
-					else {
-						jikiY -= walkSpeed;
-					}
-					break;
-
-
-				default:break;
-				}
-			}
-			if (moveF == false) {
-				moveDirect = 4;
 				if (Input.GetKeyDown(Input.key.DOWN)) {
-					graphDirect = 0;
-					moveDirect = 0;
+					HitKeyNum++;
 				}
 				if (Input.GetKeyDown(Input.key.LEFT)) {
-					graphDirect = 1;
-					moveDirect = 1;
+					HitKeyNum++;
 				}
 				if (Input.GetKeyDown(Input.key.RIGHT)) {
-					graphDirect = 2;
-					moveDirect = 2;
+					HitKeyNum++;
 				}
 				if (Input.GetKeyDown(Input.key.UP)) {
-					graphDirect = 3;
-					moveDirect = 3;
+					HitKeyNum++;
 				}
-			}
 
-			if ((jikiX + scrollX) % 32 == 0 && (jikiY + scrollY) % 32 == 0) {
+				if (Input.GetKeyDown(Input.key.DOWN) && moveF == false && canMoveDown == true) {
+					if (HitKeyNum <= 1 || moveDirect != 0) {
+						moveF = true;
+						moveDirect = 0;
+						graphDirect = 0;
+					}
+				}
+				if (Input.GetKeyDown(Input.key.LEFT) && moveF == false && canMoveLeft == true) {
+					if (HitKeyNum <= 1 || moveDirect != 1) {
+						moveF = true;
+						moveDirect = 1;
+						graphDirect = 1;
+					}
+				}
+				if (Input.GetKeyDown(Input.key.RIGHT) && moveF == false && canMoveRight == true) {
+					if (HitKeyNum <= 1 || moveDirect != 2) {
+						moveF = true;
+						moveDirect = 2;
+						graphDirect = 2;
+					}
+				}
+				if (Input.GetKeyDown(Input.key.UP) && moveF == false && canMoveUp == true) {
+					if (HitKeyNum <= 1 || moveDirect != 3) {
+						moveF = true;
+						moveDirect = 3;
+						graphDirect = 3;
+					}
+				}
+
 				if (moveF == true) {
-					appearEN++;
-					if (appearEN/2 >= GetRand(80) + 12) {
-						csQuestBase.mode[0] = 1;
-						csQuestBase.mode[1] = 0;
-						csQuestBase.RemoveScene(Flip::DOOR_COME_VERTICAL, 4);
-					}
-				}
-				moveF = false;
-				graphStep = 1;
-			}
+					switch (moveDirect) {
+					case 0:
+						if (jikiY >= 320 && mapHeight > jikiMapY + 8) {
+							scrollY += walkSpeed;
 
-			if ((jikiX + scrollX) % 32 == 16 || (jikiY + scrollY) % 32 == 16) {
-				if (animeF == true) {
-					graphStep = 0;
-					animeF = false;
-				}
-				else {
-					graphStep = 2;
-					animeF = true;
-				}
-			}
-
-
-			if (graphDirect == 3 && KeyOK() && jikiX%32==0 && jikiY%32==0) {
-
-				checkAround[0] = QuestMap.Get(QuestMap.layer.C, jikiMapX, jikiMapY - 1) - 1;
-				checkAround[1] = QuestMap.Get(QuestMap.layer.B, jikiMapX, jikiMapY - 1) - 1;
-				checkAround[2] = QuestMap.Get(QuestMap.layer.A, jikiMapX, jikiMapY - 1) - 1;
-				
-				switch (checkAround[1]) {
-				case 62:
-					if (csQuestBase.takara[0] == true) {
-						csQuestBase.takara[0] = false;
-						if (GetRand(19) < 12) {
-							takaraGet(0);
-						}
-						else if (GetRand(19) < 17 ) {
-							takaraGet(1);
 						}
 						else {
-							takaraGet(2);
+							jikiY += walkSpeed;
 						}
+						break;
+					case 1:
+						if (jikiX <= 352 && scrollX > 0) {
+							scrollX -= walkSpeed;
 
-					}
-					break;
-				case 63:
-					if (csQuestBase.takara[1] == true) {
-						csQuestBase.takara[1] = false;
-						if (GetRand(19) < 12) {
-
-							takaraGet(1);
-						}
-						else if (GetRand(19) < 17) {
-
-							takaraGet(2);
 						}
 						else {
-							takaraGet(3);
+							jikiX -= walkSpeed;
 						}
+						break;
+					case 2:
+						if (jikiX >= 352 && mapWidth > jikiMapX + 11) {
+							scrollX += walkSpeed;
 
-					}
-					break;
-				case 64:
-					if (csQuestBase.takara[2] == true) {
-						csQuestBase.takara[2] = false;
-						if (GetRand(19) < 12) {
-							takaraGet(2);
-						}
-						else if (GetRand(19) < 17) {
-							takaraGet(3);
 						}
 						else {
-							takaraGet(4);
+							jikiX += walkSpeed;
 						}
+						break;
+					case 3:
+						if (jikiY <= 320 && scrollY > 0) {
+							scrollY -= walkSpeed;
 
-					}
-					break;
-				}
-	
-				if (8 <= checkAround[2] && checkAround[2] <= 10) {
-					if (csQuestBase.bossLive[checkAround[2] - 8] == true) {
-						csQuestBase.bossN = checkAround[2] - 7;
-						csQuestBase.mode[0] = 1;
-						csQuestBase.mode[1] = 1;
-						csQuestBase.RemoveScene(Flip::DOOR_COME_HORIZONTAL, 4);
+						}
+						else {
+							jikiY -= walkSpeed;
+						}
+						break;
+
+
+					default:break;
 					}
 				}
-
-			}
-
-			if (graphDirect == 2 && KeyOK() && jikiX % 32 == 0 && jikiY % 32 == 0) {
-				checkAround[0] = QuestMap.Get(QuestMap.layer.C, jikiMapX + 1, jikiMapY) - 1;
-				checkAround[1] = QuestMap.Get(QuestMap.layer.B, jikiMapX + 1, jikiMapY) - 1;
-				checkAround[2] = QuestMap.Get(QuestMap.layer.A, jikiMapX + 1, jikiMapY) - 1;
-
-				if (checkAround[0] == 142 || checkAround[1] == 142) {
-				}
-				switch (checkAround[1]) {
-				case 62:
-					if (csQuestBase.takara[0] == true) {
-						csQuestBase.takara[0] = false;
-						if (GetRand(19) < 12) {
-							takaraGet(0);
-						}
-						else if (GetRand(19) < 17) {
-							takaraGet(1);
-						}
-						else {
-							takaraGet(2);
-						}
-
+				if (moveF == false) {
+					moveDirect = 4;
+					if (Input.GetKeyDown(Input.key.DOWN)) {
+						graphDirect = 0;
+						moveDirect = 0;
 					}
-					break;
-				case 63:
-					if (csQuestBase.takara[1] == true) {
-						csQuestBase.takara[1] = false;
-						if (GetRand(19) < 12) {
-
-							takaraGet(1);
-						}
-						else if (GetRand(19) < 17) {
-
-							takaraGet(2);
-						}
-						else {
-							takaraGet(3);
-						}
-
+					if (Input.GetKeyDown(Input.key.LEFT)) {
+						graphDirect = 1;
+						moveDirect = 1;
 					}
-					break;
-				case 64:
-					if (csQuestBase.takara[2] == true) {
-						csQuestBase.takara[2] = false;
-						if (GetRand(19) < 12) {
-							takaraGet(2);
-						}
-						else if (GetRand(19) < 17) {
-							takaraGet(3);
-						}
-						else {
-							takaraGet(4);
-						}
-
+					if (Input.GetKeyDown(Input.key.RIGHT)) {
+						graphDirect = 2;
+						moveDirect = 2;
 					}
-					break;
-				}
-
-				if (8 <= checkAround[2] && checkAround[2] <= 10) {
-					if (csQuestBase.bossLive[checkAround[2] - 8] == true) {
-						csQuestBase.bossN = checkAround[2] - 7;
-						csQuestBase.mode[0] = 1;
-						csQuestBase.mode[1] = 1;
-						csQuestBase.RemoveScene(Flip::DOOR_COME_HORIZONTAL, 4);
+					if (Input.GetKeyDown(Input.key.UP)) {
+						graphDirect = 3;
+						moveDirect = 3;
 					}
 				}
 
-			}
-
-			if (graphDirect == 1 && KeyOK() && jikiX % 32 == 0 && jikiY % 32 == 0) {
-				checkAround[0] = QuestMap.Get(QuestMap.layer.C, jikiMapX - 1, jikiMapY) - 1;
-				checkAround[1] = QuestMap.Get(QuestMap.layer.B, jikiMapX - 1, jikiMapY) - 1;
-				checkAround[2] = QuestMap.Get(QuestMap.layer.A, jikiMapX - 1, jikiMapY) - 1;
-				switch (checkAround[1]) {
-				case 62:
-					if (csQuestBase.takara[0] == true) {
-						csQuestBase.takara[0] = false;
-						if (GetRand(19) < 12) {
-							takaraGet(0);
+				if ((jikiX + scrollX) % 32 == 0 && (jikiY + scrollY) % 32 == 0) {
+					if (moveF == true) {
+						appearEN++;
+						if (appearEN / 2 >= GetRand(80) + 12) {
+							csQuestBase.mode[0] = 1;
+							csQuestBase.mode[1] = 0;
+							endS = true;
+							csQuestBase.RemoveScene(Flip::DOOR_COME_VERTICAL, 4);
 						}
-						else if (GetRand(19) < 17) {
-							takaraGet(1);
-						}
-						else {
-							takaraGet(2);
-						}
-
 					}
-					break;
-				case 63:
-					if (csQuestBase.takara[1] == true) {
-						csQuestBase.takara[1] = false;
-						if (GetRand(19) < 12) {
-
-							takaraGet(1);
-						}
-						else if (GetRand(19) < 17) {
-
-							takaraGet(2);
-						}
-						else {
-							takaraGet(3);
-						}
-
-					}
-					break;
-				case 64:
-					if (csQuestBase.takara[2] == true) {
-						csQuestBase.takara[2] = false;
-						if (GetRand(19) < 12) {
-							takaraGet(2);
-						}
-						else if (GetRand(19) < 17) {
-							takaraGet(3);
-						}
-						else {
-							takaraGet(4);
-						}
-
-					}
-					break;
+					moveF = false;
+					graphStep = 1;
 				}
 
-				if (8 <= checkAround[2] && checkAround[2] <= 10) {
-					if (csQuestBase.bossLive[checkAround[2] - 8] == true) {
-						csQuestBase.bossN = checkAround[2] - 7;
-						csQuestBase.mode[0] = 1;
-						csQuestBase.mode[1] = 1;
-						csQuestBase.RemoveScene(Flip::DOOR_COME_HORIZONTAL, 4);
+				if ((jikiX + scrollX) % 32 == 16 || (jikiY + scrollY) % 32 == 16) {
+					if (animeF == true) {
+						graphStep = 0;
+						animeF = false;
+					}
+					else {
+						graphStep = 2;
+						animeF = true;
 					}
 				}
 
-			}
 
-			if (graphDirect == 0 && KeyOK() && jikiX % 32 == 0 && jikiY % 32 == 0) {
-				checkAround[0] = QuestMap.Get(QuestMap.layer.C, jikiMapX , jikiMapY + 1 ) - 1;
-				checkAround[1] = QuestMap.Get(QuestMap.layer.B, jikiMapX , jikiMapY + 1 ) - 1;
-				checkAround[2] = QuestMap.Get(QuestMap.layer.A, jikiMapX , jikiMapY + 1) - 1;
+				if (graphDirect == 3 && KeyOK() && jikiX % 32 == 0 && jikiY % 32 == 0) {
 
-				if (8 <= checkAround[2] && checkAround[2] <= 10) {
-					if (csQuestBase.bossLive[checkAround[2] - 8] == true) {
-						csQuestBase.bossN = checkAround[2] - 7;
-						csQuestBase.mode[0] = 1;
-						csQuestBase.mode[1] = 1;
-						csQuestBase.RemoveScene(Flip::DOOR_COME_HORIZONTAL, 4);
+					checkAround[0] = QuestMap.Get(QuestMap.layer.C, jikiMapX, jikiMapY - 1) - 1;
+					checkAround[1] = QuestMap.Get(QuestMap.layer.B, jikiMapX, jikiMapY - 1) - 1;
+					checkAround[2] = QuestMap.Get(QuestMap.layer.A, jikiMapX, jikiMapY - 1) - 1;
+
+					switch (checkAround[1]) {
+					case 62:
+						if (csQuestBase.takara[0] == true) {
+							csQuestBase.takara[0] = false;
+							if (GetRand(19) < 12) {
+								takaraGet(0);
+							}
+							else if (GetRand(19) < 17) {
+								takaraGet(1);
+							}
+							else {
+								takaraGet(2);
+							}
+
+						}
+						break;
+					case 63:
+						if (csQuestBase.takara[1] == true) {
+							csQuestBase.takara[1] = false;
+							if (GetRand(19) < 12) {
+
+								takaraGet(1);
+							}
+							else if (GetRand(19) < 17) {
+
+								takaraGet(2);
+							}
+							else {
+								takaraGet(3);
+							}
+
+						}
+						break;
+					case 64:
+						if (csQuestBase.takara[2] == true) {
+							csQuestBase.takara[2] = false;
+							if (GetRand(19) < 12) {
+								takaraGet(2);
+							}
+							else if (GetRand(19) < 17) {
+								takaraGet(3);
+							}
+							else {
+								takaraGet(4);
+							}
+
+						}
+						break;
 					}
+
+					if (8 <= checkAround[2] && checkAround[2] <= 10) {
+						if (csQuestBase.bossLive[checkAround[2] - 8] == true) {
+							csQuestBase.bossN = checkAround[2] - 7;
+							csQuestBase.mode[0] = 1;
+							csQuestBase.mode[1] = 1;
+							endS = true;
+							csQuestBase.RemoveScene(Flip::DOOR_COME_HORIZONTAL, 4);
+						}
+					}
+
 				}
 
+				if (graphDirect == 2 && KeyOK() && jikiX % 32 == 0 && jikiY % 32 == 0) {
+					checkAround[0] = QuestMap.Get(QuestMap.layer.C, jikiMapX + 1, jikiMapY) - 1;
+					checkAround[1] = QuestMap.Get(QuestMap.layer.B, jikiMapX + 1, jikiMapY) - 1;
+					checkAround[2] = QuestMap.Get(QuestMap.layer.A, jikiMapX + 1, jikiMapY) - 1;
+
+					if (checkAround[0] == 142 || checkAround[1] == 142) {
+					}
+					switch (checkAround[1]) {
+					case 62:
+						if (csQuestBase.takara[0] == true) {
+							csQuestBase.takara[0] = false;
+							if (GetRand(19) < 12) {
+								takaraGet(0);
+							}
+							else if (GetRand(19) < 17) {
+								takaraGet(1);
+							}
+							else {
+								takaraGet(2);
+							}
+
+						}
+						break;
+					case 63:
+						if (csQuestBase.takara[1] == true) {
+							csQuestBase.takara[1] = false;
+							if (GetRand(19) < 12) {
+
+								takaraGet(1);
+							}
+							else if (GetRand(19) < 17) {
+
+								takaraGet(2);
+							}
+							else {
+								takaraGet(3);
+							}
+
+						}
+						break;
+					case 64:
+						if (csQuestBase.takara[2] == true) {
+							csQuestBase.takara[2] = false;
+							if (GetRand(19) < 12) {
+								takaraGet(2);
+							}
+							else if (GetRand(19) < 17) {
+								takaraGet(3);
+							}
+							else {
+								takaraGet(4);
+							}
+
+						}
+						break;
+					}
+
+					if (8 <= checkAround[2] && checkAround[2] <= 10) {
+						if (csQuestBase.bossLive[checkAround[2] - 8] == true) {
+							csQuestBase.bossN = checkAround[2] - 7;
+							csQuestBase.mode[0] = 1;
+							csQuestBase.mode[1] = 1;
+							endS = true;
+							csQuestBase.RemoveScene(Flip::DOOR_COME_HORIZONTAL, 4);
+						}
+					}
+
+				}
+
+				if (graphDirect == 1 && KeyOK() && jikiX % 32 == 0 && jikiY % 32 == 0) {
+					checkAround[0] = QuestMap.Get(QuestMap.layer.C, jikiMapX - 1, jikiMapY) - 1;
+					checkAround[1] = QuestMap.Get(QuestMap.layer.B, jikiMapX - 1, jikiMapY) - 1;
+					checkAround[2] = QuestMap.Get(QuestMap.layer.A, jikiMapX - 1, jikiMapY) - 1;
+					switch (checkAround[1]) {
+					case 62:
+						if (csQuestBase.takara[0] == true) {
+							csQuestBase.takara[0] = false;
+							if (GetRand(19) < 12) {
+								takaraGet(0);
+							}
+							else if (GetRand(19) < 17) {
+								takaraGet(1);
+							}
+							else {
+								takaraGet(2);
+							}
+
+						}
+						break;
+					case 63:
+						if (csQuestBase.takara[1] == true) {
+							csQuestBase.takara[1] = false;
+							if (GetRand(19) < 12) {
+
+								takaraGet(1);
+							}
+							else if (GetRand(19) < 17) {
+
+								takaraGet(2);
+							}
+							else {
+								takaraGet(3);
+							}
+
+						}
+						break;
+					case 64:
+						if (csQuestBase.takara[2] == true) {
+							csQuestBase.takara[2] = false;
+							if (GetRand(19) < 12) {
+								takaraGet(2);
+							}
+							else if (GetRand(19) < 17) {
+								takaraGet(3);
+							}
+							else {
+								takaraGet(4);
+							}
+
+						}
+						break;
+					}
+
+					if (8 <= checkAround[2] && checkAround[2] <= 10) {
+						if (csQuestBase.bossLive[checkAround[2] - 8] == true) {
+							csQuestBase.bossN = checkAround[2] - 7;
+							csQuestBase.mode[0] = 1;
+							csQuestBase.mode[1] = 1;
+							endS = true;
+							csQuestBase.RemoveScene(Flip::DOOR_COME_HORIZONTAL, 4);
+						}
+					}
+
+				}
+
+				if (graphDirect == 0 && KeyOK() && jikiX % 32 == 0 && jikiY % 32 == 0) {
+					checkAround[0] = QuestMap.Get(QuestMap.layer.C, jikiMapX, jikiMapY + 1) - 1;
+					checkAround[1] = QuestMap.Get(QuestMap.layer.B, jikiMapX, jikiMapY + 1) - 1;
+					checkAround[2] = QuestMap.Get(QuestMap.layer.A, jikiMapX, jikiMapY + 1) - 1;
+
+					if (8 <= checkAround[2] && checkAround[2] <= 10) {
+						if (csQuestBase.bossLive[checkAround[2] - 8] == true) {
+							csQuestBase.bossN = checkAround[2] - 7;
+							csQuestBase.mode[0] = 1;
+							csQuestBase.mode[1] = 1;
+							endS = true;
+							csQuestBase.RemoveScene(Flip::DOOR_COME_HORIZONTAL, 4);
+						}
+					}
+
+
+				}
 
 			}
 
 		}
+		else {
+			csQuestBase.textWindow->Loop();
+		}
 
+
+
+
+
+		jikiMapX = (jikiX + scrollX) / 32;
+		jikiMapY = (jikiY + scrollY) / 32;
 	}
-	else {
-		csQuestBase.textWindow->Loop();
-	}
 
-	
-
-	
-
-	jikiMapX = (jikiX + scrollX) / 32;
-	jikiMapY = (jikiY + scrollY) / 32;
 }
 
 void CSQuestBase::CSMap::Draw()
 {
+
+
 	int drawMapLeft = jikiMapX - (jikiX / 32) - 1;
 	int drawMapUp = jikiMapY - (jikiY / 32) - 1;
 	int drawMapRight = drawMapLeft + 1 + 22 + 1;
@@ -1176,13 +1197,13 @@ void CSQuestBase::CSMap::Draw()
 		}
 	}
 
-
-	if (csQuestBase.textWindow->GetTextEmpty() == false || csQuestBase.textWindow->GetWaitTextEmpty() == false) {
-		csQuestBase.textWindow->Draw();
+	if (endS == false) {
+		if (csQuestBase.textWindow->GetTextEmpty() == false || csQuestBase.textWindow->GetWaitTextEmpty() == false) {
+			csQuestBase.textWindow->Draw();
+		}
 	}
 
 	csQuestBase.jikiGraph[graphDirect * 3 + graphStep].Draw(jikiX, jikiY - 4);
-
 
 
 }
@@ -1195,6 +1216,7 @@ CSQuestBase::CSMap::CSMenueWindow::CSMenueWindow(CSMap & csmap) :csmap(csmap)
 	Window[0] = "zero/MenueWindow.png";
 	Window[1] = "zero/StatusWindow2.png";
 	Window[2] = "zero/TextWindow4.png";
+	Window[3] = "zero/ItemSelectWindow2.png";
 	yn = false;
 
 	arrowPoint = 0;
@@ -1274,6 +1296,32 @@ void CSQuestBase::CSMap::CSMenueWindow::Loop() {
 					if ((*csmap.csQuestBase.vItemSet)[arrowPoint2].skill.target[i] == 9) {
 						(*csmap.csQuestBase.vItemSet)[arrowPoint2].skill.target[i] = (*csmap.csQuestBase.vItemSet)[arrowPoint2].skill.target[0];
 					}
+
+					if ((*csmap.csQuestBase.vItemSet)[arrowPoint2].skill.target[i] == 6) {
+						switch ((*csmap.csQuestBase.vItemSet)[arrowPoint2].skill.classify[i])
+						{
+						case 6:
+							if ((*csmap.csQuestBase.vItemSet)[arrowPoint2].skill.content[i] == 0) {
+								csmap.appearEN = csmap.csQuestBase.startAppearEn = -5 - (*csmap.csQuestBase.vItemSet)[arrowPoint2].skill.power[i];
+								csmap.csQuestBase.textWindow->PushText("敵が出にくくなった。");
+							}
+							if ((*csmap.csQuestBase.vItemSet)[arrowPoint2].skill.content[i] == 1) {
+								csmap.csQuestBase.startAppearEn = -5 - (*csmap.csQuestBase.vItemSet)[arrowPoint2].skill.power[i];
+								csmap.csQuestBase.textWindow->PushText("このクエストの間、敵が出にくくなった。");
+							}
+							if ((*csmap.csQuestBase.vItemSet)[arrowPoint2].skill.content[i] == 2) {
+								csmap.appearEN = csmap.csQuestBase.startAppearEn = -5 + (*csmap.csQuestBase.vItemSet)[arrowPoint2].skill.power[i];
+								csmap.csQuestBase.textWindow->PushText("敵が出やすくなった。");
+							}
+							if ((*csmap.csQuestBase.vItemSet)[arrowPoint2].skill.content[i] == 3) {
+								csmap.csQuestBase.startAppearEn = -5 + (*csmap.csQuestBase.vItemSet)[arrowPoint2].skill.power[i];
+								csmap.csQuestBase.textWindow->PushText("このクエストの間、敵が出やすくなった。");
+							}
+							break;
+						default:
+							break;
+						}
+					}
 					
 					if ((*csmap.csQuestBase.vItemSet)[arrowPoint2].skill.target[i] == 3 || (*csmap.csQuestBase.vItemSet)[arrowPoint2].skill.target[i] == 7) {
 						switch ((*csmap.csQuestBase.vItemSet)[arrowPoint2].skill.classify[i])
@@ -1284,6 +1332,24 @@ void CSQuestBase::CSMap::CSMenueWindow::Loop() {
 						case 5:
 							if (3 <= (*csmap.csQuestBase.vItemSet)[arrowPoint2].skill.content[i] && (*csmap.csQuestBase.vItemSet)[arrowPoint2].skill.content[i] <= 6) {
 								csmap.csQuestBase.character[(*csmap.csQuestBase.vItemSet)[arrowPoint2].skill.targetNum]->Tokusyu(csmap.csQuestBase.character[0], &(*csmap.csQuestBase.vItemSet)[arrowPoint2].skill, i, csmap.csQuestBase.textWindow);
+							}
+							break;
+						case 6:
+							if ((*csmap.csQuestBase.vItemSet)[arrowPoint2].skill.content[i] == 0) {
+								csmap.appearEN= csmap.csQuestBase.startAppearEn = -5 - (*csmap.csQuestBase.vItemSet)[arrowPoint2].skill.power[i];
+								csmap.csQuestBase.textWindow->PushText("敵が出にくくなった。");
+							}
+							if ((*csmap.csQuestBase.vItemSet)[arrowPoint2].skill.content[i] == 1) {
+								csmap.csQuestBase.startAppearEn = -5 - (*csmap.csQuestBase.vItemSet)[arrowPoint2].skill.power[i];
+								csmap.csQuestBase.textWindow->PushText("このクエストの間、敵が出にくくなった。");
+							}
+							if ((*csmap.csQuestBase.vItemSet)[arrowPoint2].skill.content[i] == 2) {
+								csmap.appearEN = csmap.csQuestBase.startAppearEn = -5 + (*csmap.csQuestBase.vItemSet)[arrowPoint2].skill.power[i];
+								csmap.csQuestBase.textWindow->PushText("敵が出やすくなった。");
+							}
+							if ((*csmap.csQuestBase.vItemSet)[arrowPoint2].skill.content[i] == 3) {
+								csmap.csQuestBase.startAppearEn = -5 + (*csmap.csQuestBase.vItemSet)[arrowPoint2].skill.power[i];
+								csmap.csQuestBase.textWindow->PushText("このクエストの間、敵が出やすくなった。");
 							}
 							break;
 						default:
@@ -1300,6 +1366,24 @@ void CSQuestBase::CSMap::CSMenueWindow::Loop() {
 							case 5:
 								if (3 <= (*csmap.csQuestBase.vItemSet)[arrowPoint2].skill.content[i] && (*csmap.csQuestBase.vItemSet)[arrowPoint2].skill.content[i] <= 6) {
 									csmap.csQuestBase.character[k]->Tokusyu(csmap.csQuestBase.character[0], &(*csmap.csQuestBase.vItemSet)[arrowPoint2].skill, i, csmap.csQuestBase.textWindow);
+								}
+								break;
+							case 6:
+								if ((*csmap.csQuestBase.vItemSet)[arrowPoint2].skill.content[i] == 0) {
+									csmap.appearEN = csmap.csQuestBase.startAppearEn = -5 - (*csmap.csQuestBase.vItemSet)[arrowPoint2].skill.power[i];
+									csmap.csQuestBase.textWindow->PushText("敵が出にくくなった。");
+								}
+								if ((*csmap.csQuestBase.vItemSet)[arrowPoint2].skill.content[i] == 1) {
+									csmap.csQuestBase.startAppearEn = -5 - (*csmap.csQuestBase.vItemSet)[arrowPoint2].skill.power[i];
+									csmap.csQuestBase.textWindow->PushText("このクエストの間、敵が出にくくなった。");
+								}
+								if ((*csmap.csQuestBase.vItemSet)[arrowPoint2].skill.content[i] == 2) {
+									csmap.appearEN = csmap.csQuestBase.startAppearEn = -5 + (*csmap.csQuestBase.vItemSet)[arrowPoint2].skill.power[i];
+									csmap.csQuestBase.textWindow->PushText("敵が出やすくなった。");
+								}
+								if ((*csmap.csQuestBase.vItemSet)[arrowPoint2].skill.content[i] == 3) {
+									csmap.csQuestBase.startAppearEn = -5 + (*csmap.csQuestBase.vItemSet)[arrowPoint2].skill.power[i];
+									csmap.csQuestBase.textWindow->PushText("このクエストの間、敵が出やすくなった。");
 								}
 								break;
 							default:
@@ -1569,7 +1653,9 @@ void CSQuestBase::CSMap::CSMenueWindow::Draw() {
 	}
 	switch (step) {
 	case 0:
-
+		Window[3].DrawExtend(5, 480, 400, 560);
+		DrawFormatString(14, 500, BLACK, "クエスト名:%s",csmap.csQuestBase.vq->Qname.c_str());
+		DrawFormatString(14, 530, BLACK, "進行度:%d/%d", csmap.csQuestBase.bossWinNum,csmap.csQuestBase.vq->bossTimes);
 		break;
 	case 1:
 		Window[0].DrawExtend(425, 50, 538, 170);
@@ -1694,6 +1780,7 @@ CSQuestBase::CSBattle::CSBattle(CSQuestBase & csQuestBase ,bool boss ,int bossNu
 	int bufI = 0;
 	stringstream bufSS,bufSS2;
 	string bufS = "A";
+	endS = false;
 
 	for (int i = 0; i < 3; i++) {
 		csQuestBase.character[i]->Reset();
@@ -1818,11 +1905,16 @@ CSQuestBase::CSBattle::CSBattle(CSQuestBase & csQuestBase ,bool boss ,int bossNu
 	}
 
 	for (int i = 0; i < 3; i++) {
-		nigeru += csQuestBase.character[i]->Spd*120;
+		nigeru += csQuestBase.character[i]->Spd*100;
 		csQuestBase.character[i]->normalAtack.UseNum = i;
 		csQuestBase.character[i]->normalDefence.UseNum = i;
+		csQuestBase.character[i]->normalAtack.PMode = -1;
+		csQuestBase.character[i]->normalDefence.PMode = -1;
 		for (int j = 0; j < 10; j++) {
 			csQuestBase.character[i]->skill[j].UseNum = i;
+			if (i > 0) {
+				csQuestBase.character[i]->skill[j].PMode = -1;
+			}
 		}
 	}
 	bufI = 0;
@@ -1830,6 +1922,11 @@ CSQuestBase::CSBattle::CSBattle(CSQuestBase & csQuestBase ,bool boss ,int bossNu
 		bufI += enemy[i]->Spd;
 		for (int j = 0; j < 10; j++) {
 			enemy[i]->skill[j].UseNum = i;
+			enemy[i]->normalAtack.UseNum = i;
+			enemy[i]->normalDefence.UseNum = i;
+			enemy[i]->skill[j].PMode = -1;
+			enemy[i]->normalAtack.PMode = -1;
+			enemy[i]->normalDefence.PMode = -1;
 		}
 
 	}
@@ -1850,6 +1947,8 @@ CSQuestBase::CSBattle::CSBattle(CSQuestBase & csQuestBase ,bool boss ,int bossNu
 	dokuStep[0] = 0;
 	dokuStep[1] = 0;
 	lookItemPage = 0;
+	kabau[0] = -1;
+	kabau[1] = -1;
 
 	for (int i = 0; i < csQuestBase.vItemSet->size(); i++) {
 		(*csQuestBase.vItemSet)[i].turnUsed = false;
@@ -1860,13 +1959,26 @@ CSQuestBase::CSBattle::CSBattle(CSQuestBase & csQuestBase ,bool boss ,int bossNu
 		skillCard[i] = csQuestBase.character[0]->skill[GetRand(5)];
 		skillCard[i].Point = GetRand(9) + 1;
 		skillCard[i].cardNum = i;
+		skillCard[i].UseNum = 0;
+		skillCard[i].useChar = csQuestBase.character[0];
 		csQuestBase.character[0]->jikiSkillCard[i] = &skillCard[i];
 	}
 
 	csQuestBase.textWindow->PushText("戦闘開始");
 
 
-	Music.Load(1, "zero/Music/battle1.mp3");
+	if (boss == true) {
+		if (csQuestBase.vq->qLevel>=20) {
+			Music.Load(1, "zero/Music/boss3.mp3");
+		}
+		else {
+			Music.Load(1, "zero/Music/boss2.mp3");
+		}
+	}
+	else {
+		Music.Load(1, "zero/Music/battle1.mp3");
+	}
+
 
 	Music.PlayLoop(1);
 
@@ -1889,6 +2001,8 @@ CSQuestBase::CSBattle::~CSBattle()
 	for (int i = 0; i < 60; i++) {
 		Music.StopLoop(i);
 		SoundEffect.StopLoop(i);
+		Music.Delete(i);
+		SoundEffect.Delete(i);
 	}
 
 }
@@ -2035,6 +2149,12 @@ void CSQuestBase::CSBattle::charAct(bool jiki, Skill *bufSk ,char *death)
 
 					}
 
+					if (0 <= kabau[0] && kabau[0] < enAmount) {
+						if (enemy[kabau[0]]->live == true) {
+							bufSk->targetNum = kabau[0];
+						}
+					}
+
 					if (bufSk->targetNum < 0) {
 						bufSk->targetNum = 0;
 					}
@@ -2043,6 +2163,12 @@ void CSQuestBase::CSBattle::charAct(bool jiki, Skill *bufSk ,char *death)
 					break;
 				case 1:
 					bufSk->targetNum = zentaiStep;
+					if (0 <= kabau[0] && kabau[0] < enAmount) {
+						if (enemy[kabau[0]]->live == true) {
+							bufSk->targetNum = kabau[0];
+						}
+					}
+
 					if (bufSk->targetNum < 0) {
 						bufSk->targetNum = 0;
 					}
@@ -2073,6 +2199,12 @@ void CSQuestBase::CSBattle::charAct(bool jiki, Skill *bufSk ,char *death)
 
 						}
 
+					}
+
+					if (0 <= kabau[0] && kabau[0] < enAmount) {
+						if (enemy[kabau[0]]->live == true) {
+							bufSk->targetNum = kabau[0];
+						}
 					}
 
 					if (bufSk->targetNum < 0) {
@@ -2156,10 +2288,13 @@ void CSQuestBase::CSBattle::charAct(bool jiki, Skill *bufSk ,char *death)
 					if (bufSk->hajime) {
 						skTimes--;
 					}
+					
+					bufSk->targetNum = bufSk->UseNum;
+
 					if (bufSk->targetNum < 0) {
 						bufSk->targetNum = 0;
 					}
-					bufSk->targetNum = bufSk->UseNum;
+
 					csQuestBase.character[bufSk->targetNum]->skillHatudou(bufSk->useChar, bufSk, stepAct[1], csQuestBase.textWindow, &oneMore, &hazureta);
 						break;
 				case 7:
@@ -2252,6 +2387,14 @@ void CSQuestBase::CSBattle::charAct(bool jiki, Skill *bufSk ,char *death)
 							stepAct[1]++;
 							if (stepAct[1] >= bufSk->classifyNum) {
 								stepAct[1] = 0;
+
+								if (vSkill[stepAct[0]][0].useChar->yuusya==true) {
+									if (2 <= vSkill[stepAct[0]][0].PMode && vSkill[stepAct[0]][0].PMode <= 9) {
+										if (vSkill[stepAct[0]][0].Point > GetRand(9)) {
+											csQuestBase.character[0]->PStatusUp(vSkill[stepAct[0]][0].PMode, csQuestBase.textWindow);
+										}
+									}
+								}
 
 								if (vSkill[stepAct[0]][0].cardNum >= 0) {
 									csQuestBase.character[0]->SkillSpeadRand();
@@ -2355,6 +2498,14 @@ void CSQuestBase::CSBattle::charAct(bool jiki, Skill *bufSk ,char *death)
 									}
 								}
 
+								if (vSkill[stepAct[0]][0].useChar->yuusya == true) {
+									if (2 <= vSkill[stepAct[0]][0].PMode && vSkill[stepAct[0]][0].PMode <= 9) {
+										if (vSkill[stepAct[0]][0].Point > GetRand(9)) {
+											csQuestBase.character[0]->PStatusUp(vSkill[stepAct[0]][0].PMode, csQuestBase.textWindow);
+										}
+									}
+								}
+
 								vSkill[stepAct[0]].erase(vSkill[stepAct[0]].begin());
 								//preActNext = true;
 								actNext = false;
@@ -2438,6 +2589,12 @@ void CSQuestBase::CSBattle::charAct(bool jiki, Skill *bufSk ,char *death)
 
 					}
 
+					if (0 <= kabau[1] && kabau[1] < 3) {
+						if (csQuestBase.character[kabau[1]]->live == true) {
+							bufSk->targetNum = kabau[1];
+						}
+					}
+
 					if (bufSk->targetNum < 0) {
 						bufSk->targetNum = 0;
 					}
@@ -2446,6 +2603,13 @@ void CSQuestBase::CSBattle::charAct(bool jiki, Skill *bufSk ,char *death)
 					break;
 				case 1:
 					bufSk->targetNum = zentaiStep;
+
+					if (0 <= kabau[1] && kabau[1] < 3) {
+						if (csQuestBase.character[kabau[1]]->live == true) {
+							bufSk->targetNum = kabau[1];
+						}
+					}
+
 					if (bufSk->targetNum < 0) {
 						bufSk->targetNum = 0;
 					}
@@ -2473,6 +2637,12 @@ void CSQuestBase::CSBattle::charAct(bool jiki, Skill *bufSk ,char *death)
 							}
 						}
 
+					}
+
+					if (0 <= kabau[1] && kabau[1] < 3) {
+						if (csQuestBase.character[kabau[1]]->live == true) {
+							bufSk->targetNum = kabau[1];
+						}
 					}
 
 					if (bufSk->targetNum < 0) {
@@ -2827,7 +2997,8 @@ void CSQuestBase::CSBattle::Loop()
 	string bufS="";
 	Skill bufSkill;
 
-	if (battleStart) {
+
+	if (battleStart && endS==false) {
 
 		while (bufRepeat)
 		{
@@ -2839,6 +3010,7 @@ void CSQuestBase::CSBattle::Loop()
 				if (csQuestBase.textWindow->GetTextEmpty() && csQuestBase.textWindow->GetWaitTextEmpty()) {
 					csQuestBase.mode[0] = 2;
 					csQuestBase.mode[1] = 1;
+					endS = true;
 					csQuestBase.RemoveScene(Flip::DOOR_COME_HORIZONTAL, 4);
 				}
 				break;
@@ -3115,14 +3287,21 @@ void CSQuestBase::CSBattle::Loop()
 					}
 				}
 
+				if (csQuestBase.character[0]->Status[1] < skillCard[bArrow[3]].MP) {
+					DrawFormatString(480, 380, RED, "MPが足りません。");
+				}
+
 				if (KeyOK()) {
 					if (csQuestBase.character[0]->Status[1] >= skillCard[bArrow[3]].MP) {
 						preStep = 11;
-						delete csQuestBase.skillWindow;
+						
 						if (drawSkillWindow) {
+							delete csQuestBase.skillWindow;
 							csQuestBase.skillWindow = NULL;
-							targetSelectSkill = &(skillCard[bArrow[3]]);
+							
 						}
+						targetSelectSkill = &(skillCard[bArrow[3]]);
+
 
 						switch (skillCard[bArrow[3]].target[0]) {
 						case 0:step = 7; break;
@@ -3138,6 +3317,22 @@ void CSQuestBase::CSBattle::Loop()
 							}
 							else {
 								skillJunjo = 1;
+							}
+
+							if (skillCard[bArrow[3]].PMode == 11) {
+								if (skillCard[bArrow[3]].Point >= GetRand(9) + 1) {
+									skillJunjo = 0;
+								}
+							}
+
+							if (skillCard[bArrow[3]].PMode == 12 ) {
+								if (skillCard[bArrow[3]].Point >= GetRand(9) + 1) {
+									skillCard[bArrow[3]].times++;
+								}
+							}
+
+							if (skillCard[bArrow[3]].PMode == 1) {
+								skillCard[bArrow[3]].useChar->PDamageCut = skillCard[bArrow[3]].Point;
 							}
 
 							vSkill[skillJunjo].push_back(skillCard[bArrow[3]]);
@@ -3242,7 +3437,7 @@ void CSQuestBase::CSBattle::Loop()
 							csQuestBase.mode[0] = 0;
 							csQuestBase.mode[1] = 5;
 							csQuestBase.textWindow->PushText("残りのターゲットを討伐しよう！");
-							
+							endS = true;
 							csQuestBase.RemoveScene(Flip::DOOR_COME_VERTICAL, 4);
 						}
 
@@ -3255,7 +3450,7 @@ void CSQuestBase::CSBattle::Loop()
 						}
 						delete itemM;
 						itemM = NULL;
-
+						endS = true;
 						csQuestBase.RemoveScene(Flip::DOOR_COME_VERTICAL, 4);
 					}
 				
@@ -3287,6 +3482,22 @@ void CSQuestBase::CSBattle::Loop()
 					}
 					else {
 						skillJunjo = 1;
+					}
+
+					if (targetSelectSkill->PMode == 11 && targetSelectSkill->useChar->yuusya == true) {
+						if (targetSelectSkill->Point >= GetRand(9) + 1) {
+							skillJunjo = 0;
+						}
+					}
+
+					if (targetSelectSkill->PMode == 12 && targetSelectSkill->useChar->yuusya == true) {
+						if (targetSelectSkill->Point >= GetRand(9) + 1) {
+							targetSelectSkill->times++;
+						}
+					}
+
+					if (targetSelectSkill->PMode == 1 && targetSelectSkill->useChar->yuusya == true) {
+						targetSelectSkill->useChar->PDamageCut = targetSelectSkill->Point;
 					}
 
 					vSkill[skillJunjo].push_back(*targetSelectSkill);
@@ -3374,6 +3585,22 @@ void CSQuestBase::CSBattle::Loop()
 						skillJunjo = 1;
 					}
 
+					if (targetSelectSkill->PMode == 11 && targetSelectSkill->useChar->yuusya == true) {
+						if (targetSelectSkill->Point >= GetRand(9) + 1) {
+							skillJunjo = 0;
+						}
+					}
+
+					if (targetSelectSkill->PMode == 12 && targetSelectSkill->useChar->yuusya == true) {
+						if (targetSelectSkill->Point >= GetRand(9) + 1) {
+							targetSelectSkill->times++;
+						}
+					}
+
+					if (targetSelectSkill->PMode == 1 && targetSelectSkill->useChar->yuusya == true) {
+						targetSelectSkill->useChar->PDamageCut = targetSelectSkill->Point;
+					}
+
 					vSkill[skillJunjo].push_back(*targetSelectSkill);
 
 					bArrow[2] = 0;
@@ -3458,6 +3685,22 @@ void CSQuestBase::CSBattle::Loop()
 						skillJunjo = 1;
 					}
 
+					if (targetSelectSkill->PMode == 11 && targetSelectSkill->useChar->yuusya==true) {
+						if (targetSelectSkill->Point >= GetRand(9) + 1) {
+							skillJunjo = 0;
+						}
+					}
+
+					if (targetSelectSkill->PMode == 12 && targetSelectSkill->useChar->yuusya == true) {
+						if (targetSelectSkill->Point >= GetRand(9) + 1) {
+							targetSelectSkill->times++;
+						}
+					}
+
+					if (targetSelectSkill->PMode == 1 && targetSelectSkill->useChar->yuusya == true) {
+						targetSelectSkill->useChar->PDamageCut = targetSelectSkill->Point;
+					}
+
 					vSkill[skillJunjo].push_back(*targetSelectSkill);
 
 					bArrow[2] = 0;
@@ -3534,6 +3777,19 @@ void CSQuestBase::CSBattle::Loop()
 
 					}
 				}
+				
+				actNext = true;
+				skTimes = 0;
+				step = 1;
+				stepAct[0] = 0;
+				stepAct[1] = 0;
+
+				for (int i = 0; i < 3; i++)
+				{
+					sort(vSkill[i].begin(), vSkill[i].end());
+					reverse(vSkill[i].begin(), vSkill[i].end());
+				}
+
 				for (int i = 0; i < 3; i++)
 				{
 					for (int j = 0; j < vSkill[i].size(); j++) {
@@ -3551,6 +3807,19 @@ void CSQuestBase::CSBattle::Loop()
 									vSkill[i][j].useChar->damageCut[0] = vSkill[i][j].power[k];
 									vSkill[i][j].useChar->damageCut[1] = vSkill[i][j].power[k];
 									break;
+								case 11:
+									if (vSkill[i][j].ene == true) {
+										if (kabau[0] < 0) {
+											kabau[0] = vSkill[i][j].UseNum;
+										}
+									}
+									else {
+										if (kabau[1] < 0) {
+											kabau[1] = vSkill[i][j].UseNum;
+										}
+									}
+
+									break;
 								default:
 									break;
 								}
@@ -3558,17 +3827,7 @@ void CSQuestBase::CSBattle::Loop()
 						}
 					}
 				}
-				actNext = true;
-				skTimes = 0;
-				step = 1;
-				stepAct[0] = 0;
-				stepAct[1] = 0;
 
-				for (int i = 0; i < 3; i++)
-				{
-					sort(vSkill[i].begin(), vSkill[i].end());
-					reverse(vSkill[i].begin(), vSkill[i].end());
-				}
 				break;
 			case 5:
 
@@ -3912,6 +4171,7 @@ void CSQuestBase::CSBattle::Loop()
 				if (csQuestBase.textWindow->GetTextEmpty() && csQuestBase.textWindow->GetWaitTextEmpty()) {
 					csQuestBase.mode[0] = 2;
 					csQuestBase.mode[1] = 0;
+					endS = true;
 					csQuestBase.RemoveScene(Flip::FADE_OUT_IN, 3);
 				}
 				break;
@@ -4021,6 +4281,10 @@ void CSQuestBase::CSBattle::Loop()
 				break;
 			case 0:
 
+				kabau[0] = -1;
+				kabau[1] = -1;
+				csQuestBase.character[0]->PDamageCut = 0;
+
 				for (int i = 0; i < csQuestBase.vItemSet->size(); i++) {
 					(*csQuestBase.vItemSet)[i].turnUsed = false;
 				}
@@ -4032,6 +4296,7 @@ void CSQuestBase::CSBattle::Loop()
 					{
 						csQuestBase.mode[0] = 0;
 						csQuestBase.mode[1] = 5;
+						endS = true;
 						csQuestBase.RemoveScene(Flip::DOOR_COME_VERTICAL, 4);
 					}
 
@@ -4052,7 +4317,7 @@ void CSQuestBase::CSBattle::Loop()
 						}
 						else if (boss == false)
 						{
-							if (nigeru <= GetRand(255)) {
+							if (nigeru >= GetRand(255)) {
 								csQuestBase.textWindow->PushText("逃げようとしたが追い付かれた。");
 								for (int i = 0; i < enAmount; i++) {
 									if ( enemy[i]->bigBoss==true && boss == true) {
@@ -4137,7 +4402,7 @@ void CSQuestBase::CSBattle::Draw()
 
 	for (int i = 0; i < enAmount; i++) {
 		enemy[i]->Draw(285 + i * 140 - (enAmount / 2) * 140, 120, i % 2);
-	
+
 		enemy[i]->DrawDamageAndCure();
 	}
 
@@ -4146,16 +4411,15 @@ void CSQuestBase::CSBattle::Draw()
 		csQuestBase.character[i]->DrawDamageAndCure();
 	}
 
-	if (csQuestBase.textWindow->GetTextEmpty() == false || csQuestBase.textWindow->GetWaitTextEmpty() == false) {
-		csQuestBase.textWindow->Draw();
+
+	if (endS == false) {
+		if (csQuestBase.textWindow->GetTextEmpty() == false || csQuestBase.textWindow->GetWaitTextEmpty() == false) {
+			csQuestBase.textWindow->Draw();
+		}
 	}
 
-	if (csQuestBase.textWindow->GetTextEmpty()==false || csQuestBase.textWindow->GetWaitTextEmpty() == false)
-	{
-		csQuestBase.textWindow->Draw();
-	}
 
-	if ((3 <= step && step <= 5) || (7 <= step && step <= 9) || (11 <=step && step<=13)) {
+	if ((3 <= step && step <= 5) || (7 <= step && step <= 9) || (11 <= step && step <= 13)) {
 		bWindow[1].DrawExtend(5, 374, 120, 474);
 		DrawFormatString(30, 384, BLACK, "戦う");
 		DrawFormatString(30, 414, BLACK, "逃げる");
@@ -4180,7 +4444,7 @@ void CSQuestBase::CSBattle::Draw()
 				bArrowG2.Draw(285 + bArrow[2] * 140 - (enAmount / 2) * 140 + 53, 40, bArrow[2] % 2);
 			}
 			else {
-				bArrowG2.Draw(csQuestBase.character[bArrow[2]]->x+5, csQuestBase.character[bArrow[2]]->y - 18);
+				bArrowG2.Draw(csQuestBase.character[bArrow[2]]->x + 5, csQuestBase.character[bArrow[2]]->y - 18);
 			}
 
 
@@ -4255,7 +4519,7 @@ void CSQuestBase::CSBattle::Draw()
 
 			DrawFormatString(270, 425 + 5 * 20 + 10, BLACK, "※A又はスペースキーでスキル内容の表示、");
 			DrawFormatString(286, 425 + 6 * 20 + 10, BLACK, "非表示を切り替える。");
-			
+
 
 			if (drawSkillWindow == true) {
 				csQuestBase.haniwaSkillWindow->Draw(250);
@@ -4267,7 +4531,7 @@ void CSQuestBase::CSBattle::Draw()
 			DrawFormatString(256, 380, BLACK, "使用するアイテムを選ぼう！");
 
 			bWindow[3].DrawExtend(244, 420, 700, 574);
-			for (int i = 0; i < (lookItemPage+1)*5; i++) {
+			for (int i = 0; i < (lookItemPage + 1) * 5; i++) {
 				if (i >= csQuestBase.vItemSet->size()) {
 					break;
 				}
@@ -4278,21 +4542,21 @@ void CSQuestBase::CSBattle::Draw()
 				DrawFormatString(286, 425 + i * 18, BLACK, "%s", bufS.c_str());
 			}
 			bArrowG.Draw(250, 425 + bArrow[3] * 18);
-			DrawFormatString(270, 425 + 5 * 18 + 5, BLACK, "←%d/%d→",lookItemPage+1, (csQuestBase.vItemSet->size()/6) + 1);
+			DrawFormatString(270, 425 + 5 * 18 + 5, BLACK, "←%d/%d→", lookItemPage + 1, (csQuestBase.vItemSet->size() / 6) + 1);
 
-			DrawFormatString(270, 425 + 6 * 18 +8, BLACK, "※A又はスペースキーでスキル内容の表示、");
-			DrawFormatString(286, 425 + 7 * 18 +8, BLACK, "非表示を切り替える。");
+			DrawFormatString(270, 425 + 6 * 18 + 8, BLACK, "※A又はスペースキーでスキル内容の表示、");
+			DrawFormatString(286, 425 + 7 * 18 + 8, BLACK, "非表示を切り替える。");
 
 
 			if (drawSkillWindow == true) {
-				DrawItemSetumei(250,bArrow[3]);
+				DrawItemSetumei(250, bArrow[3]);
 			}
 
 		}
 
 	}
 
-	
+
 
 	if (csQuestBase.textWindow->GetTextEmpty() && csQuestBase.textWindow->GetWaitTextEmpty()) {
 		switch (step)
@@ -4317,7 +4581,7 @@ void CSQuestBase::CSBattle::Draw()
 		}
 		for (int i = 0; i < enAmount; i++) {
 			if (enemy[i]->live) {
-				enemy[i]->DrawStatusHenkaWindow(enemy[i]->x-4, enemy[i]->y);
+				enemy[i]->DrawStatusHenkaWindow(enemy[i]->x - 4, enemy[i]->y);
 			}
 		}
 
@@ -4325,10 +4589,9 @@ void CSQuestBase::CSBattle::Draw()
 
 	for (int i = 0; i < vSkill[1].size(); i++)
 	{
-		DrawFormatString(0, i*30, BLACK, "%d", vSkill[1][i].targetNum);
+		DrawFormatString(0, i * 30, BLACK, "%d", vSkill[1][i].targetNum);
 
 	}
-		
 
 }
 

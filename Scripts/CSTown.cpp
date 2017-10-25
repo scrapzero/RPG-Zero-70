@@ -12,6 +12,8 @@ CSTown::CSTown(int jikiMapX, int jikiMapY, int hatuSerihu) {
 	this->jikiMapY = jikiMapY;
 	txWindow = NULL;
 
+	stringstream bufSS;
+
 	switch (hatuSerihu)
 	{
 	case 0:
@@ -44,9 +46,19 @@ CSTown::CSTown(int jikiMapX, int jikiMapY, int hatuSerihu) {
 		break;
 	}
 
+
+	mySaveData = new CMySaveData(true);
+
+	if (mySaveData->Rank > 11) {
+		mySaveData->Rank = 11;
+	}
+
 	LoadDivGraph("zero/jiki.png", 12, 3, 4, 32, 32, jikiGraph);
-	LoadDivGraph("zero/MyMapChip2.png", 156, 26, 6, 32, 32, mapChip);
-	TownMap = "zero/MCE/Town.mce";
+	LoadDivGraph("zero/MyMapChip1.png", 156, 26, 6, 32, 32, mapChip);
+	bufSS << "zero/MCE/Town";
+	bufSS << mySaveData->Rank;
+	bufSS << ".mce";
+	TownMap =bufSS.str().c_str();
 	mapWidth = TownMap.GetWidth();
 	mapHeight = TownMap.GetHeight();
 
@@ -98,10 +110,9 @@ CSTown::CSTown(int jikiMapX, int jikiMapY, int hatuSerihu) {
 	canMoveLeft = false;
 	canMoveRight = false;
 	canMoveUp = false;
-	mySaveData = new CMySaveData(true);
 
 
-	Music.Load(0, "zero/Music/town2.mp3");
+	Music.Load(0, "zero/Music/town3.mp3");
 	Music.PlayLoop(0);
 }
 
@@ -110,6 +121,8 @@ CSTown::~CSTown()
 	for (int i = 0; i < 100;i++) {
 		Music.StopLoop(i);
 		SoundEffect.StopLoop(i);
+		Music.Delete(i);
+		SoundEffect.Delete(i);
 	}
 }
 
@@ -516,6 +529,13 @@ void CSTown::Loop() {
 				FlipScene(new CSHaniwa(*this), Flip::SLIDE_UP, 10);
 			}
 
+			if (checkAround[0] == 145 || checkAround[1] == 145) {
+				FlipScene(new CSHaniwaGacha(*this), Flip::SLIDE_UP, 10);
+			}
+			
+			if (checkAround[0] == 146 || checkAround[1] == 146) {
+				FlipScene(new CSBuyRecipe(*this), Flip::SLIDE_UP, 10);
+			}
 
 		}
 
@@ -552,6 +572,10 @@ void CSTown::Loop() {
 			delete txWindow;
 			txWindow = NULL;
 		}
+	}
+
+	if (Input.GetKeyEnter(Input.key.D)) {
+		mySaveData->money += 1000;
 	}
 
 }
@@ -940,6 +964,12 @@ void CSTown::CSItemSet::Loop()
 			itemManger->WindowLoop();
 			if (KeyOK()) {
 				cstown.mySaveData->SetItemSet(arrowPoint, arrowPoint2, arrowPoint3 + 1, itemManger->GetPointNum());
+				step = 5;
+				closeWindow = true;
+				delete itemManger;
+				itemManger = NULL;
+			}
+			else if (KeyCancel()) {
 				step = 5;
 				closeWindow = true;
 				delete itemManger;
@@ -1597,7 +1627,9 @@ CSTown::CSMenueWindow::CSMenueWindow(CSTown & cstown):cstown(cstown)
 	Window[2] = "zero/SellWindow.png";
 	Window[3] = "zero/StatusWindow.png";
 	Window[4] = "zero/WearCheckWindow.png";
+	Window[5] = "zero/MenueWindow.png";
 	yn = false;
+	exWindow = NULL;
 
 	arrowPoint = 0;
 	arrowPoint2 = 0;
@@ -1711,6 +1743,37 @@ void CSTown::CSMenueWindow::Loop()
 
 		switch (step)
 		{
+		case 7:
+			exWindow->Loop();
+			if (KeyCancel()) {
+				step = 6;
+				delete exWindow;
+				exWindow = NULL;
+			}
+			break;
+		case 6:
+			if (KeyUp() && arrowPoint2 > 0) {
+				arrowPoint2--;
+			}
+			if (KeyDown() && arrowPoint2 < 8) {
+				arrowPoint2++;
+			}
+
+			if (KeyOK()) {
+				if (arrowPoint2 == 8) {
+					step = 0;
+				}
+				else {
+					step = 7;
+					exWindow = new CExplainWindow(arrowPoint2);
+				}
+				
+			}
+
+			if (KeyCancel()) {
+				step = 0;
+			}
+			break;
 		case 5:
 			if (KeyUp() && arrowPoint3 > 0) {
 				if (0 <= arrowPoint3&&arrowPoint3 < 5) {
@@ -1810,17 +1873,20 @@ void CSTown::CSMenueWindow::Loop()
 			if (KeyUp() && arrowPoint > 0) {
 				arrowPoint--;
 			}
-			if (KeyDown() && arrowPoint < 3) {
+			if (KeyDown() && arrowPoint < 4) {
 				arrowPoint++;
 			}
 
 			if (KeyOK()) {
 				switch (arrowPoint)
 				{
-				case 3:
+				case 4:
 					cstown.RemoveScene(Flip::SLIDE_DOWN, 10);
 					break;
-
+				case 3:
+					step = 6;
+					arrowPoint2 = 0;
+					break;
 				case 2:
 					step = 5;
 					arrowPoint3 = 0;
@@ -1838,6 +1904,9 @@ void CSTown::CSMenueWindow::Loop()
 					break;
 				}
 
+			}
+			else if (KeyCancel()) {
+				cstown.RemoveScene(Flip::SLIDE_DOWN, 10);
 			}
 
 			break;
@@ -1861,19 +1930,41 @@ void CSTown::CSMenueWindow::Draw()
 	std::string bufS;
 	switch (step)
 	{
-	case 5:
-		Window[0].Draw(500, 10);
-		Arrow.Draw(510, 30 + arrowPoint * 38);
-		Window[4].Draw(315,90);
-		Arrow.Draw(355, 121 + arrowPoint3 * 40);
-		if (0 <= arrowPoint3&&arrowPoint3 < 5) {
-			equipWindow->Draw();
+	case 7:
+		if (exWindow != NULL) {
+			exWindow->Draw();
 		}
 
-		Window[3].DrawExtend(5, 5, 230, 370);
+		break;
+	case 6:
+		Window[5].DrawExtend(320, 10,490,300);
+		Arrow.Draw(330, 30 + arrowPoint2 * 25);
+		DrawFormatString(350, 30 + 0 * 25, BLACK, "基本の章");
+		DrawFormatString(350, 30 + 1 * 25, BLACK, "町の章");
+		DrawFormatString(350, 30 + 2 * 25, BLACK, "ハニワの章");
+		DrawFormatString(350, 30 + 3 * 25, BLACK, "装備の章");
+		DrawFormatString(350, 30 + 4 * 25, BLACK, "アイテムの章");
+		DrawFormatString(350, 30 + 5 * 25, BLACK, "スキルの章");
+		DrawFormatString(350, 30 + 6 * 25, BLACK, "クエストの章");
+		DrawFormatString(350, 30 + 7 * 25, BLACK, "戦闘の章");
+		DrawFormatString(350, 30 + 8 * 25, BLACK, "書を閉じる");
+
+
+	case 5:
+		Window[0].Draw(500, 10);
+		Arrow.Draw(510, 42 + arrowPoint * 35);
+		if (step == 5) {
+			Window[4].Draw(315, 90);
+			Arrow.Draw(355, 121 + arrowPoint3 * 40);
+			if (0 <= arrowPoint3&&arrowPoint3 < 5) {
+				equipWindow->Draw();
+			}
+		}
+
+		Window[3].DrawExtend(5, 5, 230, 375);
 		DrawFormatString(15, 10, BLACK, "ステータス");
 
-		for (int i = 0; i < 16; i++) {
+		for (int i = 0; i < 17; i++) {
 			switch (i)
 			{
 			case 0:	bufS = "HP"; break;
@@ -1892,11 +1983,15 @@ void CSTown::CSMenueWindow::Draw()
 			case 13:bufS = "光防"; break;
 			case 14:bufS = "闇防"; break;
 			case 15:bufS = "所持金"; break;
+			case 16:bufS = "ランク"; break;
 
 			default:
 				break;
 			}
-			if (i == 15) {
+			if (i == 16) {
+				DrawFormatString(15, 30 + 20 * i, BLACK, "%s;%d", bufS.c_str(), cstown.mySaveData->Rank);
+			}
+			else if (i == 15) {
 				DrawFormatString(15, 30 + 20 * i, BLACK, "%s;%d G", bufS.c_str(), Status[i]);
 			}
 			else {
@@ -1916,14 +2011,14 @@ void CSTown::CSMenueWindow::Draw()
 	case 3:
 
 		Window[0].Draw(500, 10);
-		Arrow.Draw(510, 30 + arrowPoint * 38);
+		Arrow.Draw(510, 42 + arrowPoint * 35);
 		Window[2].Draw(315, 60, false);
 		Arrow.Draw(325, 73 + arrowPoint2 * 26);
 
-		Window[3].DrawExtend(5, 5, 230, 370);
+		Window[3].DrawExtend(5, 5, 230, 375);
 		DrawFormatString(15, 10, BLACK, "ステータス");
 
-		for (int i = 0; i < 16; i++) {
+		for (int i = 0; i < 17; i++) {
 			switch (i)
 			{
 			case 0:	bufS = "HP"; break;
@@ -1942,11 +2037,15 @@ void CSTown::CSMenueWindow::Draw()
 			case 13:bufS = "光防"; break;
 			case 14:bufS = "闇防"; break;
 			case 15:bufS = "所持金"; break;
+			case 16:bufS = "ランク"; break;
 
 			default:
 				break;
 			}
-			if (i == 15) {
+			if (i == 16) {
+				DrawFormatString(15, 30 + 20 * i, BLACK, "%s;%d", bufS.c_str(), cstown.mySaveData->Rank);
+			}
+			else if (i == 15) {
 				DrawFormatString(15, 30 + 20 * i, BLACK, "%s;%d G", bufS.c_str(), Status[i]);
 			}
 			else {
@@ -1956,13 +2055,13 @@ void CSTown::CSMenueWindow::Draw()
 		break;
 	case 2:
 		Window[0].Draw(500, 10);
-		Arrow.Draw(510, 30 + arrowPoint * 38);
+		Arrow.Draw(510, 42 + arrowPoint * 35);
 		textWindow->Draw();
 
-		Window[3].DrawExtend(5, 5, 230, 370);
+		Window[3].DrawExtend(5, 5, 230, 375);
 		DrawFormatString(15, 10, BLACK, "ステータス");
 
-		for (int i = 0; i < 16; i++) {
+		for (int i = 0; i < 17; i++) {
 			switch (i)
 			{
 			case 0:	bufS = "HP"; break;
@@ -1981,11 +2080,15 @@ void CSTown::CSMenueWindow::Draw()
 			case 13:bufS = "光防"; break;
 			case 14:bufS = "闇防"; break;
 			case 15:bufS = "所持金"; break;
+			case 16:bufS = "ランク"; break;
 
 			default:
 				break;
 			}
-			if (i == 15) {
+			if (i == 16) {
+				DrawFormatString(15, 30 + 20 * i, BLACK, "%s;%d", bufS.c_str(), cstown.mySaveData->Rank);
+			}
+			else if (i == 15) {
 				DrawFormatString(15, 30 + 20 * i, BLACK, "%s;%d G", bufS.c_str(), Status[i]);
 			}
 			else {
@@ -1995,12 +2098,12 @@ void CSTown::CSMenueWindow::Draw()
 		break;
 	case 1:
 		Window[0].Draw(500, 10);
-		Arrow.Draw(510, 30 + arrowPoint * 38);
+		Arrow.Draw(510, 42 + arrowPoint * 35);
 		ynWindow->Draw();
 		Window[3].DrawExtend(5, 5, 230, 370);
 		DrawFormatString(15, 10, BLACK, "ステータス");
 
-		for (int i = 0; i < 16; i++) {
+		for (int i = 0; i < 17; i++) {
 			switch (i)
 			{
 			case 0:	bufS = "HP"; break;
@@ -2019,11 +2122,15 @@ void CSTown::CSMenueWindow::Draw()
 			case 13:bufS = "光防"; break;
 			case 14:bufS = "闇防"; break;
 			case 15:bufS = "所持金"; break;
+			case 16:bufS = "ランク"; break;
 
 			default:
 				break;
 			}
-			if (i == 15) {
+			if (i == 16) {
+				DrawFormatString(15, 30 + 20 * i, BLACK, "%s;%d", bufS.c_str(), cstown.mySaveData->Rank);
+			}
+			else if (i == 15) {
 				DrawFormatString(15, 30 + 20 * i, BLACK, "%s;%d G", bufS.c_str(), Status[i]);
 			}
 			else {
@@ -2036,14 +2143,14 @@ void CSTown::CSMenueWindow::Draw()
 
 	case 0:
 		Window[0].Draw(500, 10);
-		Arrow.Draw(510, 30 + arrowPoint * 38);
-		Window[3].DrawExtend(5,5,230,370);
+		Arrow.Draw(510, 42 + arrowPoint * 35);
+		Window[3].DrawExtend(5,5,230,375);
 		DrawFormatString(15,10,BLACK,"ステータス");
 
-		for (int i = 0; i < 16; i++) {
+		for (int i = 0; i < 17; i++) {
 			switch (i)
 			{
-			case 0:	bufS="HP"; break;
+			case 0:	bufS = "HP"; break;
 			case 1:	bufS = "MP"; break;
 			case 2:	bufS = "攻"; break;
 			case 3:	bufS = "防"; break;
@@ -2059,17 +2166,20 @@ void CSTown::CSMenueWindow::Draw()
 			case 13:bufS = "光防"; break;
 			case 14:bufS = "闇防"; break;
 			case 15:bufS = "所持金"; break;
-				
+			case 16:bufS = "ランク"; break;
+
 			default:
 				break;
 			}
-			if (i == 15) {
+			if (i == 16) {
+				DrawFormatString(15, 30 + 20 * i, BLACK, "%s;%d", bufS.c_str(), cstown.mySaveData->Rank);
+			}
+			else if (i == 15) {
 				DrawFormatString(15, 30 + 20 * i, BLACK, "%s;%d G", bufS.c_str(), Status[i]);
 			}
 			else {
 				DrawFormatString(15, 30 + 20 * i, BLACK, "%s;%d", bufS.c_str(), Status[i]);
 			}
-
 		}
 
 
@@ -2077,6 +2187,8 @@ void CSTown::CSMenueWindow::Draw()
 
 	default:break;
 	}
+
+	
 }
 
 void CSTown::CSMenueWindow::End()
@@ -2622,6 +2734,140 @@ void CSTown::CSGoToQuest::Loop()
 
 		switch (step)
 		{
+		case 12:
+			ynWindow->Loop();
+			if (KeyOK()) {
+				delete ynWindow;
+				ynWindow = NULL;
+				if (goQuest) {
+					step = 9;
+					textWindow->PushText("それでは、行ってらっしゃい");
+				}
+				else {
+					step = 11;
+				}
+
+
+			}
+			break;
+		case 11:
+			if (KeyUp() && arrowPoint[2] > 0) {
+				arrowPoint[2]--;
+			}
+
+			if (KeyDown() && arrowPoint[2] <(*vq).size() - 1) {
+				arrowPoint[2]++;
+			}
+
+			if (KeyOK()) {
+				step = 12;
+				ynWindow = new CYesNoWindow(&goQuest, "このクエストにしますか？", false, 305, 30 + 25 * (arrowPoint[2] + 1));
+			}
+
+			if (KeyCancel()) {
+				step = 10;
+				(*vq).clear();
+				delete questInfo;
+				questInfo = NULL;
+				delete enemyInfo;
+				enemyInfo = NULL;
+				delete bigBossInfo;
+				bigBossInfo = NULL;
+			}
+			break;
+			break;
+		case 10:
+			if (KeyUp() && arrowPoint[1] > 0) {
+				arrowPoint[1]--;
+			}
+
+			if (KeyDown() && arrowPoint[1] < cstown.mySaveData->Rank - 111 && arrowPoint[1]<3) {
+				//arrowPoint[1]++;
+			}
+
+			if (KeyOK()) {
+				qLevel = arrowPoint[1] + 21;
+				questInfo = new CSV("zero/ZeroData/Quest.csv");
+				enemyInfo = new CSV("zero/ZeroData/Enemy.csv");
+				bigBossInfo = new CSV("zero/ZeroData/BigBoss.csv");
+
+				for (int i = 0; i < questInfo->GetLineNum(); i++) {
+					bufI = (*questInfo)[i][1];
+					if (bufI == qLevel) {
+						bufq.Qnum = (*questInfo)[i][0];
+						bufq.Qname = (*questInfo)[i][2];
+						for (int j = 0; j < 8; j++) {
+							bufq.enemy[j] = (*questInfo)[i][3 + j];
+						}
+						bufq.bossTimes = (*questInfo)[i][11];
+						for (int j = 0; j < 3; j++) {
+							bufq.bigBoss[j] = (*questInfo)[i][12 + 7 * j];
+							for (int k = 0; k < 3; k++) {
+								for (int l = 0; l < 2; l++) {
+									bufq.boss[j][k][l] = (*questInfo)[i][13 + 7 * j + k * 2 + l];
+								}
+							}
+						}
+
+						for (int k = 0; k < 5; k++) {
+							for (int j = 0; j < 3; j++) {
+								bufq.treasure[k][j] = (*questInfo)[i][33 + 3 * k + j];
+							}
+						}
+
+						bufq.rewardMoney = (*questInfo)[i][48];
+
+						bufq.difficult = arrowPoint[0];
+						bufq.qLevel = (*questInfo)[i][1];
+
+						(*vq).push_back(bufq);
+
+					}
+
+					if (bufI == qLevel + 100 && cstown.mySaveData->rankUpQuest[arrowPoint[0]][qLevel - 1] == true) {
+						bufq.Qnum = (*questInfo)[i][0];
+						bufq.Qname = (*questInfo)[i][2];
+						bufq.Qname += "<RUクエスト>";
+						for (int j = 0; j < 8; j++) {
+							bufq.enemy[j] = (*questInfo)[i][3 + j];
+						}
+						bufq.bossTimes = (*questInfo)[i][11];
+						for (int j = 0; j < 3; j++) {
+							bufq.bigBoss[j] = (*questInfo)[i][12 + 7 * j];
+							for (int k = 0; k < 3; k++) {
+								for (int l = 0; l < 2; l++) {
+									bufq.boss[j][k][l] = (*questInfo)[i][13 + 7 * j + k * 2 + l];
+								}
+							}
+						}
+
+						for (int k = 0; k < 5; k++) {
+							for (int j = 0; j < 3; j++) {
+								bufq.treasure[k][j] = (*questInfo)[i][33 + 3 * k + j];
+							}
+						}
+
+						bufq.rewardMoney = (*questInfo)[i][48];
+
+						bufq.difficult = arrowPoint[0];
+						bufq.qLevel = (*questInfo)[i][1];
+
+						(*vq).push_back(bufq);
+
+					}
+				}
+
+				step = 11;
+				arrowPoint[2] = 0;
+				break;
+			}
+
+			if (KeyCancel()) {
+				step = 2;
+			}
+
+			break;
+			break;
 		case 9:
 			textWindow->Loop();
 			if (textWindow->GetTextEmpty()) {
@@ -2629,11 +2875,29 @@ void CSTown::CSGoToQuest::Loop()
 				(*vq).clear();
 				delete vq;
 				vq = NULL;
-
-
+				cstown.mySaveData->WriteSaveData();
+				
 				Game.FlipScene(new CSQuestBase(GetRand(syokyuMap-1)+1, &bufSQ , vItem), Flip::ROTATION_RIGHT);
 				
 			}
+			break;
+
+		case 8:
+			ynWindow->Loop();
+			if (KeyOK()) {
+				delete ynWindow;
+				ynWindow = NULL;
+				if (goQuest) {
+					step = 9;
+					textWindow->PushText("それでは、行ってらっしゃい");
+				}
+				else {
+					step = 6;
+				}
+
+
+			}
+
 			break;
 
 		case 7:
@@ -2663,12 +2927,12 @@ void CSTown::CSGoToQuest::Loop()
 			}
 
 			if (KeyOK()) {
-				step = 7;
+				step = 8;
 				ynWindow = new CYesNoWindow(&goQuest, "このクエストにしますか？", false, 305, 30 + 25 * (arrowPoint[2] + 1));
 			}
 
 			if (KeyCancel()) {
-				step = 3;
+				step = 4;
 				(*vq).clear();
 				delete questInfo;
 				questInfo = NULL;
@@ -2929,7 +3193,7 @@ void CSTown::CSGoToQuest::Loop()
 					break;
 				case 2:
 					if (cstown.mySaveData->Rank >= 11) {
-						step = 4;
+						step = 10;
 						arrowPoint[1] = 0;
 					}
 					break;
@@ -2950,7 +3214,7 @@ void CSTown::CSGoToQuest::Loop()
 				step = 1;
 				textWindow->TextClear();
 				textWindow->PushText("また準備ができたら、話しかけてください。");
-				delete vItem;
+				
 			}
 
 			break;
@@ -2958,6 +3222,30 @@ void CSTown::CSGoToQuest::Loop()
 		case 1:
 			textWindow->Loop();
 			if (textWindow->GetTextEmpty()) {
+				for (int i = 0; i < vItem->size(); i++) {
+					switch ((*vItem)[i].kind)
+					{
+					case 0:
+						if (cstown.mySaveData->sorce[(*vItem)[i].num - 1] <9999) {
+							cstown.mySaveData->sorce[(*vItem)[i].num - 1]++;
+						}
+						break;
+					case 1:
+						if (cstown.mySaveData->tool[(*vItem)[i].num - 1] <9999) {
+							cstown.mySaveData->tool[(*vItem)[i].num - 1]++;
+						}
+						break;
+					case 2:
+						if (cstown.mySaveData->food[(*vItem)[i].num - 1] <9999) {
+							cstown.mySaveData->food[(*vItem)[i].num - 1]++;
+						}
+						break;
+
+					default:
+						break;
+					}
+				}
+				delete vItem;
 				cstown.RemoveScene(Flip::SLIDE_DOWN, 10);
 			}
 			
@@ -2988,7 +3276,7 @@ void CSTown::CSGoToQuest::Draw()
 	int bufI;
 	string bufS;
 
-	if (step >= 2 && step <= 8) {
+	if ((step >= 2 && step <= 8) || (step >= 10 && step <= 12)) {
 		Window[1].DrawExtend(5, 5, 120, 160);
 		Arrow.Draw(10, 30 + 25 * arrowPoint[0]);
 		DrawFormatString(28, 30 + 25 * 0, BLACK, "下級");
@@ -3004,6 +3292,164 @@ void CSTown::CSGoToQuest::Draw()
 
 	switch (step)
 	{
+	case 12:
+		Window[1].DrawExtend(125, 5, 290, 250);
+		Window[2].DrawExtend(300, 5, 680, 310);
+		Window[2].DrawExtend(5, 360, 700, 574);
+
+
+		Arrow.Draw(137, 30 + 25 * arrowPoint[1]);
+		Arrow.Draw(305, 30 + 25 * arrowPoint[2]);
+
+		for (int i = 10; i < cstown.mySaveData->Rank; i++) {
+			if (i >= 11) {
+				break;
+			}
+
+			DrawFormatString(159, 30 + 25 * (i - 10), BLACK, "LEVEL.%d", i + 1);
+
+		}
+		DrawFormatString(132, 30 + 25 * 7, BLACK, "X又はback space");
+		DrawFormatString(132, 30 + 25 * 8, BLACK, "キーで閉じる");
+
+		for (int i = 0; i < (*vq).size(); i++) {
+			bufS = (*vq)[i].Qname;
+			DrawFormatString(325, 30 + 25 * i, BLACK, "%d:%s", i + 1, bufS.c_str());
+			DrawFormatString(325, 30 + 25 * 10, BLACK, "X又はback spaceキーで閉じる");
+
+		}
+		bufS.clear();
+		bufS += (*vq)[arrowPoint[2]].Qname;
+		if (cstown.mySaveData->questClear[(*vq)[arrowPoint[2]].Qnum - 1]) {
+			DrawFormatString(600, 370 + 30 * 0, GREEN, "clear済み");
+		}
+
+		DrawFormatString(20, 370 + 30 * 0, BLACK, "<%s>", bufS.c_str());
+		bufS.clear();
+		if ((*vq)[arrowPoint[2]].bossTimes >= 2) {
+
+			for (int i = 0; i<(*vq)[arrowPoint[2]].bossTimes; i++) {
+				if ((*vq)[arrowPoint[2]].bigBoss[i]) {
+					bufS += (*bigBossInfo)[((*vq)[arrowPoint[2]].boss[i][0][0]) - 1][1];
+				}
+				else {
+					bufS += (*enemyInfo)[((*vq)[arrowPoint[2]].boss[i][0][0]) - 1][1];
+				}
+				if (i == (*vq)[arrowPoint[2]].bossTimes - 1) {
+					bufS += "の連続討伐";
+					break;
+				}
+				bufS += "と";
+			}
+
+
+		}
+		else {
+			if ((*vq)[arrowPoint[2]].bigBoss[0]) {
+				bufS += (*bigBossInfo)[((*vq)[arrowPoint[2]].boss[0][0][0]) - 1][1];
+			}
+			else {
+				bufS += (*enemyInfo)[((*vq)[arrowPoint[2]].boss[0][0][0]) - 1][1];
+			}
+			bufS += "の討伐";
+		}
+
+		DrawFormatString(20, 370 + 30 * 1, BLACK, "クエスト内容:%s", bufS.c_str());
+
+
+
+		bufI = (*vq)[arrowPoint[2]].rewardMoney;
+
+
+		ynWindow->Draw();
+		break;
+
+
+	case 11:
+		Window[1].DrawExtend(125, 5, 290, 250);
+		Window[2].DrawExtend(300, 5, 680, 310);
+		Window[2].DrawExtend(5, 360, 700, 574);
+
+
+		Arrow.Draw(137, 30 + 25 * arrowPoint[1]);
+		Arrow.Draw(305, 30 + 25 * arrowPoint[2]);
+
+		for (int i = 10; i < cstown.mySaveData->Rank; i++) {
+			if (i >= 11) {
+				break;
+			}
+
+			DrawFormatString(159, 30 + 25 * (i-10), BLACK, "LEVEL.%d", i + 1);
+
+		}
+		DrawFormatString(132, 30 + 25 * 7, BLACK, "X又はback space");
+		DrawFormatString(132, 30 + 25 * 8, BLACK, "キーで閉じる");
+
+		for (int i = 0; i < (*vq).size(); i++) {
+			bufS = (*vq)[i].Qname;
+			DrawFormatString(325, 30 + 25 * i, BLACK, "%d:%s", i + 1, bufS.c_str());
+			DrawFormatString(325, 30 + 25 * 10, BLACK, "X又はback spaceキーで閉じる");
+
+		}
+		bufS.clear();
+		bufS += (*vq)[arrowPoint[2]].Qname;
+		if (cstown.mySaveData->questClear[(*vq)[arrowPoint[2]].Qnum - 1]) {
+			DrawFormatString(600, 370 + 30 * 0, GREEN, "clear済み");
+		}
+
+		DrawFormatString(20, 370 + 30 * 0, BLACK, "<%s>", bufS.c_str());
+		bufS.clear();
+		if ((*vq)[arrowPoint[2]].bossTimes >= 2) {
+
+			for (int i = 0; i<(*vq)[arrowPoint[2]].bossTimes; i++) {
+				if ((*vq)[arrowPoint[2]].bigBoss[i]) {
+					bufS += (*bigBossInfo)[((*vq)[arrowPoint[2]].boss[i][0][0]) - 1][1];
+				}
+				else {
+					bufS += (*enemyInfo)[((*vq)[arrowPoint[2]].boss[i][0][0]) - 1][1];
+				}
+				if (i == (*vq)[arrowPoint[2]].bossTimes - 1) {
+					bufS += "の連続討伐";
+					break;
+				}
+				bufS += "と";
+			}
+
+
+		}
+		else {
+			if ((*vq)[arrowPoint[2]].bigBoss[0]) {
+				bufS += (*bigBossInfo)[((*vq)[arrowPoint[2]].boss[0][0][0]) - 1][1];
+			}
+			else {
+				bufS += (*enemyInfo)[((*vq)[arrowPoint[2]].boss[0][0][0]) - 1][1];
+			}
+			bufS += "の討伐";
+		}
+
+		DrawFormatString(20, 370 + 30 * 1, BLACK, "クエスト内容:%s", bufS.c_str());
+
+
+
+		bufI = (*vq)[arrowPoint[2]].rewardMoney;
+		break;
+	case 10:
+		Window[1].DrawExtend(125, 5, 290, 250);
+
+		Arrow.Draw(137, 30 + 25 * arrowPoint[1]);
+
+		for (int i = 10; i < cstown.mySaveData->Rank; i++) {
+			if (i >= 11) {
+				break;
+			}
+
+			DrawFormatString(159, 30 + 25 * (i-10), BLACK, "LEVEL.%d", i + 1);
+
+		}
+		DrawFormatString(132, 30 + 25 * 7, BLACK, "X又はback space");
+		DrawFormatString(132, 30 + 25 * 8, BLACK, "キーで閉じる");
+
+		break;
 	case 9:
 		textWindow->Draw();
 		break;
@@ -3073,6 +3519,8 @@ void CSTown::CSGoToQuest::Draw()
 		DrawFormatString(20, 370 + 30 * 1, BLACK, "クエスト内容:%s", bufS.c_str());
 
 		bufI = (*vq)[arrowPoint[2]].rewardMoney;
+
+		ynWindow->Draw();
 
 		//DrawFormatString(20, 400 + 30 * 1, BLACK, "報酬金:%d", bufI);
 
@@ -3287,6 +3735,8 @@ void CSTown::CSGoToQuest::Draw()
 
 		DrawFormatString(20, 370 + 30 * 1, BLACK, "クエスト内容:%s", bufS.c_str());
 
+
+
 		bufI = (*vq)[arrowPoint[2]].rewardMoney;
 
 		//DrawFormatString(20, 400 + 30 * 1, BLACK, "報酬金:%d", bufI);
@@ -3349,3 +3799,642 @@ void CSTown::CSGoToQuest::End()
 }
 
 
+CSTown::CSHaniwaGacha::CSHaniwaGacha(CSTown & cstown) :cstown(cstown)
+{
+
+	stringstream bufSS;
+	step = 0;
+	classStart = false;
+	textWindow = new CTextWindow("ハニハニハニー！/nどのハニワのステータスガチャをするハニ？");
+	Arrow = "zero/SmallArrow.png";
+	Window[0] = "zero/ItemSelectWindow.png";
+	Window[1] = "zero/ItemSelectWindow3.png";
+	arrow = 0;
+	arrow2 = 0;
+	arrow3 = 0;
+	gachaDo = false;
+	changeF = false;
+
+	haniwaInfo = new CSV("zero/ZeroData/Haniwa.csv");
+	haniwaWindow = new CHaniwaWindow(cstown.mySaveData, 0);
+	ynWindow = NULL;
+
+	needMoney = (cstown.mySaveData->Rank - 1) * 300;
+	totalMax = (cstown.mySaveData->Rank - 1) * 15;
+	EachMax = (cstown.mySaveData->Rank - 1) * 4;
+
+	for (int i = 0; i < 10; i++) {
+		gachaResult[i] = 0;
+	}
+
+}
+
+void CSTown::CSHaniwaGacha::Loop()
+{
+	vector<int> vI;
+	int bufI = 0;
+	int buffI = 0;
+
+	if (classStart == true) {
+		
+
+		switch (step)
+		{
+		case 7:
+			textWindow->Loop();
+			if (textWindow->GetTextEmpty() && textWindow->GetWaitTextEmpty()) {
+				cstown.RemoveScene(Flip::SLIDE_DOWN, 10);
+			}
+			break;
+		case 6:
+			textWindow->Loop();
+			if (textWindow->GetTextEmpty() && textWindow->GetWaitTextEmpty()) {
+				step = 1;
+				haniwaWindow->ChangeKind(arrow);
+			}
+			break;
+		case 5:
+
+			if (ynWindow == NULL) {
+				if (KeyDown() || KeyUp()) {
+					arrow2++;
+					arrow2 %= 2;
+				}
+				else if (KeyOK()) {
+					if (arrow2 == 0) {
+						ynWindow = new CYesNoWindow(&changeF, "本当に変更しますか？", false, 460, 100);
+					}
+					else {
+						ynWindow = new CYesNoWindow(&changeF, "変更をやめますか？", false, 460, 100);
+					}
+				}
+			}
+			else {
+				ynWindow->Loop();
+				if (KeyOK()) {
+					if (changeF == true && arrow2==0) {
+						textWindow->TextClear();
+						textWindow->PushText("変更したハニよ。/n続けてガチャをするハニか？");
+						arrow2 = 0;
+						step = 6;
+						delete ynWindow;
+						ynWindow = NULL;
+						for (int i = 0; i < 10; i++) {
+							cstown.mySaveData->haniStatusPlus[arrow][i] = gachaResult[i];
+						}
+					}
+					else if (changeF == true && arrow2 == 1) {
+						textWindow->TextClear();
+						textWindow->PushText("変更をやめたハニよ。/n続けてガチャをするハニか？");
+						arrow2 = 0;
+						step = 6;
+						delete ynWindow;
+						ynWindow = NULL;
+					}
+					else{
+						delete ynWindow;
+						ynWindow = NULL;
+					}
+
+				}
+			}
+
+			break;
+
+		case 4:
+			textWindow->Loop();
+			if (textWindow->GetTextEmpty() && textWindow->GetWaitTextEmpty()) {
+				for (int i = 0; i < 10; i++) {
+					vI.push_back(i);
+				}
+				bufI = (float)totalMax*(70 + GetRand(30)) / 100;
+
+				for (int i = 0; i < bufI; i++) {
+					buffI = GetRand(vI.size()-1);
+					gachaResult[vI[buffI]]++;
+					if (gachaResult[vI[buffI]] >= EachMax) {
+						vI.erase(vI.begin() + buffI);
+					}
+
+				}
+
+				textWindow->PushText("結果が出たハニ。/n今出たものに変更するハニか？");
+				step = 5;
+				arrow2 = 0;
+				changeF = false;
+			}
+			break;
+		case 3:
+			textWindow->Loop();
+			if (textWindow->GetTextEmpty() && textWindow->GetWaitTextEmpty()) {
+				textWindow->PushText("ハニハニ...ハニーーーー!");
+				step = 4;
+			}
+			break;
+		case 2:
+			textWindow->Loop();
+			if (textWindow->GetTextEmpty() && textWindow->GetWaitTextEmpty()) {
+				textWindow->PushText("デハ、今からガチャをするハニ。");
+				step = 3;
+				for (int i = 0; i < 10; i++) {
+					gachaResult[i] = 0;
+				}
+			}
+			break;
+		case 1:
+
+			if (ynWindow == NULL) {
+				if (KeyDown() && arrow < 9) {
+					arrow++;
+					haniwaWindow->ChangeKind(arrow);
+				}
+				else if (KeyUp() && arrow > 0) {
+					arrow--;
+					haniwaWindow->ChangeKind(arrow);
+				}
+				else if (KeyOK() && cstown.mySaveData->money>=needMoney) {
+					ynWindow = new CYesNoWindow(&gachaDo, "", false, 270, 50);
+				}
+				else if (KeyCancel()) {
+					step = 7;
+					textWindow->PushText("またいつでも来てハニなー");
+				}
+			}
+			else {
+				ynWindow->Loop();
+				if (KeyOK()) {
+					if (gachaDo == true) {
+						delete ynWindow;
+						ynWindow = NULL;
+						step = 2;
+						cstown.mySaveData->money -= needMoney;
+						if (cstown.mySaveData->money < 0) {
+							cstown.mySaveData->money = 0;
+						}
+						cstown.mySaveData->WriteSaveData();
+						cstown.mySaveData->WriteSaveDataToOther();
+						textWindow->PushText("お金を支払い、セーブしました。");
+					}
+					else {
+						delete ynWindow;
+						ynWindow = NULL;
+					}
+				}
+			}
+
+			break;
+		case 0:
+			textWindow->Loop();
+			if (textWindow->GetTextEmpty() && textWindow->GetWaitTextEmpty()) {
+				step = 1;
+			}
+			break;
+		default:
+			break;
+		}
+
+
+	}
+	classStart = true;
+
+}
+
+void CSTown::CSHaniwaGacha::Draw()
+{
+	string bufS = "";
+	int bufI = 0;
+	int buffI = 0;
+
+	if (step >= 1) {
+		Window[0].DrawExtend(5, 5, 200, 230);
+		Arrow.Draw(10, 10 + 22 * arrow);
+		for (int i = 0; i < 10; i++) {
+			bufS = (*haniwaInfo)[i][1];
+			DrawFormatString(30, 10 + 22 * i, BLACK, "%s", bufS.c_str());
+		}
+
+		Window[0].DrawExtend(5, 235, 235, 310);
+		DrawFormatString(15, 245, BLACK, "%所持金:%d", cstown.mySaveData->money);
+		DrawFormatString(15, 265, BLACK, "費用　:%d", needMoney);
+		if (cstown.mySaveData->money < needMoney) {
+			DrawFormatString(15, 285, BLACK, "費用が足りません。");
+		}
+
+		Window[0].DrawExtend(5, 313, 310, 372);
+		DrawFormatString(15, 325, BLACK, "ガチャで出る合計の最大値　　:%d",totalMax);
+		DrawFormatString(15, 345, BLACK, "ガチャで出るそれぞれの最大値:%d", EachMax);
+
+		if (textWindow->GetTextEmpty() && textWindow->GetWaitTextEmpty()) {
+			haniwaWindow->Draw();
+		}
+
+	}
+
+	switch (step)
+	{
+	case 0:
+		textWindow->Draw();
+		break;
+	case 1:
+		if (ynWindow != NULL) {
+			ynWindow->Draw();
+			DrawFormatString(290, 70, BLACK, "自動でセーブされますが");
+			DrawFormatString(290, 90, BLACK, "ガチャを行いますか？");
+		}
+		
+		break;
+	case 2:
+		textWindow->Draw();
+		break;
+	case 3:
+		textWindow->Draw();
+		break;
+	case 4:
+		textWindow->Draw();
+		break;
+	case 6:
+
+	case 5:
+		textWindow->Draw();
+		
+		Window[1].DrawExtend(240, 5, 450, 270);
+		DrawFormatString(320, 10, BLACK, "現在");
+		DrawFormatString(380, 10, BLACK, "変更後");
+		DrawFormatString(260, 28 + 0 * 20, BLACK, "HP");
+		DrawFormatString(260, 28 + 1 * 20, BLACK, "MP");
+		DrawFormatString(260, 28 + 2 * 20, BLACK, "物攻");
+		DrawFormatString(260, 28 + 3 * 20, BLACK, "物防");
+		DrawFormatString(260, 28 + 4 * 20, BLACK, "魔攻");
+		DrawFormatString(260, 28 + 5 * 20, BLACK, "魔防");
+		DrawFormatString(260, 28 + 6 * 20, BLACK, "速");
+		DrawFormatString(260, 28 + 7 * 20, BLACK, "命中");
+		DrawFormatString(260, 28 + 8 * 20, BLACK, "回避");
+		DrawFormatString(260, 28 + 9 * 20, BLACK, "運");
+		DrawFormatString(260, 240, BLACK, "合計");
+		bufI = 0;
+		buffI = 0;
+		for (int i = 0; i < 10; i++) {
+			DrawFormatString(320, 28 + i * 20, BLACK, "+%d",cstown.mySaveData->haniStatusPlus[arrow][i]);
+			if (gachaResult[i] < cstown.mySaveData->haniStatusPlus[arrow][i]) {
+				DrawFormatString(380, 28 + i * 20, RED, "+%d",gachaResult[i]);
+			}
+			else if (gachaResult[i] > cstown.mySaveData->haniStatusPlus[arrow][i]) {
+				DrawFormatString(380, 28 + i * 20, BLUE_S, "+%d", gachaResult[i]);
+			}
+			else {
+				DrawFormatString(380, 28 + i * 20, BLACK, "+%d", gachaResult[i]);
+			}
+			bufI += cstown.mySaveData->haniStatusPlus[arrow][i];
+			buffI += gachaResult[i];
+
+		}
+
+		DrawFormatString(320, 240, BLACK, "+%d", bufI);
+		if (buffI < bufI) {
+			DrawFormatString(380, 240,RED, "+%d", buffI);
+		}
+		else if (buffI > bufI) {
+			DrawFormatString(380, 240, BLUE_S, "+%d", buffI);
+		}
+		else {
+			DrawFormatString(380, 240, BLACK, "+%d", buffI);
+		}
+
+		Window[1].DrawExtend(510, 5, 650, 80);
+		Arrow.Draw(520, 20 + arrow2 * 30);
+		DrawFormatString(550, 20, BLACK, "はい");
+		DrawFormatString(550, 50, BLACK, "いいえ");
+
+		if (ynWindow != NULL) {
+			ynWindow->Draw();
+		}
+
+		break;
+	case 7:
+		textWindow->Draw();
+		break;
+
+	default:
+		break;
+	}
+
+
+}
+
+void CSTown::CSHaniwaGacha::End()
+{
+
+	delete textWindow;
+	textWindow = NULL;
+	delete haniwaInfo;
+	haniwaInfo = NULL;
+	delete haniwaWindow;
+	haniwaWindow = NULL;
+	ynWindow = NULL;
+}
+
+
+CSTown::CSBuyRecipe::CSBuyRecipe(CSTown & cstown) :cstown(cstown)
+{
+	SRecipe bufSR;
+	stringstream bufSS;
+	step = 0;
+	classStart = false;
+	textWindow = new CTextWindow("どのレシピがほしいんだい？");
+	Arrow = "zero/SmallArrow.png";
+	Window[0] = "zero/ItemSelectWindow.png";
+	Window[1] = "zero/TextWindow1.png";
+	buy = false;
+
+	arrowPoint = 0;
+
+	for (int i = 0; i < 7; i++) {
+		RecipeMax[i] = (cstown.mySaveData->Rank - 1) / 2 +1;
+	}
+
+	for (int i = 0; i < 7; i++) {
+		if (RecipeMax[i] >= 5) {
+			RecipeMax[i] = 5;
+		}
+	}
+
+	for (int i = 7; i < 10; i++) {
+		RecipeMax[i] = (cstown.mySaveData->Rank - 1) / 3 + 1;
+	}
+
+	if (RecipeMax[7] >= 3) {
+		RecipeMax[7] = 3;
+	}
+
+	if (RecipeMax[8] >= 2) {
+		RecipeMax[8] = 2;
+	}
+
+	if (RecipeMax[9] >= 3) {
+		RecipeMax[9] = 3;
+	}
+
+	for (int i = 0; i < 10; i++) {
+		if (cstown.mySaveData->recipeStep[i] < RecipeMax[i]) {
+			bufSR.kind = i;
+			bufSR.step = cstown.mySaveData->recipeStep[i] + 1;
+			switch (bufSR.kind)
+			{
+			case 0:
+				bufSS << "剣レシピ";
+				break;
+			case 1:
+				bufSS << "弓レシピ";
+				break;
+			case 2:
+				bufSS << "杖レシピ";
+				break;
+			case 3:
+				bufSS << "盾レシピ";
+				break;
+			case 4:
+				bufSS << "胴レシピ";
+				break;
+			case 5:
+				bufSS << "靴レシピ";
+				break;
+			case 6:
+				bufSS << "装飾品レシピ";
+				break;
+			case 7:
+				bufSS << "加工素材レシピ";
+				break;
+			case 8:
+				bufSS << "道具レシピ";
+				break;
+			case 9:
+				bufSS << "料理レシピ";
+				break;
+			default: break;
+			}
+			bufSR.experience = bufSS.str().c_str();
+
+			bufSS << bufSR.step;
+			bufSR.name = bufSS.str().c_str();
+			bufSS.str("");
+			bufSS.clear(stringstream::goodbit);
+
+
+			bufSR.experience += "の";
+			bufSS << bufSR.step;
+			bufSR.experience += bufSS.str().c_str();
+			bufSR.experience += "ページ目が追加されます。";
+			bufSS.str("");
+			bufSS.clear(stringstream::goodbit);
+			if (i < 7) {
+				bufSR.value = bufSR.step * 2000;
+			}
+			else
+			{
+				bufSR.value = bufSR.step * 3000;
+			}
+
+			vRecipe.push_back(bufSR);
+
+		}
+	}
+
+
+}
+
+
+void CSTown::CSBuyRecipe::Loop()
+{
+	stringstream bufSS;
+	SRecipe bufSR;
+
+	if (classStart == true) {
+
+		switch (step)
+		{
+		case 4:
+			textWindow->Loop();
+			if (textWindow->GetTextEmpty() == true) {
+				cstown.RemoveScene(Flip::SLIDE_DOWN, 10);
+			}
+			break;
+		case 3:
+			textWindow->Loop();
+			if (textWindow->GetTextEmpty() && textWindow->GetWaitTextEmpty()) {
+				step = 1;
+				arrowPoint = 0;
+			}
+			break;
+		case 2:
+			ynWindow->Loop();
+			if (KeyOK()) {
+				delete ynWindow;
+				ynWindow = NULL;
+				if (buy == true) {
+					textWindow->PushText("毎度あり.../n他にレシピを買うかい？");
+					step = 3;
+					cstown.mySaveData->recipeStep[vRecipe[arrowPoint].kind]++;
+					vRecipe.clear();
+					for (int i = 0; i < 10; i++) {
+						if (cstown.mySaveData->recipeStep[i] < RecipeMax[i]) {
+							bufSR.kind = i;
+							bufSR.step = cstown.mySaveData->recipeStep[i] + 1;
+							switch (bufSR.kind)
+							{
+							case 0:
+								bufSS << "剣レシピ";
+								break;
+							case 1:
+								bufSS << "弓レシピ";
+								break;
+							case 2:
+								bufSS << "杖レシピ";
+								break;
+							case 3:
+								bufSS << "盾レシピ";
+								break;
+							case 4:
+								bufSS << "胴レシピ";
+								break;
+							case 5:
+								bufSS << "靴レシピ";
+								break;
+							case 6:
+								bufSS << "装飾品レシピ";
+								break;
+							case 7:
+								bufSS << "加工素材レシピ";
+								break;
+							case 8:
+								bufSS << "道具レシピ";
+								break;
+							case 9:
+								bufSS << "料理レシピ";
+								break;
+							default: break;
+							}
+							bufSR.experience = bufSS.str().c_str();
+
+							bufSS << bufSR.step;
+							bufSR.name = bufSS.str().c_str();
+							bufSS.str("");
+							bufSS.clear(stringstream::goodbit);
+
+
+							bufSR.experience += "の";
+							bufSS << bufSR.step;
+							bufSR.experience += bufSS.str().c_str();
+							bufSR.experience += "ページ目が追加されます。";
+							bufSS.str("");
+							bufSS.clear(stringstream::goodbit);
+							if (i < 7) {
+								bufSR.value = bufSR.step * 2000;
+							}
+							else
+							{
+								bufSR.value = bufSR.step * 3000;
+							}
+
+							vRecipe.push_back(bufSR);
+
+						}
+					}
+				}
+				else {
+					step = 1;
+				}
+
+			}
+			break;
+
+		case 1:
+			if (KeyDown() && arrowPoint < vRecipe.size() - 1) {
+				arrowPoint++;
+			}
+			if (KeyUp() && arrowPoint > 0) {
+				arrowPoint--;
+			}
+
+			if (KeyOK() && vRecipe.empty() == false && cstown.mySaveData->money >= vRecipe[arrowPoint].value) {
+				ynWindow = new CYesNoWindow(&buy, "この本を買うのかい",false, 260, 10 + arrowPoint * 25);
+				step = 2;
+			}
+
+			if (KeyCancel()) {
+				step = 4;
+				textWindow->TextClear();
+				textWindow->PushText("レシピが欲しかったらまた来な。");
+			}
+			break;
+		case 0:
+			textWindow->Loop();
+			if (textWindow->GetTextEmpty() && textWindow->GetWaitTextEmpty()) {
+				step = 1;
+			}
+			
+			break;
+
+
+		default:break;
+		}
+
+
+
+
+
+	}
+	classStart = true;
+}
+
+void CSTown::CSBuyRecipe::Draw()
+{
+	if (textWindow->GetTextEmpty() == false || textWindow->GetWaitTextEmpty() == false) {
+		textWindow->Draw();
+	}
+
+	switch (step)
+	{
+	case 0:
+
+		break;
+
+
+	case 2:
+		ynWindow->Draw();
+
+	case 1:
+		Window[0].DrawExtend(5, 5, 250, 300);
+
+		Window[1].DrawExtend(500, 5, 700, 40);
+		DrawFormatString(505, 14, BLACK, "所持金：%d",cstown.mySaveData->money);
+		
+		if (vRecipe.empty()) {
+			DrawFormatString(10,10,BLUE,"買えるレシピがありません。");
+		}
+		else {
+			Arrow.Draw(10,10 + arrowPoint * 25);
+			for (int i = 0; i < vRecipe.size(); i++) {
+				DrawFormatString(30, 10 + i*25, BLACK, "%s", vRecipe[i].name.c_str());
+			}
+
+			Window[1].DrawExtend(5, 400, 700, 560);
+			DrawFormatString(20, 430, BLACK, "%s", vRecipe[arrowPoint].name.c_str());
+			DrawFormatString(20, 460, BLACK, "説明：%s", vRecipe[arrowPoint].experience.c_str());
+			DrawFormatString(20, 490, BLACK, "値段：%d", vRecipe[arrowPoint].value);
+			if (cstown.mySaveData->money < vRecipe[arrowPoint].value) {
+				DrawFormatString(20, 520, BLUE, "お金が足りません");
+			}
+		}
+
+		break;
+	default:
+		break;
+	}
+
+}
+
+void CSTown::CSBuyRecipe::End()
+{
+	delete textWindow;
+	textWindow = NULL;
+}

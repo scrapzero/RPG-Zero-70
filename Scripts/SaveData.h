@@ -11,7 +11,7 @@ private:
 	CData *data,*otherData;
 
 public:
-
+	CMySaveData(bool kari);
 	int EquipmentAmount, haveEquipmentKindLevel[400][3];//•ŠííAí—Ş”Ô†ALevel
 	int test;
 	int recipeStep[10];
@@ -24,10 +24,12 @@ public:
 	int haniwaLevel[10];
 	int bringHaniwaKind[2];
 	bool questClear[120];
+	int haniStatusPlus[10][10];
 	int clearAmount[3][7];
 	bool rankUpQuest[3][7];
+	
+	
 
-	CMySaveData(bool kari);
 	void WriteSaveData();
 	void WriteSaveDataToOther();
 

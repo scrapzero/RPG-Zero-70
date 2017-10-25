@@ -249,7 +249,7 @@ void CTextWindow::PushText(string text,...) {
 void CTextWindow::Loop() {
 
 
-	if (KeyOK()) {
+	if (KeyOK()){
 		if (wordAmount !=  display.back().size()) {
 			wordAmount = display.back().size();
 		}
@@ -259,7 +259,9 @@ void CTextWindow::Loop() {
 		}
 		else if (endDisplay == true ) {
 		//else{
-			display.pop_front();
+			if (display.empty() == false) {
+				display.pop_front();
+			}
 			display.push_back(texts.front());
 			texts.pop();
 			wordAmount = 0;
@@ -300,10 +302,11 @@ void CTextWindow::Draw() {
 
 	for (auto i = display.begin(); i != display.end(); i++) {
 		repeat++;
-		kariS[repeat - 1] = *i;
-		if (repeat > 10) {
+		if (repeat >= 10) {
 			break;
 		}
+		kariS[repeat - 1] = *i;
+		
 
 		if (repeat == display.size()) {
 			if (wordAmount >= kariS[repeat - 1].size()) {
@@ -326,6 +329,11 @@ void CTextWindow::Draw() {
 		}
 		else {
 			S[repeat - 1] = kariS[repeat - 1];
+		}
+
+		if (Input.GetKeyEnter(Input.key.RETURN) && Input.GetKeyEnter(Input.key.Z)) {
+			int a;
+			a = 0;
 		}
 
 	}
@@ -469,30 +477,22 @@ CEquipmentWindow::CEquipmentWindow(int equipmentKind, int num, int level): equip
 		skillExperience[0] = (*skillInfo)[skillNum[0] - 1][19];
 
 		switch (bufI[0]) {
-		case 0:skillPMode[0] = "ƒ_ƒ[ƒW‘‰Á"; break;
-		case 1:skillPMode[0] = "”íƒ_ƒŒ¸­"; break;
-		case 2:skillPMode[0] = "UUP"; break;
-		case 3:skillPMode[0] = "–hUP"; break;
-		case 4:skillPMode[0] = "–‚UUP"; break;
-		case 5:skillPMode[0] = "–‚–hUP"; break;
-		case 6:skillPMode[0] = "‘¬UP"; break;
-		case 7:skillPMode[0] = "–½’†UP"; break;
-		case 8:skillPMode[0] = "‰ñ”ğUP"; break;
-		case 9:skillPMode[0] = "‰^UP"; break;
-		case 10:skillPMode[0] = "UDOWN"; break;
-		case 11:skillPMode[0] = "–hDOWN"; break;
-		case 12:skillPMode[0] = "–‚UDOWN"; break;
-		case 13:skillPMode[0] = "–‚–hDOWN"; break;
-		case 14:skillPMode[0] = "‘¬DOWN"; break;
-		case 15:skillPMode[0] = "–½’†DOWN"; break;
-		case 16:skillPMode[0] = "‰ñ”ğDOWN"; break;
-		case 17:skillPMode[0] = "‰^DOWN"; break;
-		case 18:skillPMode[0] = "‰ñ•œ—Ê‘‰Á"; break;
-		case 19:skillPMode[0] = "æ§"; break;
-		case 20:skillPMode[0] = "‰ñ”"; break;
-		case 21:skillPMode[0] = "Šm—¦ã¸"; break;
-		case 22:skillPMode[0] = "Á”ïMPŒ¸­—Ê"; break;
-		case 23:skillPMode[0] = "ˆêŒ‚"; break;
+		case 0: skillPMode[0] = "ƒ_ƒ[ƒW‘‰Á"; break;
+		case 1: skillPMode[0] = "”íƒ_ƒŒ¸­"; break;
+		case 2: skillPMode[0] = "•¨Uã¸"; break;
+		case 3: skillPMode[0] = "•¨–hã¸"; break;
+		case 4: skillPMode[0] = "–‚Uã¸"; break;
+		case 5: skillPMode[0] = "–‚–hã¸"; break;
+		case 6: skillPMode[0] = "‘¬“xã¸"; break;
+		case 7: skillPMode[0] = "–½’†ã¸"; break;
+		case 8: skillPMode[0] = "‰ñ”ğã¸"; break;
+		case 9: skillPMode[0] = "‰^ã¸"; break;
+		case 10: skillPMode[0] = "‰ñ•œ—Ê‘‰Á"; break;
+		case 11: skillPMode[0] = "æ§"; break;
+		case 12: skillPMode[0] = "‰ñ”‘‰Á"; break;
+		case 13: skillPMode[0] = "Šm—¦ã¸"; break;
+		case 14: skillPMode[0] = "Á”ïMPŒ¸­"; break;
+		case 15: skillPMode[0] = "ˆêŒ‚"; break;
 		}
 
 	}
@@ -598,30 +598,22 @@ void CEquipmentWindow::ChangeKind( int num, int level)
 		skillExperience[1] = (*skillInfo)[skillNum[1] - 1][19];
 		for (int i = 0; i < 2; i++) {
 			switch (bufI[i]) {
-			case 0:skillPMode[i] = "ƒ_ƒ[ƒW‘‰Á"; break;
-			case 1:skillPMode[i] = "”íƒ_ƒŒ¸­"; break;
-			case 2:skillPMode[i] = "UUP"; break;
-			case 3:skillPMode[i] = "–hUP"; break;
-			case 4:skillPMode[i] = "–‚UUP"; break;
-			case 5:skillPMode[i] = "–‚–hUP"; break;
-			case 6:skillPMode[i] = "‘¬UP"; break;
-			case 7:skillPMode[i] = "–½’†UP"; break;
-			case 8:skillPMode[i] = "‰ñ”ğUP"; break;
-			case 9:skillPMode[i] = "‰^UP"; break;
-			case 10:skillPMode[i] = "UDOWN"; break;
-			case 11:skillPMode[i] = "–hDOWN"; break;
-			case 12:skillPMode[i] = "–‚UDOWN"; break;
-			case 13:skillPMode[i] = "–‚–hDOWN"; break;
-			case 14:skillPMode[i] = "‘¬DOWN"; break;
-			case 15:skillPMode[i] = "–½’†DOWN"; break;
-			case 16:skillPMode[i] = "‰ñ”ğDOWN"; break;
-			case 17:skillPMode[i] = "‰^DOWN"; break;
-			case 18:skillPMode[i] = "‰ñ•œ—Ê‘‰Á"; break;
-			case 19:skillPMode[i] = "æ§"; break;
-			case 20:skillPMode[i] = "‰ñ”"; break;
-			case 21:skillPMode[i] = "Šm—¦ã¸"; break;
-			case 22:skillPMode[i] = "Á”ïMPŒ¸­—Ê"; break;
-			case 23:skillPMode[i] = "ˆêŒ‚"; break;
+			case 0: skillPMode[i] = "ƒ_ƒ[ƒW‘‰Á"; break;
+			case 1: skillPMode[i] = "”íƒ_ƒŒ¸­"; break;
+			case 2: skillPMode[i] = "•¨Uã¸"; break;
+			case 3: skillPMode[i] = "•¨–hã¸"; break;
+			case 4: skillPMode[i] = "–‚Uã¸"; break;
+			case 5: skillPMode[i] = "–‚–hã¸"; break;
+			case 6: skillPMode[i] = "‘¬“xã¸"; break;
+			case 7: skillPMode[i] = "–½’†ã¸"; break;
+			case 8: skillPMode[i] = "‰ñ”ğã¸"; break;
+			case 9: skillPMode[i] = "‰^ã¸"; break;
+			case 10: skillPMode[i] = "‰ñ•œ—Ê‘‰Á"; break;
+			case 11: skillPMode[i] = "æ§"; break;
+			case 12: skillPMode[i] = "‰ñ”‘‰Á"; break;
+			case 13: skillPMode[i] = "Šm—¦ã¸"; break;
+			case 14: skillPMode[i] = "Á”ïMPŒ¸­"; break;
+			case 15: skillPMode[i] = "ˆêŒ‚"; break;
 			}
 		}
 
@@ -643,30 +635,22 @@ void CEquipmentWindow::ChangeKind( int num, int level)
 		skillExperience[0] = (*skillInfo)[skillNum[0] - 1][19];
 
 		switch (bufI[0]) {
-		case 0:skillPMode[0] = "ƒ_ƒ[ƒW‘‰Á"; break;
-		case 1:skillPMode[0] = "”íƒ_ƒŒ¸­"; break;
-		case 2:skillPMode[0] = "UUP"; break;
-		case 3:skillPMode[0] = "–hUP"; break;
-		case 4:skillPMode[0] = "–‚UUP"; break;
-		case 5:skillPMode[0] = "–‚–hUP"; break;
-		case 6:skillPMode[0] = "‘¬UP"; break;
-		case 7:skillPMode[0] = "–½’†UP"; break;
-		case 8:skillPMode[0] = "‰ñ”ğUP"; break;
-		case 9:skillPMode[0] = "‰^UP"; break;
-		case 10:skillPMode[0] = "UDOWN"; break;
-		case 11:skillPMode[0] = "–hDOWN"; break;
-		case 12:skillPMode[0] = "–‚UDOWN"; break;
-		case 13:skillPMode[0] = "–‚–hDOWN"; break;
-		case 14:skillPMode[0] = "‘¬DOWN"; break;
-		case 15:skillPMode[0] = "–½’†DOWN"; break;
-		case 16:skillPMode[0] = "‰ñ”ğDOWN"; break;
-		case 17:skillPMode[0] = "‰^DOWN"; break;
-		case 18:skillPMode[0] = "‰ñ•œ—Ê‘‰Á"; break;
-		case 19:skillPMode[0] = "æ§"; break;
-		case 20:skillPMode[0] = "‰ñ”"; break;
-		case 21:skillPMode[0] = "Šm—¦ã¸"; break;
-		case 22:skillPMode[0] = "Á”ïMPŒ¸­—Ê"; break;
-		case 23:skillPMode[0] = "ˆêŒ‚"; break;
+		case 0: skillPMode[0] = "ƒ_ƒ[ƒW‘‰Á"; break;
+		case 1: skillPMode[0] = "”íƒ_ƒŒ¸­"; break;
+		case 2: skillPMode[0] = "•¨Uã¸"; break;
+		case 3: skillPMode[0] = "•¨–hã¸"; break;
+		case 4: skillPMode[0] = "–‚Uã¸"; break;
+		case 5: skillPMode[0] = "–‚–hã¸"; break;
+		case 6: skillPMode[0] = "‘¬“xã¸"; break;
+		case 7: skillPMode[0] = "–½’†ã¸"; break;
+		case 8: skillPMode[0] = "‰ñ”ğã¸"; break;
+		case 9: skillPMode[0] = "‰^ã¸"; break;
+		case 10: skillPMode[0] = "‰ñ•œ—Ê‘‰Á"; break;
+		case 11: skillPMode[0] = "æ§"; break;
+		case 12: skillPMode[0] = "‰ñ”‘‰Á"; break;
+		case 13: skillPMode[0] = "Šm—¦ã¸"; break;
+		case 14: skillPMode[0] = "Á”ïMPŒ¸­"; break;
+		case 15: skillPMode[0] = "ˆêŒ‚"; break;
 		}
 
 	}
@@ -868,34 +852,34 @@ CHaniwaWindow::CHaniwaWindow(CMySaveData * savedata, int kind)
 		switch (i)
 		{
 		case 0:
-			HP = bufI + bufFlo*Level;
+			HP = bufI + bufFlo*Level + mySaveData->haniStatusPlus[KindNum][0];
 			break;
 		case 1:
-			MP = bufI + bufFlo*Level;
+			MP = bufI + bufFlo*Level + mySaveData->haniStatusPlus[KindNum][1];
 			break;
 		case 2:
-			Atc = bufI + bufFlo*Level;
+			Atc = bufI + bufFlo*Level + mySaveData->haniStatusPlus[KindNum][2];
 			break;
 		case 3:
-			Def = bufI + bufFlo*Level;
+			Def = bufI + bufFlo*Level + mySaveData->haniStatusPlus[KindNum][3];
 			break;
 		case 4:
-			MAtc = bufI + bufFlo*Level;
+			MAtc = bufI + bufFlo*Level + mySaveData->haniStatusPlus[KindNum][4];
 			break;
 		case 5:
-			MDef = bufI + bufFlo*Level;
+			MDef = bufI + bufFlo*Level + mySaveData->haniStatusPlus[KindNum][5];
 			break;
 		case 6:
-			Spd = bufI + bufFlo*Level;
+			Spd = bufI + bufFlo*Level + mySaveData->haniStatusPlus[KindNum][6];
 			break;
 		case 7:
-			Hit = bufI + bufFlo*Level;
+			Hit = bufI + bufFlo*Level + mySaveData->haniStatusPlus[KindNum][7];
 			break;
 		case 8:
-			Escape = bufI + bufFlo*Level;
+			Escape = bufI + bufFlo*Level + mySaveData->haniStatusPlus[KindNum][8];
 			break;
 		case 9:
-			Luck = bufI + bufFlo*Level;
+			Luck = bufI + bufFlo*Level + mySaveData->haniStatusPlus[KindNum][9];
 			break;
 		case 10:
 			FireDef = bufI + bufFlo*Level;
@@ -912,13 +896,12 @@ CHaniwaWindow::CHaniwaWindow(CMySaveData * savedata, int kind)
 		case 14:
 			DarkDef = bufI + bufFlo*Level;
 			break;
-		
-
 
 		default:
 			break;
 		}
 	}
+
 
 
 }
@@ -934,12 +917,13 @@ CHaniwaWindow::~CHaniwaWindow()
 
 void CHaniwaWindow::Draw()
 {
-	Window.DrawExtend(4, 370, 700, 570);
+	Window.DrawExtend(4, 375, 700, 570);
+	DrawFormatString(40, 550, BLACK, "()‚Ì’†‚ÍƒnƒjƒƒKƒ`ƒƒ‚É‚æ‚éƒvƒ‰ƒX’l");
 
 	DrawFormatString(20, 400, BLACK, "%s  Level:%d", name.c_str(),Level);
-	DrawFormatString(20, 430, BLACK, "HP:%d MP:%d", HP,MP);
-	DrawFormatString(20, 460, BLACK, "U:%d@–hF%d –‚U:%d@–‚–hF%d", Atc, Def, MAtc, MDef);
-	DrawFormatString(20, 490, BLACK, "‘¬:%d@–½’†F%d ‰ñ”ğ:%d@‰^F%d", Spd, Hit, Escape, Luck);
+	DrawFormatString(20, 430, BLACK, "HP:%d(%d)  MP:%d(%d) ", HP,mySaveData->haniStatusPlus[KindNum][0],MP, mySaveData->haniStatusPlus[KindNum][1]);
+	DrawFormatString(20, 460, BLACK, "U:%d(%d) @–hF%d(%d)  –‚U:%d(%d) @–‚–hF%d(%d) ", Atc,mySaveData->haniStatusPlus[KindNum][2], Def,mySaveData->haniStatusPlus[KindNum][3], MAtc, mySaveData->haniStatusPlus[KindNum][4], MDef, mySaveData->haniStatusPlus[KindNum][5]);
+	DrawFormatString(20, 490, BLACK, "‘¬:%d(%d) @–½’†F%d(%d)  ‰ñ”ğ:%d(%d) @‰^F%d(%d) ", Spd, mySaveData->haniStatusPlus[KindNum][6], Hit, mySaveData->haniStatusPlus[KindNum][7], Escape, mySaveData->haniStatusPlus[KindNum][8], Luck, mySaveData->haniStatusPlus[KindNum][9]);
 	DrawFormatString(20, 520, BLACK, "‰Š–h:%d@–Ø–hF%d …–h:%d@Œõ–hF%d@ˆÅ–hF%d", FireDef, WoodDef, WaterDef, LightDef, DarkDef);
 
 }
@@ -961,34 +945,34 @@ void CHaniwaWindow::ChangeKind(int kind)
 		switch (i)
 		{
 		case 0:
-			HP = bufI + bufFlo*Level;
+			HP = bufI + bufFlo*Level + mySaveData->haniStatusPlus[KindNum][0];
 			break;
 		case 1:
-			MP = bufI + bufFlo*Level;
+			MP = bufI + bufFlo*Level + mySaveData->haniStatusPlus[KindNum][1];
 			break;
 		case 2:
-			Atc = bufI + bufFlo*Level;
+			Atc = bufI + bufFlo*Level + mySaveData->haniStatusPlus[KindNum][2];
 			break;
 		case 3:
-			Def = bufI + bufFlo*Level;
+			Def = bufI + bufFlo*Level + mySaveData->haniStatusPlus[KindNum][3];
 			break;
 		case 4:
-			MAtc = bufI + bufFlo*Level;
+			MAtc = bufI + bufFlo*Level + mySaveData->haniStatusPlus[KindNum][4];
 			break;
 		case 5:
-			MDef = bufI + bufFlo*Level;
+			MDef = bufI + bufFlo*Level + mySaveData->haniStatusPlus[KindNum][5];
 			break;
 		case 6:
-			Spd = bufI + bufFlo*Level;
+			Spd = bufI + bufFlo*Level + mySaveData->haniStatusPlus[KindNum][6];
 			break;
 		case 7:
-			Hit = bufI + bufFlo*Level;
+			Hit = bufI + bufFlo*Level + mySaveData->haniStatusPlus[KindNum][7];
 			break;
 		case 8:
-			Escape = bufI + bufFlo*Level;
+			Escape = bufI + bufFlo*Level + mySaveData->haniStatusPlus[KindNum][8];
 			break;
 		case 9:
-			Luck = bufI + bufFlo*Level;
+			Luck = bufI + bufFlo*Level + mySaveData->haniStatusPlus[KindNum][9];
 			break;
 		case 10:
 			FireDef = bufI + bufFlo*Level;
@@ -1213,4 +1197,74 @@ void CHaniwaSkillWindow::ChangeLevel(int level)
 	}
 }
 
+CExplainWindow::CExplainWindow(int kind)
+{
+	lookPage = 0;
+	amountPage = 0;
 
+	switch (kind)
+	{
+	case 0:
+		amountPage = 1;
+		exGraph[0] = "zero/ExKihon1.png";
+		break;
+	case 1:
+		amountPage = 1;
+		exGraph[0] = "zero/ExTown1.png";
+		break;
+	case 2:
+		amountPage = 2;
+		exGraph[0] = "zero/ExHaniwa1.png";
+		exGraph[1] = "zero/ExHaniwa2.png";
+		break;
+	case 3:
+		amountPage = 1;
+		exGraph[0] = "zero/ExEquipment1.png";
+		break;
+	case 4:
+		amountPage = 2;
+		exGraph[0] = "zero/ExItem1.png";
+		exGraph[1] = "zero/ExItem2.png";
+		break;
+	case 5:
+		amountPage = 4;
+		exGraph[0] = "zero/ExSkill1.png";
+		exGraph[1] = "zero/ExSkill2.png";
+		exGraph[2] = "zero/ExSkill3.png";
+		exGraph[3] = "zero/ExSkill4.png";
+		break;
+	case 6:
+		amountPage = 2;
+		exGraph[0] = "zero/ExQuest1.png";
+		exGraph[1] = "zero/ExQuest2.png";
+		break;
+	case 7:
+		amountPage = 3;
+		exGraph[0] = "zero/ExBattle1.png";
+		exGraph[1] = "zero/ExBattle2.png";
+		exGraph[2] = "zero/ExBattle3.png";
+		break;
+	default:
+		break;
+	}
+
+}
+
+void CExplainWindow::Loop()
+{
+	if (KeyRight() && lookPage<amountPage-1) {
+		lookPage++;
+	}
+	if (KeyLeft() && lookPage>0) {
+		lookPage--;
+	}
+
+}
+
+void CExplainWindow::Draw()
+{
+	exGraph[lookPage].Draw();
+
+	DrawFormatString(20, 555, BLACK, "X–”‚Íback spaceƒL[‚Å•Â‚¶‚éB@©%d/%d¨", lookPage + 1, amountPage);
+
+}

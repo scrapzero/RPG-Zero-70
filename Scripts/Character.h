@@ -104,6 +104,7 @@ public:
 	void JoutaiIjou(Skill *atackSkill, int skillNum, CTextWindow *textWindow);
 	void Tokusyu(CCharacterBase *atackChar, Skill *atackSkill, int skillNum, CTextWindow *textWindow);
 	void DethJudge(CTextWindow *textWindow);
+	void PStatusUp(int pKind ,CTextWindow *txWindo);
 
 	void GiveDokuDamage(CTextWindow *textWindow, bool boss);
 
@@ -162,13 +163,16 @@ public:
 	int statusChangeDisplayTime;
 	int displayStatusChange;
 	int actTimes;
+	bool yuusya;
+	char PDamageCut;
+	bool nusunda;
 
 
 	int statusHenka[8];
 
 
-	int dropItem[6][2];
-	string dropItemName[6];
+	int dropItem[7][2];
+	string dropItemName[7];
 
 	
 	Graph charGraph;
@@ -179,6 +183,10 @@ public:
 	Skill normalAtack;
 	Skill normalDefence;
 	Skill *jikiSkillCard[4];
+
+
+
+	CMySaveData *mySaveData;
 
 private:
 	CEffect1 effect1;
@@ -207,7 +215,6 @@ public:
 
 class CHaniwa :public CCharacterBase {
 private:
-	CMySaveData *mySaveData;
 	CSV *haniwaInfo;
 	CSV * haniwaSkillInfo;
 	CSV * skillInfo;
@@ -226,12 +233,12 @@ public:
 
 class CEnemy :public CCharacterBase {
 private:
-	CMySaveData *mySaveData;
 	CSV *enemyInfo;
 	CSV *skillInfo;
 	CSV *itemInfo;
 
 	int kind;
+	
 	int skillNum[10];
 
 

@@ -64,7 +64,7 @@ CItemManager::~CItemManager()
 	}
 
 
-	savedata->WriteSaveData();
+	//savedata->WriteSaveData();
 
 }
 

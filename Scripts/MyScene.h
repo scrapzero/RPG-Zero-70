@@ -44,8 +44,7 @@ struct SItem {
 
 enum {
 	walkSpeed = 4,
-	syokyuMap = 1,
-	zyoukyuuMap = 0
+	syokyuMap = 2,
 	
 };
 
@@ -54,11 +53,12 @@ using namespace std;
 
 class CSTitle :public CScene {
 	CTextWindow *textWindow;
-	CEquipmentManager *equipmentManager;
 	CMySaveData *mySaveData;
-	CItemManager *ItemManager;
-	CProduce *product;
-	int money;
+	CMusic Music;
+	Graph Back, Arrow,exWindow;
+	int arrowPoint;
+	bool musicF;
+	bool exWindowOpen;
 
 
 	//初期化　画像のロードなども
@@ -213,10 +213,11 @@ public:
 		CItemManager *itemManager;
 		CEquipmentWindow *equipWindow;
 		CYesNoWindow *ynWindow;
+		CExplainWindow *exWindow;
 		bool classStart, yn;
 		char wearWeaponNumLevel[5][3];
 		int step, arrowPoint, arrowPoint2, arrowPoint3;
-		Graph Arrow, Window[5];
+		Graph Arrow, Window[6];
 		CSV *equipmentInfo;
 		int Level;
 		int KindNum;
@@ -296,6 +297,57 @@ public:
 
 	};
 
+	class CSHaniwaGacha :public CScene {
+	public:
+		CSTown& cstown;
+		CTextWindow *textWindow;
+		CSHaniwaGacha(CSTown& cstown);
+		CSV *haniwaInfo;
+		bool classStart,gachaDo;
+		int step, arrow, arrow2, arrow3;
+		Graph Arrow, Window[4];
+		CYesNoWindow *ynWindow;
+		CHaniwaWindow *haniwaWindow;
+		bool changeF;
+		int needMoney, totalMax,EachMax;
+		int gachaResult[10];
+
+		void Loop();
+		void Draw();
+		void End();
+
+	};
+
+	class CSBuyRecipe :public CScene {
+	public:
+		CSTown& cstown;
+		CTextWindow *textWindow;
+		CSBuyRecipe(CSTown& cstown);
+		CYesNoWindow *ynWindow;
+		bool classStart, buy;
+		int step, arrowPoint;
+		Graph Arrow, Window[3];
+
+		char RecipeMax[10];
+
+		struct SRecipe
+		{
+			char kind;
+			string name;
+			int step;
+			string experience;
+			int value;
+		};
+
+
+		vector<SRecipe> vRecipe;
+		
+		void Loop();
+		void Draw();
+		void End();
+
+	};
+
 
 	//初期化　画像のロードなども
 	void Start();
@@ -360,6 +412,7 @@ private:
 		int mapWidth, mapHeight, scrollX, scrollY;
 		int moveDirect, graphDirect, graphStep;//下左右上止
 		bool moveF, animeF;
+		bool endS;
 		bool canMoveLeft, canMoveRight, canMoveDown, canMoveUp;
 		int appearEN;
 
@@ -386,7 +439,7 @@ private:
 			bool useItem;
 			char wearWeaponNumLevel[5][3];
 			int step, arrowPoint, arrowPoint2, arrowPoint3;
-			Graph Arrow, Window[3];
+			Graph Arrow, Window[4];
 			CSV *equipmentInfo;
 			void DrawItemSetumei(int y, int locate);
 		
@@ -418,6 +471,7 @@ private:
 		CCharacterBase *enemy[5];
 		CItemManager *itemM;
 		bool boss;
+		bool endS;
 		bool nigeta,battleStart;
 		int bossNum;
 		int bArrow[4];
@@ -430,6 +484,8 @@ private:
 		int stepAct[2],skTimes;
 		int step,zentaiStep;
 		char dokuStep[2];
+
+		char kabau[2];
 		
 		Skill *targetSelectSkill;//少し注意
 

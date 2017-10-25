@@ -51,14 +51,14 @@ CProduce::CProduce(CMySaveData * CSD, int proKind) :RecipeInfo("")
 		break;
 	case 7: RecipeInfo = "zero/ZeroData/SorceRecipe.csv"; 
 		recipeNameKind = "加工素材レシピ";
-		kindNum = 100;
+		kindNum = 60;
 		break;
 	case 8: RecipeInfo = "zero/ZeroData/ToolRecipe.csv"; 
 		recipeNameKind = "道具レシピ";
-		kindNum = 100;
+		kindNum = 50;
 		break;
 	case 9: RecipeInfo = "zero/ZeroData/FoodRecipe.csv"; 
-		kindNum = 100;
+		kindNum = 50;
 		recipeNameKind = "料理レシピ";
 		break;
 	default: break;
@@ -137,7 +137,7 @@ void CProduce::WindowLoop()
 	if (step == 0) {
 
 		if (KeyRight()) {
-			if (lookLocate % 2 == 1 && kindNum > (lookPage + 1) * 20) {
+			if (lookLocate % 2 == 1 && kindNum > (lookPage + 1) * 20 && lookPage + 1 <savedata->recipeStep[proKind]) {
 				lookPage++;
 				if (kindNum <= lookPage * 20 + lookLocate - 1) {
 					lookLocate = 0;
@@ -283,7 +283,7 @@ void CProduce::WindowDraw()
 	if (step <= 1) {
 		Window[2](2, 10);
 		Window[1](450, 10);
-		DrawFormatString(40, 20, BLACK, "%s",recipeNameKind.c_str());
+		DrawFormatString(40, 20, BLACK, "%s   ←%d/%d→",recipeNameKind.c_str(),lookPage + 1,savedata->recipeStep[proKind]);
 		Arrow(18 + (lookLocate % 2) * 200, 52 + (lookLocate / 2) * 30);
 
 		if (proKind <= 6) {
@@ -294,11 +294,12 @@ void CProduce::WindowDraw()
 		}
 
 		for (int i = lookPage * 20; i < (lookPage * 20) + 20; i++) {
-			name = RecipeInfo[i][3];
-			DrawFormatString(40 + ( i% 2) * 200, 52 + ((i % 20) / 2) * 30, BLACK, "%s", name.c_str());
-			if (i >= kindNum) {
+			if (i >= kindNum || i>=RecipeInfo.GetLineNum()) {
 				break;
 			}
+			name = RecipeInfo[i][3];
+			DrawFormatString(40 + ( i% 2) * 200, 52 + ((i % 20) / 2) * 30, BLACK, "%s", name.c_str());
+			
 		}
 
 		for (int i = 0, looptime = RecipeInfo[lookLocate + lookPage * 20][4]; i < looptime; i++) {

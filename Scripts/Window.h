@@ -199,4 +199,14 @@ public:
 };
 
 
+class CExplainWindow {
+public:
+	CExplainWindow(int kind);
+	void Loop();
+	void Draw();
+	int amountPage;
+	int lookPage;
+	Graph exGraph[4];
+
+};
 

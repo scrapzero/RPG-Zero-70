@@ -57,10 +57,11 @@ void suken::DebugLoopExit() {
 }
 
 
-
 bool KeyOK() {
 	return (Input.GetKeyEnter(Input.key.RETURN) || Input.GetKeyEnter(Input.key.Z));
 }
+
+
 
 bool KeyCancel() {
 	return (Input.GetKeyEnter(Input.key.BACK) || Input.GetKeyEnter(Input.key.X));
