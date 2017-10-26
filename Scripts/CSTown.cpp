@@ -3165,7 +3165,7 @@ void CSTown::CSGoToQuest::Loop()
 
 			}
 
-			if (KeyDown() && arrowPoint[0] < 2) {
+			if (KeyDown() && arrowPoint[0] < 3) {
 				arrowPoint[0]++;
 				if (arrowPoint[0] == 1 && cstown.mySaveData->Rank < 5) {
 					arrowPoint[0]++;
@@ -4100,10 +4100,12 @@ void CSTown::CSHaniwaGacha::Draw()
 			DrawFormatString(380, 240, BLACK, "+%d", buffI);
 		}
 
-		Window[1].DrawExtend(510, 5, 650, 80);
-		Arrow.Draw(520, 20 + arrow2 * 30);
-		DrawFormatString(550, 20, BLACK, "‚Í‚¢");
-		DrawFormatString(550, 50, BLACK, "‚¢‚¢‚¦");
+		if (step == 5) {
+			Window[1].DrawExtend(510, 5, 650, 80);
+			Arrow.Draw(520, 20 + arrow2 * 30);
+			DrawFormatString(550, 20, BLACK, "‚Í‚¢");
+			DrawFormatString(550, 50, BLACK, "‚¢‚¢‚¦");
+		}
 
 		if (ynWindow != NULL) {
 			ynWindow->Draw();

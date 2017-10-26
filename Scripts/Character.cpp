@@ -1308,7 +1308,7 @@ Skill CCharacterBase::returnSkill()
 		}
 
 		if (doku || huchi || mahi) {
-			if (GetRand(19) < 3) {
+			if (GetRand(19) < 2) {
 				return normalAtack;
 			}
 		}
@@ -1322,7 +1322,7 @@ Skill CCharacterBase::returnSkill()
 			}
 		}
 
-		if (totalChange * 4 >= GetRand(100)) {
+		if (totalChange * 3 >= GetRand(100)) {
 			return normalDefence;
 		}
 
@@ -2144,16 +2144,7 @@ CHaniwa::CHaniwa(CMySaveData * mySD,int kind)
 
 
 	skillInfo = new CSV("zero/ZeroData/Skill.csv");
-	if (3 <= kind && kind <= 7) {
-		normalAtack.num = kind - 1;
-	}
-	else if(kind==2)
-	{
-		normalAtack.num = 7;
-	}
-	else {
-		normalAtack.num = 1;
-	}
+	normalAtack.num = 1;
 
 	normalAtack.ene = false;
 	normalDefence.ene = false;

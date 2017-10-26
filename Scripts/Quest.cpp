@@ -1976,7 +1976,7 @@ CSQuestBase::CSBattle::CSBattle(CSQuestBase & csQuestBase ,bool boss ,int bossNu
 		}
 	}
 	else {
-		Music.Load(1, "zero/Music/battle1.mp3");
+		Music.Load(1, "zero/Music/battle2.mp3");
 	}
 
 
@@ -4587,11 +4587,6 @@ void CSQuestBase::CSBattle::Draw()
 
 	}
 
-	for (int i = 0; i < vSkill[1].size(); i++)
-	{
-		DrawFormatString(0, i * 30, BLACK, "%d", vSkill[1][i].targetNum);
-
-	}
 
 }
 

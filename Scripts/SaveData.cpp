@@ -159,7 +159,7 @@ CMySaveData::CMySaveData(bool kari) {
 		for (int i = 0; i < 2; i++) {
 			bringHaniwaKind[i] = i + 1;
 		}
-		Rank = 11;
+		Rank = 1;
 
 		for (int i = 0; i < 120; i++) {
 			questClear[i] = false;

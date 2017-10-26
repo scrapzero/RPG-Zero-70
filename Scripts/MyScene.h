@@ -44,7 +44,7 @@ struct SItem {
 
 enum {
 	walkSpeed = 4,
-	syokyuMap = 2,
+	syokyuMap = 4,
 	
 };
 
