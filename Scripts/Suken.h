@@ -29,4 +29,6 @@
 #include "sukenlib\Utility\MCE.h"
 #include "sukenlib\Utility\Memory.h"
 
+#define IDI_ICON1 101
+
 using namespace suken;

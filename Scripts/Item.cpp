@@ -30,7 +30,7 @@ CItemManager::CItemManager(int kind, CMySaveData *CSD) : itemInfo("")
 
 	}
 	savedata = CSD;
-
+	itemSize=itemInfo.GetLineNum() - 1;
 
 	for (int i = 0; i < 200; i++) {
 		sorce[i]=CSD->GetItem(0, i);
@@ -56,7 +56,7 @@ CItemManager::~CItemManager()
 	for (int i = 0; i < 200; i++) {
 		savedata->SetItem(0, i, sorce[i]);
 	}
-	for (int i = 0; i < 60; i++) {
+	for (int i = 0; i < 40; i++) {
 		savedata->SetItem(1, i, tool[i]);
 	}
 	for (int i = 0; i < 100; i++) {

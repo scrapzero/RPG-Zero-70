@@ -22,47 +22,48 @@ CProduce::CProduce(CMySaveData * CSD, int proKind) :RecipeInfo("")
 	{
 
 	case 0:	RecipeInfo = "zero/ZeroData/SoadRecipe.csv";
-		kindNum=100; 
+		kindNum=40; 
 		recipeNameKind = "剣レシピ";
 		break;
 	case 1: RecipeInfo = "zero/ZeroData/ArrowRecipe.csv";
-		kindNum = 100; 
+		kindNum = 40; 
 		recipeNameKind = "弓レシピ";
 		break;
 	case 2: RecipeInfo = "zero/ZeroData/WandRecipe.csv";
-		kindNum=100; 
+		kindNum=40; 
 		recipeNameKind = "杖レシピ";
 		break;
 	case 3:	RecipeInfo = "zero/ZeroData/ShieldRecipe.csv"; 
 		recipeNameKind = "盾レシピ";
-		kindNum = 100;
+		kindNum = 40;
 		break;
 	case 4: RecipeInfo = "zero/ZeroData/ProtecterRecipe.csv"; 
 		recipeNameKind = "胴レシピ";
-		kindNum = 100;
+		kindNum = 40;
 		break;
 	case 5: RecipeInfo = "zero/ZeroData/ShoesRecipe.csv"; 
 		recipeNameKind = "靴レシピ";
-		kindNum = 100;
+		kindNum = 40;
 		break;
 	case 6: RecipeInfo = "zero/ZeroData/AccessoryRecipe.csv"; 
 		recipeNameKind = "装飾品レシピ";
-		kindNum = 100;
+		kindNum = 40;
 		break;
 	case 7: RecipeInfo = "zero/ZeroData/SorceRecipe.csv"; 
 		recipeNameKind = "加工素材レシピ";
-		kindNum = 60;
+		kindNum = 40;
 		break;
 	case 8: RecipeInfo = "zero/ZeroData/ToolRecipe.csv"; 
 		recipeNameKind = "道具レシピ";
-		kindNum = 50;
+		kindNum = 40;
 		break;
 	case 9: RecipeInfo = "zero/ZeroData/FoodRecipe.csv"; 
-		kindNum = 50;
+		kindNum = 40;
 		recipeNameKind = "料理レシピ";
 		break;
 	default: break;
 	}
+	kindNum=RecipeInfo.GetLineNum() - 1;
 
 	SorceInfo[0] = new CSV("zero/ZeroData/Sorce.csv");
 	SorceInfo[1] = new CSV("zero/ZeroData/Tool.csv");

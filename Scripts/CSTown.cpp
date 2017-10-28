@@ -575,8 +575,13 @@ void CSTown::Loop() {
 	}
 
 	if (Input.GetKeyEnter(Input.key.D)) {
-		mySaveData->money += 1000;
+		mySaveData->money += 100000;
 	}
+
+	if (Input.GetKeyEnter(Input.key.A)) {
+		mySaveData->Rank++;
+	}
+
 
 }
 
@@ -2411,15 +2416,15 @@ void CSTown::CSHaniwa::Draw()
 	case 6:
 		haniwaWindow->Draw();
 		Window[0].DrawExtend(5, 5, 240, 365);
-		Window[1].DrawExtend(245, 15 + 32 * arrow, 390, 140 + 32 * arrow);
-		Window[1].DrawExtend(400, 15 + 32 * arrow, 700, 180 + 32 * arrow);
+		Window[1].DrawExtend(245, 5, 390, 130);
+		Window[1].DrawExtend(400, 5, 650, 170);
 		Arrow.Draw(15, 30 + 32 * arrow);
-		Arrow.Draw(253, 25 + 32 * arrow + 30 * arrow2);
-		Arrow.Draw(410, 25 + 32 * arrow + 30 * arrow3);
-		DrawFormatString(270, 25 + 32 * arrow + 30 * 0, BLACK, "お供にする", bufS.c_str());
-		DrawFormatString(270, 25 + 32 * arrow + 30 * 1, BLACK, "LEVELを上げる");
-		DrawFormatString(270, 25 + 32 * arrow + 30 * 2, BLACK, "技確認");
-		DrawFormatString(270, 25 + 32 * arrow + 30 * 3, BLACK, "閉じる");
+		Arrow.Draw(253, 15 + 30 * arrow2);
+		Arrow.Draw(410, 15 + 30 * arrow3);
+		DrawFormatString(270, 15 + 30 * 0, BLACK, "お供にする", bufS.c_str());
+		DrawFormatString(270, 15 + 30 * 1, BLACK, "LEVELを上げる");
+		DrawFormatString(270, 15 + 30 * 2, BLACK, "技確認");
+		DrawFormatString(270, 15 + 30 * 3, BLACK, "閉じる");
 
 		if (cstown.mySaveData->haniwaLevel[arrow] >= cstown.mySaveData->Rank * 10) {
 			if (cstown.mySaveData->haniwaLevel[arrow] >= 100) {
@@ -2440,9 +2445,9 @@ void CSTown::CSHaniwa::Draw()
 
 		for (int i = 0; i < 4; i++) {
 			bufS = (*haniwaSkillInfo)[arrow*4+i][1];
-			DrawFormatString(430, 25 + 32 * arrow + 30 * i, BLACK, "技%d:%s", i + 1, bufS.c_str());
+			DrawFormatString(430, 15 + 30 * i, BLACK, "技%d:%s", i + 1, bufS.c_str());
 		}
-		DrawFormatString(430, 25 + 32 * arrow + 30 * 4, BLACK, "閉じる");
+		DrawFormatString(430, 15+ 30 * 4, BLACK, "閉じる");
 
 		haniSkillWindow->Draw();
 
@@ -2451,15 +2456,15 @@ void CSTown::CSHaniwa::Draw()
 	case 5:
 		haniwaWindow->Draw();
 		Window[0].DrawExtend(5, 5, 240, 365);
-		Window[1].DrawExtend(245, 15 + 32 * arrow, 390, 140 + 32 * arrow);
-		Window[1].DrawExtend(400, 10 + 32 * arrow, 680, 50 + 32 * arrow);
+		Window[1].DrawExtend(245, 5, 390, 130);
+		Window[1].DrawExtend(400, 5, 650, 170);
 		Arrow.Draw(15, 30 + 32 * arrow);
-		Arrow.Draw(253, 25 + 32 * arrow + 30 * arrow2);
-		DrawFormatString(270, 25 + 32 * arrow + 30 * 0, BLACK, "お供にする", bufS.c_str());
-		DrawFormatString(270, 25 + 32 * arrow + 30 * 1, BLACK, "LEVELを上げる");
-		DrawFormatString(270, 25 + 32 * arrow + 30 * 2, BLACK, "技確認");
-		DrawFormatString(270, 25 + 32 * arrow + 30 * 3, BLACK, "閉じる");
-		DrawFormatString(410, 19 + 32 * arrow, BLACK, "所持金:%d G", cstown.mySaveData->money);
+		Arrow.Draw(253, 15 + 30 * arrow2);
+		DrawFormatString(270, 15 + 30 * 0, BLACK, "お供にする", bufS.c_str());
+		DrawFormatString(270, 15 + 30 * 1, BLACK, "LEVELを上げる");
+		DrawFormatString(270, 15 + 30 * 2, BLACK, "技確認");
+		DrawFormatString(270, 15 + 30 * 3, BLACK, "閉じる");
+		DrawFormatString(410, 9 , BLACK, "所持金:%d G", cstown.mySaveData->money);
 
 		ynWindow->Draw();
 
@@ -2484,15 +2489,15 @@ void CSTown::CSHaniwa::Draw()
 	case 4:
 		haniwaWindow->Draw();
 		Window[0].DrawExtend(5, 5, 240, 365);
-		Window[1].DrawExtend(245, 15 + 32 * arrow, 390, 140 + 32 * arrow);
-		Window[1].DrawExtend(400, 15 + 32 * arrow, 650, 180 + 32 * arrow);
+		Window[1].DrawExtend(245, 5, 390, 130);
+		Window[1].DrawExtend(400, 5, 650, 170);
 		Arrow.Draw(15, 30 + 32 * arrow);
-		Arrow.Draw(253, 25 + 32 * arrow + 30 * arrow2);
-		Arrow.Draw(410, 25 + 32 * arrow + 30 * arrow3);
-		DrawFormatString(270, 25 + 32 * arrow + 30 * 0, BLACK, "お供にする", bufS.c_str());
-		DrawFormatString(270, 25 + 32 * arrow + 30 * 1, BLACK, "LEVELを上げる");
-		DrawFormatString(270, 25 + 32 * arrow + 30 * 2, BLACK, "技確認");
-		DrawFormatString(270, 25 + 32 * arrow + 30 * 3, BLACK, "閉じる");
+		Arrow.Draw(253, 15 + 30 * arrow2);
+		Arrow.Draw(410, 15 + 30 * arrow3);
+		DrawFormatString(270, 15 + 30 * 0, BLACK, "お供にする", bufS.c_str());
+		DrawFormatString(270, 15 + 30 * 1, BLACK, "LEVELを上げる");
+		DrawFormatString(270, 15 + 30 * 2, BLACK, "技確認");
+		DrawFormatString(270, 15 + 30 * 3, BLACK, "閉じる");
 
 		if (cstown.mySaveData->haniwaLevel[arrow] >= cstown.mySaveData->Rank * 10) {
 			if (cstown.mySaveData->haniwaLevel[arrow] >= 100) {
@@ -2505,10 +2510,10 @@ void CSTown::CSHaniwa::Draw()
 
 		for (int i = 0; i < 2; i++) {
 			bufS = (*haniwaInfo)[cstown.mySaveData->bringHaniwaKind[i] - 1][1];
-			DrawFormatString(430, 25 + 32 * arrow + 30 * i, BLACK, "お供%d:%s", i + 1, bufS.c_str());
+			DrawFormatString(430, 15 + 30 * i, BLACK, "お供%d:%s", i + 1, bufS.c_str());
 		}
-		DrawFormatString(430, 25 + 32 * arrow + 30 * 2, BLACK, "閉じる");
-		DrawFormatString(410, 25 + 32 * arrow + 30 * 4, BLUE, "Z又はEnterキーで入れ替え");
+		DrawFormatString(430, 15 + 30 * 2, BLACK, "閉じる");
+		DrawFormatString(410, 15 + 30 * 4, BLUE, "Z又はEnterキーで入れ替え");
 
 		for (int i = 0; i < 10; i++) {
 			bufS = (*haniwaInfo)[i][1];
@@ -2522,13 +2527,13 @@ void CSTown::CSHaniwa::Draw()
 	case 3:
 		haniwaWindow->Draw();
 		Window[0].DrawExtend(5, 5, 240, 365);
-		Window[1].DrawExtend(245, 15 + 32 * arrow, 390, 140 + 32 * arrow);
+		Window[1].DrawExtend(245, 5, 390, 130);
 		Arrow.Draw(15, 30 + 32 * arrow);
-		Arrow.Draw(253, 25 + 32 * arrow + 30 * arrow2);
-		DrawFormatString(270, 25 + 32 * arrow + 30 * 0, BLACK, "お供にする", bufS.c_str());
-		DrawFormatString(270, 25 + 32 * arrow + 30 * 1, BLACK, "LEVELを上げる");
-		DrawFormatString(270, 25 + 32 * arrow + 30 * 2, BLACK, "技確認");
-		DrawFormatString(270, 25 + 32 * arrow + 30 * 3, BLACK, "閉じる");
+		Arrow.Draw(253, 15 + 30 * arrow2);
+		DrawFormatString(270, 15 + 30 * 0, BLACK, "お供にする", bufS.c_str());
+		DrawFormatString(270, 15 + 30 * 1, BLACK, "LEVELを上げる");
+		DrawFormatString(270, 15 + 30 * 2, BLACK, "技確認");
+		DrawFormatString(270, 15 + 30 * 3, BLACK, "閉じる");
 
 		if (cstown.mySaveData->haniwaLevel[arrow] >= cstown.mySaveData->Rank * 10) {
 			if (cstown.mySaveData->haniwaLevel[arrow] >= 100) {
@@ -3018,6 +3023,7 @@ void CSTown::CSGoToQuest::Loop()
 					if(bufI == qLevel + 100 && cstown.mySaveData->rankUpQuest[arrowPoint[0]][qLevel-1]) {
 						bufq.Qnum = (*questInfo)[i][0];
 						bufq.Qname = (*questInfo)[i][2];
+						bufq.Qname += "<RUクエスト>";
 						for (int j = 0; j < 8; j++) {
 							bufq.enemy[j] = (*questInfo)[i][3 + j];
 						}
@@ -3819,7 +3825,7 @@ CSTown::CSHaniwaGacha::CSHaniwaGacha(CSTown & cstown) :cstown(cstown)
 	haniwaWindow = new CHaniwaWindow(cstown.mySaveData, 0);
 	ynWindow = NULL;
 
-	needMoney = (cstown.mySaveData->Rank - 1) * 300;
+	needMoney = (cstown.mySaveData->Rank - 1) * 3000;
 	totalMax = (cstown.mySaveData->Rank - 1) * 15;
 	EachMax = (cstown.mySaveData->Rank - 1) * 4;
 
@@ -4150,33 +4156,20 @@ CSTown::CSBuyRecipe::CSBuyRecipe(CSTown & cstown) :cstown(cstown)
 
 	arrowPoint = 0;
 
-	for (int i = 0; i < 7; i++) {
-		RecipeMax[i] = (cstown.mySaveData->Rank - 1) / 2 +1;
-	}
+
 
 	for (int i = 0; i < 7; i++) {
-		if (RecipeMax[i] >= 5) {
-			RecipeMax[i] = 5;
+		if (cstown.mySaveData->Rank >= 7) {
+			RecipeMax[i] = 2;
+		}
+		else {
+			RecipeMax[i] = 1;
 		}
 	}
 
-	for (int i = 7; i < 10; i++) {
-		RecipeMax[i] = (cstown.mySaveData->Rank - 1) / 3 + 1;
-	}
 
-	if (RecipeMax[7] >= 3) {
-		RecipeMax[7] = 3;
-	}
 
-	if (RecipeMax[8] >= 2) {
-		RecipeMax[8] = 2;
-	}
-
-	if (RecipeMax[9] >= 3) {
-		RecipeMax[9] = 3;
-	}
-
-	for (int i = 0; i < 10; i++) {
+	for (int i = 0; i < 7; i++) {
 		if (cstown.mySaveData->recipeStep[i] < RecipeMax[i]) {
 			bufSR.kind = i;
 			bufSR.step = cstown.mySaveData->recipeStep[i] + 1;
@@ -4229,11 +4222,11 @@ CSTown::CSBuyRecipe::CSBuyRecipe(CSTown & cstown) :cstown(cstown)
 			bufSS.str("");
 			bufSS.clear(stringstream::goodbit);
 			if (i < 7) {
-				bufSR.value = bufSR.step * 2000;
+				bufSR.value = bufSR.step * 30000;
 			}
 			else
 			{
-				bufSR.value = bufSR.step * 3000;
+				bufSR.value = bufSR.step * 15000;
 			}
 
 			vRecipe.push_back(bufSR);

@@ -715,10 +715,10 @@ void CEquipmentWindow::Draw()
 	Window(0, 376);
 	
 	if (equipmentKind<=2) {
-		DrawFormatString(16, 395, BLACK, "%s   No.%d   LEVEL:%d   売値：%d　属性:%s", name.c_str(),KindNum, Level, SellMoney, Element.c_str());
+		DrawFormatString(16, 395, BLACK, "%s   No.%d  売値：%d　属性:%s", name.c_str(),KindNum, SellMoney, Element.c_str());
 	}
 	else {
-		DrawFormatString(16, 395, BLACK, "%s     LEVEL:%d     売値：%d", name.c_str(), Level, SellMoney);
+		DrawFormatString(16, 395, BLACK, "%s     売値：%d", name.c_str(), SellMoney);
 	}
 	DrawFormatString(16,420, BLACK, "ステータス上昇値:");
 	DrawFormatString(175, 420, BLACK, "HP %d  MP %d  攻 %d   防 %d  魔攻 %d  魔防 %d",HP, MP,Atc,Def,MAtc,MDef);
