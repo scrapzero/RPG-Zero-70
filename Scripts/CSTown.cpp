@@ -12,6 +12,8 @@ CSTown::CSTown(int jikiMapX, int jikiMapY, int hatuSerihu) {
 	this->jikiMapY = jikiMapY;
 	txWindow = NULL;
 
+
+
 	stringstream bufSS;
 
 	switch (hatuSerihu)
@@ -572,14 +574,6 @@ void CSTown::Loop() {
 			delete txWindow;
 			txWindow = NULL;
 		}
-	}
-
-	if (Input.GetKeyEnter(Input.key.D)) {
-		mySaveData->money += 100000;
-	}
-
-	if (Input.GetKeyEnter(Input.key.A)) {
-		mySaveData->Rank++;
 	}
 
 
@@ -2275,8 +2269,8 @@ void CSTown::CSHaniwa::Loop()
 					delete ynWindow;
 					ynWindow = NULL;
 				}
-				else if(cstown.mySaveData->money>= (cstown.mySaveData->haniwaLevel[arrow]) * 1000){
-					cstown.mySaveData->money -= (cstown.mySaveData->haniwaLevel[arrow]) * 1000;
+				else if(cstown.mySaveData->money>= (cstown.mySaveData->haniwaLevel[arrow]) * 500){
+					cstown.mySaveData->money -= (cstown.mySaveData->haniwaLevel[arrow]) * 500;
 					cstown.mySaveData->haniwaLevel[arrow]++;
 					step = 3;
 					delete ynWindow;
@@ -2329,7 +2323,7 @@ void CSTown::CSHaniwa::Loop()
 					break;
 				case 1:
 					if (cstown.mySaveData->haniwaLevel[arrow] < cstown.mySaveData->Rank * 10 && cstown.mySaveData->haniwaLevel[arrow] < 100) {
-						bufI = (cstown.mySaveData->haniwaLevel[arrow]) * 1000;
+						bufI = (cstown.mySaveData->haniwaLevel[arrow]) * 500;
 						bufSS << bufI;
 						bufS = bufSS.str();
 						bufS += " Gで1Lv上げますか？";
@@ -3020,7 +3014,7 @@ void CSTown::CSGoToQuest::Loop()
 
 					}
 
-					if(bufI == qLevel + 100 && cstown.mySaveData->rankUpQuest[arrowPoint[0]][qLevel-1]) {
+					if(bufI == qLevel + 100 && cstown.mySaveData->rankUpQuest[arrowPoint[0]][qLevel-1]==true) {
 						bufq.Qnum = (*questInfo)[i][0];
 						bufq.Qname = (*questInfo)[i][2];
 						bufq.Qname += "<RUクエスト>";
@@ -4222,7 +4216,7 @@ CSTown::CSBuyRecipe::CSBuyRecipe(CSTown & cstown) :cstown(cstown)
 			bufSS.str("");
 			bufSS.clear(stringstream::goodbit);
 			if (i < 7) {
-				bufSR.value = bufSR.step * 30000;
+				bufSR.value = bufSR.step * 10000;
 			}
 			else
 			{

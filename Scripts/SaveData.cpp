@@ -37,20 +37,17 @@ CMySaveData::CMySaveData(bool kari) {
 
 
 	data->ReadAll();
-	//EquipmentAmount = data->GetInt(NEquipmentAmount);
-	EquipmentAmount = 152;
-	/*for (int i = 0; i < EquipmentAmount; i++) {
+	EquipmentAmount = data->GetInt(NEquipmentAmount);
+	for (int i = 0; i < EquipmentAmount; i++) {
 		haveEquipmentKindLevel[i][0] = data->GetInt(NhaveEquipmentKindLevel[i][0]);
 		haveEquipmentKindLevel[i][1] = data->GetInt(NhaveEquipmentKindLevel[i][1]);
 		haveEquipmentKindLevel[i][2] = data->GetInt(NhaveEquipmentKindLevel[i][2]);
-	}*/
+	}
 
 	for (int i = 0; i < 7; i++) {
-		for (int j = 0; j < 22; j++) {
-			haveEquipmentKindLevel[i*22+j][0] = i;
-			haveEquipmentKindLevel[i * 22 + j][1] = j+1;
-			haveEquipmentKindLevel[i * 22 + j][2] = data->GetInt(NhaveEquipmentKindLevel[i][2]);
-		}
+			haveEquipmentKindLevel[i][0] = data->GetInt(NhaveEquipmentKindLevel[i][0]);
+			haveEquipmentKindLevel[i][1] = data->GetInt(NhaveEquipmentKindLevel[i][1]);
+			haveEquipmentKindLevel[i][2] = data->GetInt(NhaveEquipmentKindLevel[i][2]);
 	}
 
 	for (int i = 0; i < 5; i++) {
@@ -142,11 +139,8 @@ CMySaveData::CMySaveData(bool kari) {
 		for (int i = 0; i < 100; i++) {
 			food[i] = 0;
 		}
-		sorce[1] = 100;
-		sorce[3] = 100;
+
 		tool[0] = 1;
-		food[0] = 50;
-		food[2] = 100;
 		money = 1000;
 
 	

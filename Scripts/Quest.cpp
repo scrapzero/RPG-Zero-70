@@ -4010,7 +4010,7 @@ void CSQuestBase::CSBattle::Loop()
 							step = 12;
 							bArrow[3] = 0;
 							if (drawSkillWindow == true) {
-								csQuestBase.haniwaSkillWindow = new CHaniwaSkillWindow(csQuestBase.character[preStep2 - 3]->skill[0].num, csQuestBase.mySaveData->haniwaLevel[csQuestBase.mySaveData->bringHaniwaKind[preStep2-4]]);
+								csQuestBase.haniwaSkillWindow = new CHaniwaSkillWindow(csQuestBase.character[preStep2 - 3]->skill[0].num, csQuestBase.mySaveData->haniwaLevel[csQuestBase.mySaveData->bringHaniwaKind[preStep2-4] - 1]);
 							}
 
 							break;
